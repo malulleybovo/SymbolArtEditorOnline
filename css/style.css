@@ -1,0 +1,195 @@
+body {
+    margin: 0;
+    background-color: lightblue;
+    overflow: hidden;
+}
+
+h1 {
+    color: navy;
+    margin-left: 20px;
+}
+
+.highlight {background-color: #CCC;}
+
+.landing {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 999999;
+    background-color: #aff1ff;
+    background-image: url("http://wikiwiki.jp/vipdepso2/?plugin=ref&page=topimages&src=arks_iogo.png");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+.titleScreen {
+
+    width: 80%;
+    height: 100%;
+    float: right;
+
+    background-color: #325865;
+
+}
+
+.titleHeader {
+    text-align: center;
+    padding: 10px;
+}
+
+.big-text {
+    font-family: Arial Black;
+    font-size: 40px;
+    font-weight: bold;
+    color: black;
+    text-shadow: 3px 0 0 #aff1ff, -3px 0 0 #aff1ff, 0 3px 0 #aff1ff, 0 -3px 0 #aff1ff, 2px 2px #aff1ff, -2px -2px 0 #aff1ff, 2px -2px 0 #aff1ff, -2px 2px 0 #aff1ff;
+}
+
+.medium-text {
+    font-family: Arial;
+    font-size: 26px;
+    font-weight: bold;
+    color: white;
+}
+
+.small-text {
+    font-family: Arial;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+}
+
+.center {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+}
+
+.center-relative {
+    position: relative;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.canvas-SA {
+    background-color: white;
+}
+
+.canvas-box {
+    position : absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    width: 1920px;
+    height: 960px;
+}
+
+.full-size {
+    height: 100%;
+}
+
+.layer1 {
+    z-index: 200;
+}
+
+.layer2 {
+    z-index: 100;
+}
+
+.canvas-ctrl {
+    height: 100%;
+}
+
+.button {
+    position: fixed;
+    color: white;
+    text-shadow: none;
+    border-radius: 0px 0px 5px 0px;
+}
+.button.selected {
+    color: black;
+}
+
+.button-highlight{
+    background-color: #aff1ff;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-default {
+    cursor: default;
+}
+
+.no-highlight {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;  
+}
+
+.hidden {
+    display: none;
+}
+
+.alert-box {
+        position: fixed;
+        width: 0 auto;
+        min-width: 1.5em;
+        height: 0 auto;
+        padding: 1em;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0.8;
+        background-color: #87EBFF;
+        font-family: Arial Black;
+        font-weight: lighter;
+        font-size: 1.5em;
+        color: white;
+        text-align: center;
+        border-radius: 10%;
+        z-index: 20;
+}
+#canvasctrl {
+    float: left;
+    width: 20%;
+    height: 100%;
+}
+#canvascontainer {
+    background-color: black;
+    width: 100%;
+    height: 100%;
+}
+#canvasctrlbutton {
+    left: 0;
+    top: 0;
+}
+#layerctrl {
+    position: relative;
+    float: right;
+}
+
+white { color: white; }
+
+.editor-box-icon {
+    position: absolute;
+    -ms-transform: scale(0.5); /* IE 9 */
+    -webkit-transform: scale(0.5); /* Chrome, Safari, Opera */
+     transform: scale(0.5);
+}
+
+.ui-dialog .ui-dialog-buttonpane { 
+    text-align: center;
+}
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { 
+    float: none;
+}
