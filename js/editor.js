@@ -16,7 +16,9 @@ var Editor = Class({
         this.layers = [];
         this.parts = [];
 
-        this.parts[241] = new PIXI.Texture(new PIXI.BaseTexture(LoadedImageFiles["241.png"]));
+        for (var i = 241; i < 244; i++) {
+            this.parts[i] = new PIXI.Texture(new PIXI.BaseTexture(LoadedImageFiles[i + ".png"]));
+        }
 
         this.SABox = new PIXI.mesh.NineSlicePlane(new PIXI.Texture(new PIXI.BaseTexture(LoadedImageFiles["SABoxSprite.png"])), 2, 2, 2, 2);
         this.SABox.height = 960;
@@ -163,7 +165,7 @@ var Editor = Class({
         });
 
         // Initialize Layer Control
-        this.layerCtrl = new LayerCtrl();
+        this.layerCtrl = new LayerCtrl(this);
         this.layerCtrl.hide();
         
         $(this.layerCtrl.gui.domElement)[0].editor = this;
@@ -181,6 +183,9 @@ var Editor = Class({
         $('body').append(this.editorBoxIcons.bl);
         //Add the canvas to the HTML document
         parent.appendChild(this.renderer.view);
+
+        // Add Toolbar
+        this.toolbar = new Toolbar();
 
         $('canvas')[0].editor = this;
 
@@ -218,7 +223,6 @@ var Editor = Class({
         var quad = new PIXI.mesh.Plane(
           this.parts[layer.part], 2, 2
         );
-        quad.partNum = layer.part;
         quad.tint = layer.color;
         quad.x = layer.x;
         quad.y = layer.y;
@@ -321,6 +325,7 @@ var Editor = Class({
         var i = findWithAttr(this.layers, 'layer', layer);
         if (i == -1) return;
         var quad = this.layers[i].quad;
+        quad.texture = this.parts[layer.part];
         quad.tint = layer.color;
         quad.x = layer.x;
         quad.y = layer.y;
@@ -329,6 +334,17 @@ var Editor = Class({
         quad.rotation = layer.rotation;
         for (var i = 0; i < layer.vertices.length; i++) {
             quad.vertices[i] = layer.vertices[i];
+        }
+
+        switch (layer.alpha) {
+            case 0: quad.alpha = 0.121569; break;
+            case 1: quad.alpha = 0.247059; break;
+            case 2: quad.alpha = 0.372549; break;
+            case 3: quad.alpha = 0.498039; break;
+            case 4: quad.alpha = 0.623529; break;
+            case 5: quad.alpha = 0.74902; break;
+            case 6: quad.alpha = 0.87451; break;
+            case 7: quad.alpha = 1; break;
         }
 
         function findWithAttr(array, attr, value) {

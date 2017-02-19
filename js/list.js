@@ -53,14 +53,17 @@ var List = Class({
         });
         $(HTMLBody).append(this.toggleButton);
         document.onkeypress = function (e) {
-            if (e.keyCode == 13) {
+            if (e.keyCode == 13) { // Enter
                 $('#canvasctrlbutton').click();
             }
-            if (e.keyCode == 113) {
+            if (e.keyCode == 113) { // Q
                 console.log(list.toSAML());
             }
         }
         document.onkeydown = function (e) {
+            if (e.keyCode == 9) {
+                e.preventDefault(); // Disable TAB
+            }
             if (e.keyCode == 32) { // Triggers active element highlight
                 var canvas = $('canvas')[0];
                 if (canvas.isHighlightActive !== undefined) { // Have already triggered
@@ -337,6 +340,7 @@ var List = Class({
         console.log("Moved from index " + srcIndex + " to index " + destIndex);
         srcElem.group = destElem.group;
         srcElem.elem.parent = destElem.group;
+        srcElem.parentFolder = destElem.parentFolder;
 
         if (!isForward && destIndex > 0) {
             dest = dest.prev();
@@ -490,12 +494,30 @@ var List = Class({
 
         $(parentNode.firstChild.children[subGroup.activeElem]).remove();
 
-        var layer = subGroup.remLayer();
+        var elem = subGroup.remLayer();
 
         $(folder).trigger('create');
 
-        this.editor.removeLayer(layer);
+        if (elem.type == 'l') {
+            this.editor.removeLayer(elem);
+        }
+        else if (elem.type == 'g') {
+            removeGroupFromEditor(elem, this.editor);
+        }
         this.editor.render();
+
+        // Function to recursively delete all quads in editor pertaining to the removed group
+        function removeGroupFromEditor(group, editor) {
+            for (var i = 0; i < group.elems.length; i++) {
+                var elem = group.elems[i];
+                if (elem.type == 'l') {
+                    editor.removeLayer(elem);
+                }
+                else if (elem.type == 'g') {
+                    removeGroupFromEditor(elem, editor);
+                }
+            }
+        }
     },
     displayGroup: function (group, parentFolder, parentGroup, index) {
         if (group === undefined) group = this.mainGroup;

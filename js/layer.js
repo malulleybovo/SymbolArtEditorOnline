@@ -1,5 +1,5 @@
 var Layer = Class({
-    initialize: function (name, part, color, x, y, scale, rotation, vertices) {
+    initialize: function (name, part, color, x, y, scale, rotation, vertices, alpha) {
         this.type = 'l';
         this.name = name;
         (part !== undefined) ? this.part = part : this.part = 241;
@@ -10,9 +10,9 @@ var Layer = Class({
         (y !== undefined) ? this.y = y : this.y = (960 - (this.scaleY * 64)) / 2;
         (rotation !== undefined) ? this.rotation = rotation : this.rotation = 0;
         (vertices !== undefined) ? this.vertices = vertices : this.vertices = [0, 0, 64, 0, 0, 64, 64, 64];
+        (alpha !== undefined) ? this.alpha = alpha : this.alpha = 7;
     },
     update: function (quad) {
-        this.part = quad.partNum;
         this.color = quad.tint;
         this.x = quad.x;
         this.y = quad.y;
@@ -21,6 +21,16 @@ var Layer = Class({
         this.rotation = quad.rotation;
         for (var i = 0; i < quad.vertices.length; i++) {
             this.vertices[i] = quad.vertices[i];
+        }
+        this.alpha = 0.121569;
+        switch (quad.alpha) {
+            case 0.247059: this.alpha = 1; break;
+            case 0.372549: this.alpha = 2; break;
+            case 0.498039: this.alpha = 3; break;
+            case 0.623529: this.alpha = 4; break;
+            case 0.74902: this.alpha = 5; break;
+            case 0.87451: this.alpha = 6; break;
+            case 1: this.alpha = 7; break;
         }
     },
     getAbsVertices: function () {
@@ -37,7 +47,7 @@ var Layer = Class({
     },
     toSAML: function (numTabs) { // numTabs not used
         var absVtx = this.getAbsVertices();
-        var color = hexToRgb(this.color.toString(16));
+        var color = hexToRgb(Math.round(this.color).toString(16));
         color = {
             r: (color.r + 35 < 255) ? color.r + 35 : 255,
             g: (color.g + 35 < 255) ? color.g + 35 : 255,
@@ -46,15 +56,15 @@ var Layer = Class({
         var saml = '<layer name="' + this.name
             + '" visible="true" type="' + (this.part - 1)
             + '" color="#' + rgbToHex(color)
-            + '" alpha="' + 1
-            + '" ltx="' + absVtx[0]
-            + '" lty="' + absVtx[1]
-            + '" lbx="' + absVtx[4]
-            + '" lby="' + absVtx[5]
-            + '" rtx="' + absVtx[2]
-            + '" rty="' + absVtx[3]
-            + '" rbx="' + absVtx[6]
-            + '" rby="' + absVtx[7]
+            + '" alpha="' + this.alpha
+            + '" ltx="' + absVtx[2]
+            + '" lty="' + absVtx[3]
+            + '" lbx="' + absVtx[6]
+            + '" lby="' + absVtx[7]
+            + '" rtx="' + absVtx[0]
+            + '" rty="' + absVtx[1]
+            + '" rbx="' + absVtx[4]
+            + '" rby="' + absVtx[5]
             + '"/>';
         return saml;
 

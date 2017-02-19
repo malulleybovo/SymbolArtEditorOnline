@@ -107,7 +107,7 @@ h1 {
 
 .button {
     position: fixed;
-    color: white;
+    color: #02baf2;
     text-shadow: none;
     border-radius: 0px 0px 5px 0px;
 }
@@ -187,9 +187,64 @@ white { color: white; }
      transform: scale(0.5);
 }
 
+.toolbarbtn {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+}
+
 .ui-dialog .ui-dialog-buttonpane { 
     text-align: center;
 }
 .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { 
     float: none;
+}
+
+#sidenav {
+    height: 100%;
+    width: 0px;
+    position: relative;
+    float: right;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.1s;
+    padding-top: 60px;
+}
+
+#sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #02baf2;
+    display: block;
+    text-shadow: none;
+}
+
+#sidenav a:hover, .offcanvas a:focus{
+    color: #f1f1f1;
+}
+
+#sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+@media screen and (max-height: 450px) {
+  #sidenav {padding-top: 15px;}
+  #sidenav a {font-size: 18px;}
+}
+
+.img-highlight {
+    border: 2px solid #02baf2;
+}
+.img-no-highlight {
+    margin: 2px;
 }

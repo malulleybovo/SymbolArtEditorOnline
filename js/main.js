@@ -65,6 +65,8 @@ window.onload = function () {
 }
 
 function initDocument() {
+    document.title = "Symbol Art Editor";
+
     // Get reference to head and body of the document
     HTMLHead = document.getElementsByTagName('head')[0];
     HTMLBody = document.getElementsByTagName('body')[0];
