@@ -1,7 +1,7 @@
 var Toolbar = Class({
     initialize: function () {
         this.player = $('<audio id="player" src="sound/Help!.wav" preload="auto"></audio>');
-        this.player[0].bges = [
+        this.player[0].bges = [ // list of playable sounds
             // sound 0
             // sound 1
             'sound/General.wav', // sound 2
