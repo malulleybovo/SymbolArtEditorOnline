@@ -15,7 +15,7 @@
                 // Audio source (BGE) changes to selected option
                 var p = $('#player')[0];
                 p.src = p.bges[this.index];
-                p.play();
+                p.play(); // Play sample
             });
         }
 
