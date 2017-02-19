@@ -29,7 +29,9 @@
     },
     update: function (partNum) {
         // TODO - update selection in list of options based on partNum
-        this.selectmenu.setSelectedOption(partNum - 241); // TODO change - 241
+        if (this.selectmenu.isMenuActive(0)) {
+            this.selectmenu.setSelectedOption(partNum - 241); // TODO change - 241
+        }
         //console.log('Not Implemented: PartSelectMenu.update(partNum)');
     },
     toggle: function () {

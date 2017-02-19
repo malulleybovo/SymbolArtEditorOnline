@@ -41,6 +41,13 @@
         }
         return -1;
     },
+    isMenuActive: function (index) {
+        if (index >= 0 && index < SelectMenu.menus.length
+            && SelectMenu.activeMenu !== undefined && SelectMenu.activeMenu == SelectMenu.menus[index]) {
+            return true;
+        }
+        return false;
+    },
     setSelectedOption: function (num) {
         if (SelectMenu.activeMenu.options.length <= num) return -1;
         if (SelectMenu.activeMenu.selectedOption != null) {
