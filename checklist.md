@@ -12,7 +12,6 @@
 - [x] moving symbols by group not implemented
 - [x] vertices not rounded to nearest integer
 - [x] display at top on space press and hold
-- [x] moving layers by group does not work for groups containing subgroups
 - [x] highlighting layers by group does not work for groups containing subgroups
 - [x] symbol art BGE implementation
 - [x] fix vertex orientation of quads (orientation is horizontally inverted)
@@ -30,3 +29,4 @@
 - [ ] click selected list view element again to unselect it
 - [ ] add option to output result to image file
 - [ ] hide vertex change buttons while user is moving a layer in editor
+- [ ] moving layers by group does not work for groups containing subgroups

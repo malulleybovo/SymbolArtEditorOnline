@@ -25,29 +25,31 @@ var SAMLLoader = Class({
 
         var mainFolder = this.list.container[0].firstChild;
         var currFolder = mainFolder;
+
+        // Get all tags found in string
         var tags = SAMLText.match(/<[^\n|<]*>/g);
         var nestingLvl = 0;
         for (var i = 0; i < tags.length; i++) {
             var tag = tags[i];
-            if (/<layer>|<layer [^\n|<]*>/.test(tag)) {
+            if (/<layer>|<layer [^\n|<]*>/.test(tag)) { // if <layer>
                 this.list.callback('insertlayer', $(currFolder.firstChild));
                 var newLayerNode = currFolder.lastChild.firstChild.lastChild;
                 this.setupElem(newLayerNode, tag, 'layer');
             }
-            else if (/<g>|<g [^\n|<]*>/.test(tag)) {
+            else if (/<g>|<g [^\n|<]*>/.test(tag)) { // if <g>
                 this.list.callback('insertgroup', $(currFolder.firstChild));
                 currFolder = currFolder.lastChild.firstChild.lastChild;
                 this.setupElem(currFolder, tag, 'g');
                 nestingLvl++;
             }
             else if (/<\/([a-z|A-Z]+[0-9]?)>/.test(tag)) {
-                if (/<\/g>/.test(tag)) {
+                if (/<\/g>/.test(tag)) { // if </g>
                     if (nestingLvl > 0) {
                         currFolder = currFolder.parentNode.parentNode.parentNode;
                         nestingLvl--;
                     }
                 }
-                else if (/<\/sa>/.test(tag)) {
+                else if (/<\/sa>/.test(tag)) { // if </sa>
                     break;
                 }
             }
@@ -61,6 +63,7 @@ var SAMLLoader = Class({
         return null;
     },
     setupElem: function (node, tag, type) {
+        // Get all key="value" pairs in tag
         var pairs = tag.match(/([A-Z|a-z][A-Z|a-z|0-9|_]*[A-Z|a-z|0-9]*="[^"|\n]+")+/g);
         for (var i = 0; i < pairs.length; i++) {
             var keyValue = pairs[i].split('=');

@@ -104,10 +104,10 @@ function initUI() {
     UI = [];
 
     UI.landing = $('<div class="landing">');
-    $('body').append(UI.landing);
-
+    
+    UI.landing.image = $('<div class="landing-img">');
+    
     UI.landing.menu = $('<div class="landing-menu">');
-    UI.landing.append(UI.landing.menu);
 
     UI.landing.menu.newAppButton = $('<div>');
     UI.landing.menu.newAppButton.append($('<i class="fa fa-plus">'));
@@ -144,6 +144,18 @@ function initUI() {
             alert("Error reading file.");
         }
     });
+
+    $('body').append(UI.landing);
+    UI.landing.append(UI.landing.image);
+    setInterval(function () {
+        UI.landing.image.addClass('landing-img-ready');
+    }, 500);
+    UI.landing.append(UI.landing.menu);
+    setInterval(function () {
+        UI.landing.menu.animate({
+            opacity: 1
+        });
+    }, 1000);
 
     addNode('Canvas Container', 'div', HTMLBody, 'button medium-text no-highlight cursor-pointer');
     UINodeList['Canvas Container'].id = 'canvascontainer';
