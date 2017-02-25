@@ -1,3 +1,5 @@
+@import "landing.css";
+
 body {
     margin: 0;
     background-color: lightblue;
@@ -10,18 +12,6 @@ h1 {
 }
 
 .highlight {background-color: #CCC;}
-
-.landing {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    z-index: 999999;
-    background-color: #aff1ff;
-    background-image: url("http://wikiwiki.jp/vipdepso2/?plugin=ref&page=topimages&src=arks_iogo.png");
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
-}
 
 .titleScreen {
 

@@ -1,0 +1,29 @@
+﻿.landing {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 999999;
+    background-color: #aff1ff;
+    background-image: url("http://wikiwiki.jp/vipdepso2/?plugin=ref&page=topimages&src=arks_iogo.png");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+.landing-menu {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+.landing-menu div {
+    display: inline-block;
+    margin: 40px;
+    font-size: 72px;
+    transition: 0.3s;
+}
+
+.landing-menu div:hover {
+    transform: scale(2);
+}

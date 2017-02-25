@@ -22,7 +22,7 @@ var Layer = Class({
         for (var i = 0; i < quad.vertices.length; i++) {
             this.vertices[i] = quad.vertices[i];
         }
-        this.alpha = 0.121569;
+        this.alpha = 0;
         switch (quad.alpha) {
             case 0.247059: this.alpha = 1; break;
             case 0.372549: this.alpha = 2; break;

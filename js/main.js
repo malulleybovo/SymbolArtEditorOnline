@@ -101,73 +101,49 @@ function initUI() {
         e.preventDefault();
     }
 
-    addNode('Landing', 'div', undefined, 'landing');
+    UI = [];
 
-    // Create container for title screen content
-    addNode('Title Screen Container', 'div', UINodeList['Landing'], 'center');
+    UI.landing = $('<div class="landing">');
+    $('body').append(UI.landing);
 
-    // Create title block
-    addNode('Title', 'div', UINodeList['Title Screen Container'], 'titleHeader big-text no-highlight cursor-default', title);
+    UI.landing.menu = $('<div class="landing-menu">');
+    UI.landing.append(UI.landing.menu);
 
-    // Create file handler
-    addNode('File Handler', 'input', HTMLBody, 'hidden');
-    UINodeList['File Handler'].type = 'file';
-    UINodeList['File Handler'].onchange = function (e) {
-        $(UINodeList['Landing']).animate({
+    UI.landing.menu.newAppButton = $('<div>');
+    UI.landing.menu.newAppButton.append($('<i class="fa fa-plus">'));
+    UI.landing.menu.newAppButton.click(function (e) {
+        UI.landing.animate({
             opacity: 0
         }, "slow", "linear", function () {
-            $(this).remove();
+            UI.landing.remove();
+        });
+    });
+    UI.landing.menu.append(UI.landing.menu.newAppButton);
+
+    UI.landing.menu.loadAppButton = $('<div>');
+    UI.landing.menu.loadAppButton.append($('<i class="fa fa-upload">'));
+    UI.landing.menu.loadAppButton.click(function () {
+        UI.fileHandler.click();
+    });
+    UI.landing.menu.append(UI.landing.menu.loadAppButton);
+
+    UI.fileHandler = $('<input type="file" class="hidden">');
+    UI.fileHandler.change(function (e) {
+        UI.landing.animate({
+            opacity: 0
+        }, "slow", "linear", function () {
+            UI.landing.remove();
         });
         var reader = new FileReader();
         reader.onload = function (evt) {
-            var img = new Image();
-            img.onload = function () {
-                convertToBKMAPP(evt.target.result);
-                ctx.drawImage(img, 0, 0);
-            }
-            img.src = event.target.result;
+            var text = evt.target.result;
+            samlLoader.load(text);
         }
-        reader.readAsDataURL(e.target.files[0]);
+        reader.readAsText(e.target.files[0]);
         reader.onerror = function (evt) {
             alert("Error reading file.");
         }
-    }
-
-    // Create button
-    addNode('Insert File Button', 'div', UINodeList['Title Screen Container'], 'button medium-text no-highlight cursor-pointer');
-    addNode('File Upload Icon', 'i', UINodeList['Insert File Button'], 'material-icons center-relative no-highlight hidden', 'file_upload');
-    UINodeList['File Upload Icon'].onload = function () { // Show icon only upon loading is complete
-        UINodeList['File Upload Icon'].className = 'material-icons center-relative no-highlight';
-    }
-    UINodeList['Insert File Button'].onmouseenter = function () {
-        UINodeList['Insert File Button'].className = 'button button-highlight medium-text no-highlight cursor-pointer';
-    }
-    UINodeList['Insert File Button'].onmouseleave = function () {
-        UINodeList['Insert File Button'].className = 'button medium-text no-highlight cursor-pointer';
-    }
-    UINodeList['Insert File Button'].onclick = function () {
-        UINodeList['File Handler'].click();
-    }
-
-    // Create button
-    addNode('New Button', 'div', UINodeList['Title Screen Container'], 'button medium-text no-highlight cursor-pointer');
-    addNode('File Upload Icon', 'i', UINodeList['New Button'], 'material-icons center-relative no-highlight hidden', 'file_upload');
-    UINodeList['File Upload Icon'].onload = function () { // Show icon only upon loading is complete
-        UINodeList['File Upload Icon'].className = 'material-icons center-relative no-highlight';
-    }
-    UINodeList['New Button'].onmouseenter = function () {
-        UINodeList['New Button'].className = 'button button-highlight medium-text no-highlight cursor-pointer';
-    }
-    UINodeList['New Button'].onmouseleave = function () {
-        UINodeList['New Button'].className = 'button medium-text no-highlight cursor-pointer';
-    }
-    UINodeList['New Button'].onclick = function (e) {
-        $(UINodeList['Landing']).animate({
-            opacity: 0
-        }, "slow", "linear", function () {
-            $(this).remove();
-        });
-    };
+    });
 
     addNode('Canvas Container', 'div', HTMLBody, 'button medium-text no-highlight cursor-pointer');
     UINodeList['Canvas Container'].id = 'canvascontainer';
@@ -293,6 +269,8 @@ function initUI() {
             list.editor.decrSize();
         }
     }
+
+    samlLoader = new SAMLLoader(list);
 
     function addNode(id, type, parentNode, CSSclass, innerText) {
         if (id === undefined) return;
