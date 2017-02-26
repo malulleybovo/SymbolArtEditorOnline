@@ -16,7 +16,7 @@ var Editor = Class({
         this.layers = [];
         this.parts = [];
 
-        for (var i = 241; i < 244; i++) {
+        for (var i = 241; i <= 292; i++) {
             this.parts[i] = new PIXI.Texture(new PIXI.BaseTexture(LoadedImageFiles[i + ".png"]));
         }
 

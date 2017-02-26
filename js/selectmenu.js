@@ -1,12 +1,12 @@
 ﻿var SelectMenu = Class({
     initialize: function () {
         var newMenu = {};
-        newMenu.container = $('<div id="sidenav">');
+        newMenu.container = $('<div id="sidenav" class=" cursor-pointer">');
         newMenu.container[0].selectmenu = this;
 
-        newMenu.container.list = $('<div style="width: 170px;">');
+        newMenu.container.list = $('<div class="menu" style="width: 170px;">');
 
-        newMenu.closeButton = $('<a href="javascript:void(0)" class="closebtn">&times;</a>');
+        newMenu.closeButton = $('<div class="closebtn">&times;</a>');
         newMenu.closeButton[0].selectmenu = this; // Attach refference to select menu
         newMenu.closeButton.click(function () { // Close menu function
             this.selectmenu.toggle();
@@ -18,6 +18,12 @@
 
         newMenu.container.append(newMenu.closeButton);
         newMenu.container.append(newMenu.container.list);
+        Ps.initialize(newMenu.container[0], {
+            wheelSpeed: 0.2,
+            wrapContent: false,
+            wheelPropagation: false,
+            minScrollbarLength: 20
+        });
 
         SelectMenu.menus = SelectMenu.menus || [];
         SelectMenu.menus.push(newMenu);
@@ -59,7 +65,7 @@
     },
     addIconOption: function (url, handler, addonProperties) {
         url = url || "https://image.flaticon.com/teams/1-freepik.jpg";
-        var newOption = $('<img src="' + url + '" style="width: 64px; height: 64px;" class="img-no-highlight ui-li-thumb">');
+        var newOption = $('<img src="' + url + '" style="width: 48px; height: 48px;" class="img-no-highlight ui-li-thumb">');
         newOption[0].handler = handler || function () { }; // specific function/action for a given option
         newOption[0].index = SelectMenu.activeMenu.options.length;
 
@@ -88,11 +94,14 @@
     },
     toggle: function () {
         SelectMenu.activeMenu.isOpen = !SelectMenu.activeMenu.isOpen;
+        var container = $('#sidenav');
         if (SelectMenu.activeMenu.isOpen) {
-            $('#sidenav')[0].style.width = "170px";
+            container[0].style.width = "170px";
+            container.find('.closebtn')[0].style.transform = 'translate(0%, 0%)';
         }
         else {
-            $('#sidenav')[0].style.width = "0px";
+            container[0].style.width = "0px";
+            container.find('.closebtn')[0].style.transform = 'translate(300%, 0%)';
         }
     }
 });

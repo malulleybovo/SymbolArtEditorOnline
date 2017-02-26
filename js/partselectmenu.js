@@ -8,8 +8,8 @@
         this.selectmenu.setActiveMenu(0);
 
         // Setup options
-        for (var i = 0; i < 3; i++) {
-            this.selectmenu.addIconOption('./images/' + (241 + i) + '.png', function () {
+        for (var i = 241; i <= 292; i++) {
+            this.selectmenu.addIconOption('./images/' + i + '.png', function () {
                 // TODO - assign selected part to the layer being editted
                 var layer = this.layerCtrl.activeLayer;
                 layer.part = 241 + this.index;

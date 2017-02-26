@@ -201,30 +201,27 @@ white { color: white; }
     top: 0;
     left: 0;
     background-color: #111;
-    overflow-x: hidden;
+    overflow: auto;
     transition: 0.1s;
-    padding-top: 60px;
 }
 
-#sidenav a {
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 25px;
-    color: #02baf2;
-    display: block;
-    text-shadow: none;
-}
-
-#sidenav a:hover, .offcanvas a:focus{
-    color: #f1f1f1;
+#sidenav .menu {
+    width: 100%;
+    margin-top: 60px;
 }
 
 #sidenav .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
+    position: fixed;
     font-size: 36px;
-    margin-left: 50px;
+    top: 4px;
+    right: 20px;
+    color: #02baf2;
+    text-shadow: none;
+    transform: translate(300%, 0%);
+}
+
+#sidenav .closebtn:hover {
+    color: white;
 }
 
 @media screen and (max-height: 450px) {

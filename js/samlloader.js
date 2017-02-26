@@ -21,6 +21,7 @@ var SAMLLoader = Class({
         var xmlTags = SAMLText.match(/<\?xml([ ]+[A-Z|a-z][A-Z|a-z|0-9|_]*[A-Z|a-z|0-9]*="[^"|\n]+")*[ ]*\?>/g);
         if (xmlTags.length > 0) {
             // Found an xml tag
+            // TODO
         }
 
         var mainFolder = this.list.container[0].firstChild;
@@ -72,11 +73,16 @@ var SAMLLoader = Class({
 
             switch (key) {
                 case 'name':
-                    if (type == 'layer') {
-                        
-                    }
-                    else if (type == 'g' || type == 'sa') {
-
+                    if (/^[a-z|A-Z|0-9].*[a-z|A-Z|0-9]$|^[a-z|A-Z|0-9]$/.test(value)) {
+                        // Valid Info
+                        if (type == 'layer') {
+                            node.elem.name = value;
+                            node.firstChild.innerText = value;
+                        }
+                        else if (type == 'g' || type == 'sa') {
+                            node.firstChild.elem.name = value;
+                            node.firstChild.firstChild.innerText = value;
+                        }
                     }
                     break;
                 case 'visible':
@@ -109,13 +115,17 @@ var SAMLLoader = Class({
                     break;
                 case 'sound':
                     if (type == 'sa') {
-
+                        value = parseInt(value);
+                        if (value === undefined || value < 0 || value >= $('#player')[0].bges.length) {
+                            value = 0;
+                        }
+                        // TODO - implement setting bge of application after deciding where this info is stored
                     }
                     break;
                 case 'type':
                     if (type == 'layer') {
                         value = parseInt(value);
-                        if (value === undefined) {
+                        if (value === undefined || !this.editor.parts[value + 1]) {
                             // Invalid Input
                             break;
                         }
@@ -141,11 +151,15 @@ var SAMLLoader = Class({
                     break;
                 case 'alpha':
                     if (type == 'layer') {
-                        value = parseFloat(value);
+                        value = parseInt(value);
                         if (value === undefined) {
                             // Invalid Input
                             break;
                         }
+
+                        if (value < 0) value = 0;
+                        else if (value > 7) value = 7;
+
                         node.elem.alpha = value;
                     }
                     break;

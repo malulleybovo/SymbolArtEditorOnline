@@ -252,18 +252,23 @@ var List = Class({
                 var elem = $(this);
                 var parent = elem.parent().parent();
                 if (parent[0].textbox) {
-                    if (e.keyCode == 13) {
-                        var prevElem = $(elem[0].prevNode); // Retrieve prev display DOM elem
-                        prevElem.text(elem.val()); // Update name of elem in node
-                        parent.append(prevElem);
-                        console.log("Changing layer name from \"" + parent[0].elem.name + "\" to \"" + prevElem.text() + "\"");
-                        parent[0].elem.name = prevElem.text();
-                        parent[0].textbox = false;
-                        elem.remove();
-                        parent.trigger('create');
-                        prevElem.focus();
+                    if (e.keyCode == 13) { // Enter Key
+                        if (/^[a-z|A-Z|0-9].*[a-z|A-Z|0-9]$|^[a-z|A-Z|0-9]$/.test(elem.val())) { // Validade new name
+                            var prevElem = $(elem[0].prevNode); // Retrieve prev display DOM elem
+                            prevElem.text(elem.val()); // Update name of elem in node
+                            parent.append(prevElem);
+                            console.log("Changing layer name from \"" + parent[0].elem.name + "\" to \"" + prevElem.text() + "\"");
+                            parent[0].elem.name = prevElem.text();
+                            parent[0].textbox = false;
+                            elem.remove();
+                            parent.trigger('create');
+                            prevElem.focus();
+                        }
+                        else {
+                            this.blur();
+                        }
                     }
-                    else if (e.keyCode == 27) {
+                    else if (e.keyCode == 27) { // Esc Key
                         this.blur();
                     }
                 }
