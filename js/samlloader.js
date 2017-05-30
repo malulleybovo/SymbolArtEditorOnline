@@ -73,7 +73,7 @@ var SAMLLoader = Class({
 
             switch (key) {
                 case 'name':
-                    if (/^[a-z|A-Z|0-9].*[a-z|A-Z|0-9]$|^[a-z|A-Z|0-9]$/.test(value)) {
+                    if (true) {
                         // Valid Info
                         if (type == 'layer') {
                             node.elem.name = value;
@@ -125,11 +125,13 @@ var SAMLLoader = Class({
                 case 'type':
                     if (type == 'layer') {
                         value = parseInt(value);
-                        if (value === undefined || !this.editor.parts[value + 1]) {
+                        // +1 due to SAML parts format starting from 240 and not 241
+                        var partIdx = partsInfo.dataArray.indexOf((value + 1).toString());
+                        if (value === undefined || !this.editor.parts[partIdx]) {
                             // Invalid Input
                             break;
                         }
-                        node.elem.part = value + 1;
+                        node.elem.part = partIdx;
                     }
                     break;
                 case 'color':
@@ -151,16 +153,22 @@ var SAMLLoader = Class({
                     break;
                 case 'alpha':
                     if (type == 'layer') {
-                        value = parseInt(value);
+                        value = parseFloat(value);
                         if (value === undefined) {
                             // Invalid Input
                             break;
                         }
 
-                        if (value < 0) value = 0;
-                        else if (value > 7) value = 7;
-
-                        node.elem.alpha = value;
+                        node.elem.alpha = 0;
+                        switch (value) {
+                            case 0.247059: node.elem.alpha = 1; break;
+                            case 0.372549: node.elem.alpha = 2; break;
+                            case 0.498039: node.elem.alpha = 3; break;
+                            case 0.623529: node.elem.alpha = 4; break;
+                            case 0.74902: node.elem.alpha = 5; break;
+                            case 0.87451: node.elem.alpha = 6; break;
+                            case 1: node.elem.alpha = 7; break;
+                        }
                     }
                     break;
                 case 'ltx':
@@ -170,7 +178,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[2] = value + 32;
+                        node.elem.vertices[0] = value + 32;
                     }
                     break;
                 case 'lty':
@@ -180,7 +188,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[3] = value + 32;
+                        node.elem.vertices[1] = value + 32;
                     }
                     break;
                 case 'lbx':
@@ -190,7 +198,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[6] = value + 32;
+                        node.elem.vertices[4] = value + 32;
                     }
                     break;
                 case 'lby':
@@ -200,7 +208,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[7] = value + 32;
+                        node.elem.vertices[5] = value + 32;
                     }
                     break;
                 case 'rtx':
@@ -210,7 +218,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[0] = value + 32;
+                        node.elem.vertices[2] = value + 32;
                     }
                     break;
                 case 'rty':
@@ -220,7 +228,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[1] = value + 32;
+                        node.elem.vertices[3] = value + 32;
                     }
                     break;
                 case 'rbx':
@@ -230,7 +238,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[4] = value + 32;
+                        node.elem.vertices[6] = value + 32;
                     }
                     break;
                 case 'rby':
@@ -240,7 +248,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[5] = value + 32;
+                        node.elem.vertices[7] = value + 32;
                     }
                     break;
             }

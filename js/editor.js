@@ -16,8 +16,8 @@ var Editor = Class({
         this.layers = [];
         this.parts = [];
 
-        for (var i = 241; i <= 292; i++) {
-            this.parts[i] = new PIXI.Texture(new PIXI.BaseTexture(LoadedImageFiles[i + ".png"]));
+        for (var i in partsInfo.dataArray) {
+            this.parts[i] = new PIXI.Texture(new PIXI.BaseTexture(LoadedImageFiles[partsInfo.dataArray[i] + partsInfo.imgType]));
         }
 
         this.SABox = new PIXI.mesh.NineSlicePlane(new PIXI.Texture(new PIXI.BaseTexture(LoadedImageFiles["SABoxSprite.png"])), 2, 2, 2, 2);

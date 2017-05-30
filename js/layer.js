@@ -2,7 +2,7 @@ var Layer = Class({
     initialize: function (name, part, color, x, y, scale, rotation, vertices, alpha) {
         this.type = 'l';
         this.name = name;
-        (part !== undefined) ? this.part = part : this.part = 241;
+        (part !== undefined) ? this.part = part : this.part = 0;
         (color !== undefined) ? this.color = color : this.color = 0xffffff;
         (scale !== undefined && scale.x !== undefined) ? this.scaleX = scale.x : this.scaleX = 1;
         (scale !== undefined && scale.y !== undefined) ? this.scaleY = scale.y : this.scaleY = 1;
@@ -53,22 +53,39 @@ var Layer = Class({
             g: (color.g + 35 < 255) ? color.g + 35 : 255,
             b: (color.b + 35 < 255) ? color.b + 35 : 255,
         }
+        var alphaVal = 0.121569;
+        switch (this.alpha) {
+            case 1: alphaVal = 0.247059; break;
+            case 2: alphaVal = 0.372549; break;
+            case 3: alphaVal = 0.498039; break;
+            case 4: alphaVal = 0.623529; break;
+            case 5: alphaVal = 0.74902; break;
+            case 6: alphaVal = 0.87451; break;
+            case 7: alphaVal = 1; break;
+        }
         var saml = '<layer name="' + this.name
-            + '" visible="true" type="' + (this.part - 1)
+             // -1 due to SAML parts format starting from 240 and not 241
+            + '" visible="true" type="' + (partsInfo.dataArray[this.part] - 1)
             + '" color="#' + rgbToHex(color)
-            + '" alpha="' + this.alpha
-            + '" ltx="' + absVtx[2]
-            + '" lty="' + absVtx[3]
-            + '" lbx="' + absVtx[6]
-            + '" lby="' + absVtx[7]
-            + '" rtx="' + absVtx[0]
-            + '" rty="' + absVtx[1]
-            + '" rbx="' + absVtx[4]
-            + '" rby="' + absVtx[5]
+            + '" alpha="' + alphaVal
+            + '" ltx="' + absVtx[0]
+            + '" lty="' + absVtx[1]
+            + '" lbx="' + absVtx[4]
+            + '" lby="' + absVtx[5]
+            + '" rtx="' + absVtx[2]
+            + '" rty="' + absVtx[3]
+            + '" rbx="' + absVtx[6]
+            + '" rby="' + absVtx[7]
             + '"/>';
         return saml;
 
         function hexToRgb(hex) {
+            if (hex.length < 6) {
+                var initialLen = hex.length;
+                for (var i = 0; i < 6 - initialLen; i++) {
+                    hex = '0' + hex;
+                }
+            }
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? {
                 r: parseInt(result[1], 16),

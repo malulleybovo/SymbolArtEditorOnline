@@ -1,7 +1,7 @@
 ﻿var SelectMenu = Class({
     initialize: function () {
         var newMenu = {};
-        newMenu.container = $('<div id="sidenav" class=" cursor-pointer">');
+        newMenu.container = $('<div id="sidenav" class="no-highlight cursor-pointer">');
         newMenu.container[0].selectmenu = this;
 
         newMenu.container.list = $('<div class="menu" style="width: 170px;">');
@@ -65,7 +65,7 @@
     },
     addIconOption: function (url, handler, addonProperties) {
         url = url || "https://image.flaticon.com/teams/1-freepik.jpg";
-        var newOption = $('<img src="' + url + '" style="width: 48px; height: 48px;" class="img-no-highlight ui-li-thumb">');
+        var newOption = $('<img src="' + url + '" style="width: 24px; height: 24px;" class="img-no-highlight ui-li-thumb">');
         newOption[0].handler = handler || function () { }; // specific function/action for a given option
         newOption[0].index = SelectMenu.activeMenu.options.length;
 

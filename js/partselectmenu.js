@@ -8,11 +8,11 @@
         this.selectmenu.setActiveMenu(0);
 
         // Setup options
-        for (var i = 241; i <= 292; i++) {
-            this.selectmenu.addIconOption('./images/' + i + '.png', function () {
+        for (var i in partsInfo.dataArray) {
+            this.selectmenu.addIconOption(partsInfo.path + partsInfo.dataArray[i] + partsInfo.imgType, function () {
                 // TODO - assign selected part to the layer being editted
                 var layer = this.layerCtrl.activeLayer;
-                layer.part = 241 + this.index;
+                layer.part = this.index;
 
                 var editor = this.layerCtrl.editor;
                 editor.updateLayer(layer);
@@ -30,7 +30,7 @@
     update: function (partNum) {
         // TODO - update selection in list of options based on partNum
         if (this.selectmenu.isMenuActive(0)) {
-            this.selectmenu.setSelectedOption(partNum - 241); // TODO change - 241
+            this.selectmenu.setSelectedOption(partNum);
         }
         //console.log('Not Implemented: PartSelectMenu.update(partNum)');
     },
