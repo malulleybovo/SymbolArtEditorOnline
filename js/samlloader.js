@@ -33,12 +33,12 @@ var SAMLLoader = Class({
         for (var i = 0; i < tags.length; i++) {
             var tag = tags[i];
             if (/<layer>|<layer [^\n|<]*>/.test(tag)) { // if <layer>
-                this.list.callback('insertlayer', $(currFolder.firstChild));
+                contextMenuCallback('insert layer', null, null, $(currFolder.firstChild));
                 var newLayerNode = currFolder.lastChild.firstChild.lastChild;
                 this.setupElem(newLayerNode, tag, 'layer');
             }
             else if (/<g>|<g [^\n|<]*>/.test(tag)) { // if <g>
-                this.list.callback('insertgroup', $(currFolder.firstChild));
+                contextMenuCallback('insert group', null, null, $(currFolder.firstChild));
                 currFolder = currFolder.lastChild.firstChild.lastChild;
                 this.setupElem(currFolder, tag, 'g');
                 nestingLvl++;

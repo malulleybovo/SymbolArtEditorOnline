@@ -167,44 +167,6 @@ function initUI() {
 
     // Initialize Interface
     list = new List("Layers", "Symbol Art", UINodeList['Canvas Box'],
-        function (action, el, pos) {
-            switch (action) {
-                case 'rename':
-                    el[0].focusinCallback();
-                    break;
-                case 'add layer':
-                    list.addElem("Layer " + layerNum, el[0].parentFolder); layerNum++;
-                    break;
-                case 'insert layer':
-                    var folder = el[0].parentNode;
-                    if (el[0].elem.type == 'g') {
-                        $(folder).collapsible('expand');
-                    }
-                    list.addElemAtEnd("Layer " + layerNum, folder); layerNum++;
-                    break;
-                case 'append layer':
-                    list.addElemAtEnd("Layer " + layerNum, el[0].parentFolder); layerNum++;
-                    break;
-                case 'add group':
-                    list.addFolder("Group " + groupNum, el[0].parentFolder); groupNum++;
-                    break;
-                case 'insert group':
-                    var folder = el[0].parentNode;
-                    if (el[0].elem.type == 'g') {
-                        $(folder).collapsible('expand');
-                    }
-                    list.addFolderAtEnd("Group " + groupNum, folder); groupNum++;
-                    break;
-                case 'append group':
-                    list.addFolderAtEnd("Group " + groupNum, el[0].parentFolder); groupNum++;
-                    break;
-                case 'remove':
-                    list.removeElem(el[0].parentFolder);
-                    break;
-                default:
-                    break;
-            }
-        },
         function (e) {
             var elem;
             if (this.elem.type == 'l') {
@@ -277,7 +239,7 @@ function initUI() {
     });
     UINodeList['Canvas Container'].onwheel = function (e) {
         e.preventDefault();
-        if (!e.ctrlKey) return;
+        //if (!e.ctrlKey) return;
         if (e.deltaY < 0) { // Zoom +
             list.editor.incrSize();
         }

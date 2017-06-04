@@ -5,33 +5,51 @@ var CONTEXT_MENU_ICON_LABELS = [
     "fa-trash-o"
 ]
 
+var contextMenuCallback = function (key, options, evt, selector) {
+    selector = selector || this;
+    switch (key) {
+        case 'rename':
+            selector[0].focusinCallback();
+            break;
+        case 'new layer':
+            list.addElem("Layer " + layerNum, selector[0].parentFolder); layerNum++;
+            break;
+        case 'insert layer':
+            var folder = selector[0].parentNode;
+            if (selector[0].elem.type == 'g') {
+                $(folder).collapsible('expand');
+            }
+            list.addElemAtEnd("Layer " + layerNum, folder); layerNum++;
+            break;
+        case 'append layer':
+            list.addElemAtEnd("Layer " + layerNum, selector[0].parentFolder); layerNum++;
+            break;
+        case 'new group':
+            list.addFolder("Group " + groupNum, selector[0].parentFolder); groupNum++;
+            break;
+        case 'insert group':
+            var folder = selector[0].parentNode;
+            if (selector[0].elem.type == 'g') {
+                $(folder).collapsible('expand');
+            }
+            list.addFolderAtEnd("Group " + groupNum, folder); groupNum++;
+            break;
+        case 'append group':
+            list.addFolderAtEnd("Group " + groupNum, selector[0].parentFolder); groupNum++;
+            break;
+        case 'remove':
+            list.removeElem(selector[0].parentFolder);
+            break;
+        default:
+            break;
+    }
+}
+
 /* Symbol Art Main Folder Context Menu */
 $(function () {
     $.contextMenu({
         selector: '.context-menu-symbol-art',
-        callback: function (key, options) {
-            switch (key) {
-                case 'rename':
-                    this[0].focusinCallback();
-                    break;
-                case 'insert layer':
-                    var folder = this[0].parentNode;
-                    if (this[0].elem.type == 'g') {
-                        $(folder).collapsible('expand');
-                    }
-                    list.addElemAtEnd("Layer " + layerNum, folder); layerNum++;
-                    break;
-                case 'insert group':
-                    var folder = this[0].parentNode;
-                    if (this[0].elem.type == 'g') {
-                        $(folder).collapsible('expand');
-                    }
-                    list.addFolderAtEnd("Group " + groupNum, folder); groupNum++;
-                    break;
-                default:
-                    break;
-            }
-        },
+        callback: contextMenuCallback,
         items: {
             "rename": { name: "Rename", icon: CONTEXT_MENU_ICON_LABELS[0], accesskey: "r" },
             "sep1": "---------",
@@ -50,30 +68,7 @@ $(function () {
 $(function () {
     $.contextMenu({
         selector: '.context-menu-layer',
-        callback: function (key, options) {
-            switch (key) {
-                case 'rename':
-                    this[0].focusinCallback();
-                    break;
-                case 'new layer':
-                    list.addElem("Layer " + layerNum, this[0].parentFolder); layerNum++;
-                    break;
-                case 'append layer':
-                    list.addElemAtEnd("Layer " + layerNum, this[0].parentFolder); layerNum++;
-                    break;
-                case 'new group':
-                    list.addFolder("Group " + groupNum, this[0].parentFolder); groupNum++;
-                    break;
-                case 'append group':
-                    list.addFolderAtEnd("Group " + groupNum, this[0].parentFolder); groupNum++;
-                    break;
-                case 'remove':
-                    list.removeElem(this[0].parentFolder);
-                    break;
-                default:
-                    break;
-            }
-        },
+        callback: contextMenuCallback,
         items: {
             "rename": { name: "Rename", icon: CONTEXT_MENU_ICON_LABELS[0], accesskey: "r" },
             "sep1": "---------",
@@ -101,44 +96,7 @@ $(function () {
 $(function () {
     $.contextMenu({
         selector: '.context-menu-group',
-        callback: function (key, options) {
-            switch (key) {
-                case 'rename':
-                    this[0].focusinCallback();
-                    break;
-                case 'new layer':
-                    list.addElem("Layer " + layerNum, this[0].parentFolder); layerNum++;
-                    break;
-                case 'insert layer':
-                    var folder = this[0].parentNode;
-                    if (this[0].elem.type == 'g') {
-                        $(folder).collapsible('expand');
-                    }
-                    list.addElemAtEnd("Layer " + layerNum, folder); layerNum++;
-                    break;
-                case 'append layer':
-                    list.addElemAtEnd("Layer " + layerNum, this[0].parentFolder); layerNum++;
-                    break;
-                case 'new group':
-                    list.addFolder("Group " + groupNum, this[0].parentFolder); groupNum++;
-                    break;
-                case 'insert group':
-                    var folder = this[0].parentNode;
-                    if (this[0].elem.type == 'g') {
-                        $(folder).collapsible('expand');
-                    }
-                    list.addFolderAtEnd("Group " + groupNum, folder); groupNum++;
-                    break;
-                case 'append group':
-                    list.addFolderAtEnd("Group " + groupNum, this[0].parentFolder); groupNum++;
-                    break;
-                case 'remove':
-                    list.removeElem(this[0].parentFolder);
-                    break;
-                default:
-                    break;
-            }
-        },
+        callback: contextMenuCallback,
         items: {
             "rename": { name: "Rename", icon: CONTEXT_MENU_ICON_LABELS[0], accesskey: "r" },
             "sep1": "---------",

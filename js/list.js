@@ -2,7 +2,7 @@ var groupID = 0;
 var layerID = 0;
 
 var List = Class({
-    initialize: function (headerName, groupName, editorContainer, callback, elemMousedownCallback) {
+    initialize: function (headerName, groupName, editorContainer, elemMousedownCallback) {
         // Initialize Canvas Control
         this.page = $(document.getElementById('canvasctrl'));
 
@@ -117,7 +117,6 @@ var List = Class({
             }
         }
 
-        this.callback = callback;
         this.elemMousedownCallback = elemMousedownCallback;
         this.createGroupNode = function (name, subGroup, group, parentGroup, folder) {
             var groupFolder = $('<div data-role="collapsible" id="' + groupID + '">'); groupID++;
