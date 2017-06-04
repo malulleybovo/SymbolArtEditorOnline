@@ -5,9 +5,6 @@ var List = Class({
     initialize: function (headerName, groupName, editorContainer, callback, elemMousedownCallback) {
         // Initialize Canvas Control
         this.page = $(document.getElementById('canvasctrl'));
-        this.page.on("contextmenu", function () {
-            return false;
-        });
 
         // Initialize Side Bar
         $(".sidebar.left").sidebar().trigger("sidebar:close");
@@ -124,7 +121,7 @@ var List = Class({
         this.elemMousedownCallback = elemMousedownCallback;
         this.createGroupNode = function (name, subGroup, group, parentGroup, folder) {
             var groupFolder = $('<div data-role="collapsible" id="' + groupID + '">'); groupID++;
-            var header = $('<h2>' + name + '</h2>');
+            var header = $('<h2 class="context-menu-group">' + name + '</h2>');
             groupFolder.append(header);
             var list = $('<ul data-role="listview" data-divider-theme="b">');
             list.css('margin-left', '1px');
@@ -134,11 +131,6 @@ var List = Class({
             header[0].parentFolder = folder; // Get reference to collapsible
             $(header).mousedown(this.elemMousedownCallback);
             // Show menu when #myDiv is clicked
-            $(header).contextMenu({
-                menu: menuType
-            },
-                this.callback
-            );
             header[0].list = this;
             header[0].focusinCallback = this.rename;
             header.focusin(function (e) {
@@ -184,7 +176,7 @@ var List = Class({
             return groupFolder;
         };
         this.createLayerNode = function (name, group, folder) {
-            var li = $('<li class="ui-draggable ui-draggable-handle">');
+            var li = $('<li class="context-menu-layer" class="ui-draggable ui-draggable-handle">');
             li.append('<a href="#" data-role="button" data-transition="pop" style="text-shadow:none;">' + name + '</a>');
             li[0].group = group;
             li[0].parentFolder = folder;
@@ -192,11 +184,6 @@ var List = Class({
             li[0].list = this;
             $(li).mousedown(this.elemMousedownCallback);
             // Show menu when right clicked
-            $(li).contextMenu({
-                menu: 'LayerMenu'
-            },
-                this.callback
-            );
             li.focusin(function (e) {
                 this.list.changeSelectedElem(this.firstChild);
             });
@@ -525,9 +512,11 @@ var List = Class({
         }
     },
     displayGroup: function (group, parentFolder, parentGroup, index) {
+        var contextMenuType = "group";
         if (group === undefined) group = this.mainGroup;
+        if (index === undefined) contextMenuType = "symbol-art";
         var groupFolder = $('<div data-role="collapsible" id="' + groupID + '">'); groupID++;
-        var header = $('<h2>' + group.name + '</h2>');
+        var header = $('<h2 class="context-menu-' + contextMenuType + '">' + group.name + '</h2>');
         groupFolder.append(header);
         var list = $('<ul data-role="listview" data-divider-theme="b">');
         var menuType;
@@ -544,11 +533,6 @@ var List = Class({
         }
         header[0].focusinCallback = this.rename;
         // Show menu when #myDiv is clicked
-        $(header).contextMenu({
-            menu: menuType
-        },
-            this.callback
-        );
         groupFolder[0].isOpen = false;
         $(groupFolder).on('collapsibleexpand', function (e) {
             e.stopPropagation();
@@ -568,18 +552,13 @@ var List = Class({
                 this.displayGroup(group.elems[i], groupFolder[0].list, group, i);
             }
             else if (group.elems[i].type = 'l') {
-                var li = $('<li id="' + layerID + '">'); layerID++;
+                var li = $('<li class="context-menu-layer" id="' + layerID + '">'); layerID++;
                 li.append('<a href="#popupBasic" data-rel="popup" data-role="button" data-inline="true" data-transition="pop">' + group.elems[i].name + '</a>');
                 li[0].group = group;
                 li[0].parentFolder = groupFolder[0];
                 li[0].elem = group.elems[i];
                 $(li).mousedown(this.elemMousedownCallback);
                 // Show menu when #myDiv is clicked
-                $(li).contextMenu({
-                    menu: 'LayerMenu'
-                },
-					this.callback
-                );
                 list.append(li);
             }
         }

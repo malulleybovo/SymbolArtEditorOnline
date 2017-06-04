@@ -71,6 +71,10 @@ function initDocument() {
     HTMLHead = document.getElementsByTagName('head')[0];
     HTMLBody = document.getElementsByTagName('body')[0];
 
+    $('body').on("contextmenu", function (e) {
+        e.preventDefault();
+    });
+
     // Create link to stylesheet
     CSSFileLink = document.createElement('link');
     CSSFileLink.setAttribute('rel', 'stylesheet');
@@ -168,30 +172,30 @@ function initUI() {
                 case 'rename':
                     el[0].focusinCallback();
                     break;
-                case 'addlayer':
+                case 'add layer':
                     list.addElem("Layer " + layerNum, el[0].parentFolder); layerNum++;
                     break;
-                case 'insertlayer':
+                case 'insert layer':
                     var folder = el[0].parentNode;
                     if (el[0].elem.type == 'g') {
                         $(folder).collapsible('expand');
                     }
                     list.addElemAtEnd("Layer " + layerNum, folder); layerNum++;
                     break;
-                case 'addlayeratend':
+                case 'append layer':
                     list.addElemAtEnd("Layer " + layerNum, el[0].parentFolder); layerNum++;
                     break;
-                case 'addgroup':
+                case 'add group':
                     list.addFolder("Group " + groupNum, el[0].parentFolder); groupNum++;
                     break;
-                case 'insertgroup':
+                case 'insert group':
                     var folder = el[0].parentNode;
                     if (el[0].elem.type == 'g') {
                         $(folder).collapsible('expand');
                     }
                     list.addFolderAtEnd("Group " + groupNum, folder); groupNum++;
                     break;
-                case 'addgroupatend':
+                case 'append group':
                     list.addFolderAtEnd("Group " + groupNum, el[0].parentFolder); groupNum++;
                     break;
                 case 'remove':
