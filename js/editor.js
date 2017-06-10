@@ -26,7 +26,7 @@ var Editor = Class({
         this.stage.addChild(this.SABox);
 
         // Color Picker
-        this.cPicker = $('<div id="colorSelector">');
+        this.cPicker = $('<div id="colorSelector" class="no-panning">');
         this.cPicker.append($('<div style="background-color: rgb(255, 255, 255);">'));
         this.cPicker.ColorPicker({
             color: '#ffffff',

@@ -1,7 +1,7 @@
 ﻿var SelectMenu = Class({
     initialize: function () {
         var newMenu = {};
-        newMenu.container = $('<div id="sidenav" class="no-highlight cursor-pointer">');
+        newMenu.container = $('<div id="sidenav" class="no-highlight cursor-pointer no-panning">');
         newMenu.container[0].selectmenu = this;
 
         newMenu.container.list = $('<div class="menu" style="width: 170px;">');

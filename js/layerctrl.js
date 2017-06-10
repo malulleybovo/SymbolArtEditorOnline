@@ -9,6 +9,7 @@ var LayerCtrl = Class({
         this.gui = new dat.GUI({ autoPlace: false });
         this.gui.domElement.id = layerCtrlID;
         this.gui.domElement.layerCtrl = this;
+        $(this.gui.domElement).addClass("no-panning");
 
         $('body').append(this.gui.domElement);
 
