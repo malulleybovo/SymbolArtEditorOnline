@@ -55,34 +55,34 @@ var Editor = Class({
         // Buttons
         var tl = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-u-l ui-btn-icon-notext ui-btn-inline editor-box-icon">');
         tl[0].list = list;
-        tl.mousedown(function () {
+        tl.on('vmousedown', function () {
             this.selected = true;
-        }).mousemove(function () {
-        }).mouseup(function () {
+        }).on('vmousemove', function () {
+        }).on('vmouseup', function () {
             this.selected = false;
         }).hide();
         var tr = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-u-r ui-btn-icon-notext ui-btn-inline editor-box-icon">');
         tr[0].list = list;
-        tr.mousedown(function () {
+        tr.on('vmousedown', function () {
             this.selected = true;
-        }).mousemove(function () {
-        }).mouseup(function () {
+        }).on('vmousemove', function () {
+        }).on('vmouseup', function () {
             this.selected = false;
         }).hide();
         var br = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-d-r ui-btn-icon-notext ui-btn-inline editor-box-icon">');
         br[0].list = list;
-        br.mousedown(function () {
+        br.on('vmousedown', function () {
             this.selected = true;
-        }).mousemove(function () {
-        }).mouseup(function () {
+        }).on('vmousemove', function () {
+        }).on('vmouseup', function () {
             this.selected = false;
         }).hide();
         var bl = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-d-l ui-btn-icon-notext ui-btn-inline editor-box-icon">');
         bl[0].list = list;
-        bl.mousedown(function () {
+        bl.on('vmousedown', function () {
             this.selected = true;
-        }).mousemove(function () {
-        }).mouseup(function () {
+        }).on('vmousemove', function () {
+        }).on('vmouseup', function () {
             this.selected = false;
         }).hide();
         function changeVertices(that, ix, iy, clientPos) {
@@ -101,16 +101,16 @@ var Editor = Class({
             bl: bl
         };
 
-        $('body').mousedown(function (e) {
-            var buttons = $(this).find('button');
+        $('body').on('vmousedown', function (e) {
+            var buttons = $(this).find('button.editor-box-icon');
             if (!buttons.is(":visible")) return;
             if (buttons[0].selected) buttons[0].moving = true;
             else if (buttons[1].selected) buttons[1].moving = true;
             else if (buttons[2].selected) buttons[2].moving = true;
             else if (buttons[3].selected) buttons[3].moving = true;
-        }).mousemove(function (e) {
+        }).on('vmousemove', function (e) {
             // Mouse Move for Button Control
-            var buttons = $(this).find('button');
+            var buttons = $(this).find('button.editor-box-icon');
             if (!buttons.is(":visible")) return;
             if (buttons[0].moving) {
                 var pos = {
@@ -119,6 +119,9 @@ var Editor = Class({
                 }
                 $(buttons[0]).css({ top: (pos.top - 22.8), left: (pos.left - 14.8) });
                 changeVertices(buttons[0], 0, 1, pos);
+                var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
+                layerCtrl.v0.updateDisplay();
+                layerCtrl.v1.updateDisplay();
             }
             else if (buttons[1].moving) {
                 var pos = {
@@ -127,6 +130,9 @@ var Editor = Class({
                 }
                 $(buttons[1]).css({ top: (pos.top - 22.8), left: (pos.left - 54) });
                 changeVertices(buttons[1], 2, 3, pos);
+                var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
+                layerCtrl.v2.updateDisplay();
+                layerCtrl.v3.updateDisplay();
             }
             else if (buttons[2].moving) {
                 var pos = {
@@ -135,6 +141,9 @@ var Editor = Class({
                 }
                 $(buttons[2]).css({ top: (pos.top - 22.8), left: (pos.left - 93.2) });
                 changeVertices(buttons[2], 6, 7, pos);
+                var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
+                layerCtrl.v6.updateDisplay();
+                layerCtrl.v7.updateDisplay();
             }
             else if (buttons[3].moving) {
                 var pos = {
@@ -143,17 +152,12 @@ var Editor = Class({
                 }
                 $(buttons[3]).css({ top: (pos.top - 22.8), left: (pos.left - 132.4) });
                 changeVertices(buttons[3], 4, 5, pos);
+                var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
+                layerCtrl.v4.updateDisplay();
+                layerCtrl.v5.updateDisplay();
             }
-
-            // Mouse move for Layer Control
-            var elem = $('#layerCtrl')[0];
-            if (elem.changing) {
-                elem.editor.updateLayer(elem.layerCtrl.activeLayer);
-                elem.editor.render();
-                $(window.list.selectedElem).parent().trigger('mousedown'); // Update editor box
-            }
-        }).mouseup(function (e) {
-            var buttons = $(this).find('button');
+        }).on('vmouseup', function (e) {
+            var buttons = $(this).find('button.editor-box-icon');
             if (!buttons.is(":visible")) return;
             buttons[0].moving = false;
             buttons[1].moving = false;
@@ -167,13 +171,14 @@ var Editor = Class({
         // Initialize Layer Control
         this.layerCtrl = new LayerCtrl(this);
         this.layerCtrl.hide();
-        
-        $(this.layerCtrl.gui.domElement)[0].editor = this;
-        $(this.layerCtrl.gui.domElement).mousedown(function () {
-            $('#layerCtrl')[0].changing = true;
-        }).mouseup(function () {
-            $('#layerCtrl')[0].changing = false;
-        })
+
+        this.layerCtrl.alpha.editor = this;
+        this.layerCtrl.alpha.onChange(function () {
+            var editor = $('canvas')[0].editor;
+            editor.updateLayer($('#' + layerCtrlID)[0].layerCtrl.activeLayer);
+            editor.render();
+            $(window.list.selectedElem).parent().trigger('mousedown'); // Update vertex edit button pos
+        });
 
 
         $('body').append(this.cPicker);
@@ -219,7 +224,7 @@ var Editor = Class({
         }
     },
     createLayer: function (layer) {
-        
+
         var quad = new PIXI.mesh.Plane(
           this.parts[layer.part], 2, 2
         );
@@ -252,11 +257,18 @@ var Editor = Class({
         this.updateLayer(layer);
         quad.editor = this;
         quad.layerData = layerData;
-        quad.interactive = false;
+        quad.interactive = true;
         quad.on('mousedown', function (evtData) {
             this.isMoving = true;
             this.origClickX = evtData.data.originalEvent.offsetX;
             this.origClickY = evtData.data.originalEvent.offsetY;
+            this.origX = this.x;
+            this.origY = this.y;
+        }).on('touchstart', function (evtData) {
+            this.isMoving = true;
+            var newPosition = evtData.data.getLocalPosition(this.parent);
+            this.origClickX = newPosition.x;
+            this.origClickY = newPosition.y;
             this.origX = this.x;
             this.origY = this.y;
         });
@@ -268,10 +280,39 @@ var Editor = Class({
                 console.log(this.x + ', ' + this.y);
                 this.editor.render();
                 this.layerData.layer.update(this);
+                var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
+                layerCtrl.posX.updateDisplay();
+                layerCtrl.posY.updateDisplay();
+                $(this.editor.list.selectedElem).parent().trigger('mousedown'); // Update editor box
+            }
+        }).on('touchmove', function (evtData) {
+            if (this.isMoving) {
+                this.layerData.layer;
+                var newPosition = evtData.data.getLocalPosition(this.parent);
+                this.x = Math.round(newPosition.x - (this.origClickX - this.origX));
+                this.y = Math.round(newPosition.y - (this.origClickY - this.origY));
+                console.log(this.x + ', ' + this.y);
+                this.editor.render();
+                this.layerData.layer.update(this);
+                var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
+                layerCtrl.posX.updateDisplay();
+                layerCtrl.posY.updateDisplay();
                 $(this.editor.list.selectedElem).parent().trigger('mousedown'); // Update editor box
             }
         });
         quad.on('mouseup', function (evtData) {
+            this.isMoving = false;
+            delete this.origClickX;
+            delete this.origClickY;
+            delete this.origX;
+            delete this.origY;
+        }).on('touchend', function (evtData) {
+            this.isMoving = false;
+            delete this.origClickX;
+            delete this.origClickY;
+            delete this.origX;
+            delete this.origY;
+        }).on('touchendoutside', function (evtData) {
             this.isMoving = false;
             delete this.origClickX;
             delete this.origClickY;
@@ -380,12 +421,12 @@ var Editor = Class({
 
         canvas[0].movingFolder = folder;
 
-        canvas.mousedown(function (e) {
+        canvas.on('vmousedown', function (e) {
             if ($('canvas')[0].list.selectedElem.parentNode.elem.type == 'g') {
                 this.mouseMoving = true;
                 this.prevPos = { x: e.clientX, y: e.clientY };
             }
-        }).mousemove(function (e) {
+        }).on('vmousemove', function (e) {
             if (this.mouseMoving) {
                 var canvas = $('canvas')[0];
                 var list = canvas.list;
@@ -395,7 +436,7 @@ var Editor = Class({
                 var firstIndex = lis.index(lisInGroup[0]);
                 var lastIndex = firstIndex + lisInGroup.length;
                 canvas.layersMoved = [];
-                if(firstIndex == -1) return;
+                if (firstIndex == -1) return;
                 var layer;
                 for (var i = firstIndex; i < lastIndex; i++) {
                     layer = list.editor.layers[i].layer;
@@ -407,7 +448,7 @@ var Editor = Class({
                 editor.render();
             }
             this.prevPos = { x: e.clientX, y: e.clientY };
-        }).mouseup(function (e) {
+        }).on('vmouseup', function (e) {
             this.mouseMoving = false;
         });
     },
@@ -416,7 +457,7 @@ var Editor = Class({
 
         canvas[0].movingFolder = undefined;
 
-        canvas.mousedown(undefined).mousemove(undefined).mouseup(undefined);
+        canvas.on('vmousedown', function () { }).on('vmousemove', function () { }).on('vmouseup', function () { });
     },
     hideInterface: function () {
         this.layerCtrl.hide();

@@ -169,32 +169,55 @@ function initUI() {
     list = new List("Layers", "Symbol Art", UINodeList['Canvas Box'],
         function (e) {
             var elem;
+            var canvas = $('canvas')[0];
+            var editor;
+            try {
+                editor = canvas.editor;
+            }
+            catch (err) {
+                console.error('Canvas could not be found. It may not have been correctly initialized./n/t' + err.message);
+            }
+            try {
+                var testEditor = editor.zoom;
+            }
+            catch (err) {
+                console.error('No editor attached to canvas. It may not have been correctly initialized./n/t' + err.message);
+            }
             if (this.elem.type == 'l') {
                 elem = $(this);
-                var offset = $(UINodeList['Canvas']).offset();
-                var cont = $(UINodeList['Canvas Container']);
-                var basePosX = offset.left + list.editor.zoom * elem[0].elem.x;
-                var basePosY = offset.top + list.editor.zoom * elem[0].elem.y;
-                (list.editor.editorBoxIcons.tl.css('left', (basePosX + list.editor.zoom * elem[0].elem.vertices[0] - 14.8) + 'px').css('top', (basePosY + list.editor.zoom * elem[0].elem.vertices[1] - 22.8) + 'px'));
-                (list.editor.editorBoxIcons.tr.css('left', (basePosX + list.editor.zoom * elem[0].elem.vertices[2] - 54) + 'px').css('top', (basePosY + list.editor.zoom * elem[0].elem.vertices[3] - 22.8) + 'px'));
-                (list.editor.editorBoxIcons.bl.css('left', (basePosX + list.editor.zoom * elem[0].elem.vertices[4] - 132.4) + 'px').css('top', (basePosY + list.editor.zoom * elem[0].elem.vertices[5] - 22.8) + 'px'));
-                (list.editor.editorBoxIcons.br.css('left', (basePosX + list.editor.zoom * elem[0].elem.vertices[6] - 93.2) + 'px').css('top', (basePosY + list.editor.zoom * elem[0].elem.vertices[7] - 22.8) + 'px'));
+                var myLayer = elem[0].elem;
+                try {
+                    var testMyLayer = myLayer.x;
+                }
+                catch (err) {
+                    console.error('Selected layer was not found./n/t' + err.message);
+                }
+                var offset = $('canvas').offset();
+                var basePosX = offset.left + editor.zoom * myLayer.x;
+                var basePosY = offset.top + editor.zoom * myLayer.y;
+                (editor.editorBoxIcons.tl.css('left', (basePosX + editor.zoom * myLayer.vertices[0] - 14.8) + 'px')
+                    .css('top', (basePosY + editor.zoom * myLayer.vertices[1] - 22.8) + 'px'));
+                (editor.editorBoxIcons.tr.css('left', (basePosX + editor.zoom * myLayer.vertices[2] - 54) + 'px')
+                    .css('top', (basePosY + editor.zoom * myLayer.vertices[3] - 22.8) + 'px'));
+                (editor.editorBoxIcons.bl.css('left', (basePosX + editor.zoom * myLayer.vertices[4] - 132.4) + 'px')
+                    .css('top', (basePosY + editor.zoom * myLayer.vertices[5] - 22.8) + 'px'));
+                (editor.editorBoxIcons.br.css('left', (basePosX + editor.zoom * myLayer.vertices[6] - 93.2) + 'px')
+                    .css('top', (basePosY + editor.zoom * myLayer.vertices[7] - 22.8) + 'px'));
                 
-                list.editor.cPicker[0].selectedLayer = elem[0].elem;
-                list.editor.layerCtrl.update(elem[0].elem);
-                list.editor.cPicker[0].editor = list.editor;
-                $('#colorSelector div').css('backgroundColor', '#' + elem[0].elem.color.toString(16));
+                editor.cPicker[0].selectedLayer = myLayer;
+                editor.layerCtrl.update(myLayer);
+                editor.cPicker[0].editor = editor;
+                $('#colorSelector div').css('backgroundColor', '#' + myLayer.color.toString(16));
 
-                list.editor.showInterface();
-                list.editor.disableGroupInteraction();
-                list.editor.enableInteraction(elem[0].elem);
+                editor.showInterface();
+                editor.disableGroupInteraction();
+                editor.enableInteraction(myLayer);
             }
             else if (this.elem.type == 'g') {
                 elem = $(this.parentNode);
-                var cont = $(UINodeList['Canvas Container']);
-                list.editor.hideInterface();
-                list.editor.disableInteraction();
-                list.editor.enableGroupInteraction(this.elem);
+                editor.hideInterface();
+                editor.disableInteraction();
+                editor.enableGroupInteraction(this.elem);
 
             }
             else {

@@ -129,6 +129,9 @@ var List = Class({
             header[0].elem = group.elems[group.activeElem];
             header[0].parentFolder = folder; // Get reference to collapsible
             $(header).mousedown(this.elemMousedownCallback);
+            header.on("swiperight", function () {
+                $(this).contextMenu();
+            });
             // Show menu when #myDiv is clicked
             header[0].list = this;
             header[0].focusinCallback = this.rename;
@@ -185,6 +188,9 @@ var List = Class({
             // Show menu when right clicked
             li.focusin(function (e) {
                 this.list.changeSelectedElem(this.firstChild);
+            });
+            li.on("swiperight", function () {
+                $(this).contextMenu();
             });
 
             li[0].textbox = false;
@@ -531,6 +537,9 @@ var List = Class({
             menuType = 'MainGroupMenu';
         }
         header[0].focusinCallback = this.rename;
+        header.on("swiperight", function () {
+            $(this).contextMenu();
+        });
         // Show menu when #myDiv is clicked
         groupFolder[0].isOpen = false;
         $(groupFolder).on('collapsibleexpand', function (e) {
@@ -557,6 +566,9 @@ var List = Class({
                 li[0].parentFolder = groupFolder[0];
                 li[0].elem = group.elems[i];
                 $(li).mousedown(this.elemMousedownCallback);
+                li.on("swiperight", function () {
+                    $(this).contextMenu();
+                });
                 // Show menu when #myDiv is clicked
                 list.append(li);
             }
