@@ -19,7 +19,7 @@ var c, ctx, alertBox, list;
 var title, description;
 var layerNum = 0;
 var groupNum = 0;
-
+$(document).delegate(".ui-page", "scrollstart", false);
 // Quick Controls Variables
 function initConsts() {
     title = "Symbol Art Editor";
