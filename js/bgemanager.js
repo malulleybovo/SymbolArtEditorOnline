@@ -22,7 +22,7 @@ var Toolbar = Class({
         this.bgeselect = new BGESelectMenu();
 
         // Initialize Toolbar Button
-        this.btn = $('<div data-toolbar="content-option" class="btn-toolbar toolbarbtn">');
+        this.btn = $('<div data-toolbar="content-option" class="btn-toolbar toolbarbtn no-panning">');
         this.btn.icon = $('<i class="fa fa-music" style="text-shadow: none;margin-top: 2.5px;">');
         this.btn.append(this.btn.icon);
 
