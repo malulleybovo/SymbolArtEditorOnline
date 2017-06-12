@@ -89,8 +89,10 @@ var Editor = Class({
             var canvasPos = $('canvas').offset();
             var pos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
             var layer = that.list.selectedElem.parentNode.elem;
+            alert(pos.left + ', ' + pos.top);
             layer.vertices[ix] = Math.round((pos.left / that.list.editor.zoom) - layer.x);
             layer.vertices[iy] = Math.round((pos.top / that.list.editor.zoom) - layer.y);
+            alert(layer.vertices[ix] + ', ' + layer.vertices[iy]);
             that.list.editor.updateLayer(layer);
             that.list.editor.render();
         }
@@ -109,24 +111,22 @@ var Editor = Class({
             else if (buttons[2].selected) buttons[2].moving = true;
             else if (buttons[3].selected) buttons[3].moving = true;
         }).on('vmousemove', function (e) {
-            alert('vmousemove');
             // Mouse Move for Button Control
             var buttons = $(this).find('button.editor-box-icon');
             if (!buttons.is(":visible")) return;
             if (buttons[0].moving) {
-                alert('button 0 moving');
                 var pos = {
                     left: Math.round(e.clientX),
                     top: Math.round(e.clientY)
                 }
                 $(buttons[0]).css({ top: (pos.top - 22.8), left: (pos.left - 14.8) });
                 changeVertices(buttons[0], 0, 1, pos);
+                alert(pos.left + ', ' + pos.top);
                 var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
                 layerCtrl.v0.updateDisplay();
                 layerCtrl.v1.updateDisplay();
             }
             else if (buttons[1].moving) {
-                alert('button 1 moving');
                 var pos = {
                     left: Math.round(e.clientX),
                     top: Math.round(e.clientY)
@@ -138,7 +138,6 @@ var Editor = Class({
                 layerCtrl.v3.updateDisplay();
             }
             else if (buttons[2].moving) {
-                alert('button 2 moving');
                 var pos = {
                     left: Math.round(e.clientX),
                     top: Math.round(e.clientY)
@@ -150,7 +149,6 @@ var Editor = Class({
                 layerCtrl.v7.updateDisplay();
             }
             else if (buttons[3].moving) {
-                alert('button 3 moving');
                 var pos = {
                     left: Math.round(e.clientX),
                     top: Math.round(e.clientY)
