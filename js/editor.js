@@ -56,7 +56,7 @@ var Editor = Class({
         var tl = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-u-l ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
         tl[0].list = list;
         tl.on('vmousedown', function () {
-            this.selected = true;
+            if (!panZoomActive) this.selected = true;
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
             this.selected = false;
@@ -64,7 +64,7 @@ var Editor = Class({
         var tr = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-u-r ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
         tr[0].list = list;
         tr.on('vmousedown', function () {
-            this.selected = true;
+            if (!panZoomActive) this.selected = true;
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
             this.selected = false;
@@ -72,7 +72,7 @@ var Editor = Class({
         var br = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-d-r ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
         br[0].list = list;
         br.on('vmousedown', function () {
-            this.selected = true;
+            if (!panZoomActive) this.selected = true;
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
             this.selected = false;
@@ -80,7 +80,7 @@ var Editor = Class({
         var bl = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-d-l ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
         bl[0].list = list;
         bl.on('vmousedown', function () {
-            this.selected = true;
+            if (!panZoomActive) this.selected = true;
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
             this.selected = false;
