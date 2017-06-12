@@ -270,6 +270,22 @@ function initUI() {
             list.editor.decrSize();
         }
     }
+    $(UINodeList['Canvas Container']).panzoom({
+        minScale: this.ZOOM_MIN,
+        maxScale: this.ZOOM_MAX,
+        increment: this.ZOOM_STEP,
+        disablePan: true
+    }).on("panzoomzoom", function (e, panzoom, scale, opts) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        //if (!e.ctrlKey) return;
+        if (e.deltaY < 0) { // Zoom +
+            list.editor.incrSize();
+        }
+        else { // Zoom -
+            list.editor.decrSize();
+        }
+    });
 
     samlLoader = new SAMLLoader(list);
 

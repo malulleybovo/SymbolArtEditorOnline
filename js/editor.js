@@ -193,12 +193,6 @@ var Editor = Class({
         this.toolbar = new Toolbar();
 
         $('canvas')[0].editor = this;
-        $('canvas').panzoom({
-            minScale: this.ZOOM_MIN,
-            maxScale: this.ZOOM_MAX,
-            increment: this.ZOOM_STEP,
-            disablePan: true
-        });
 
         this.render();
     },
