@@ -135,7 +135,7 @@ var List = Class({
             // Show menu when #myDiv is clicked
             header[0].list = this;
             header[0].focusinCallback = this.rename;
-            header.focusin(function (e) {
+            header.on('vmousedown', function (e) {
                 this.list.changeSelectedElem(this.firstChild);
             });
             groupFolder[0].isOpen = false;
@@ -186,7 +186,7 @@ var List = Class({
             li[0].list = this;
             $(li).mousedown(this.elemMousedownCallback);
             // Show menu when right clicked
-            li.focusin(function (e) {
+            li.on('vmousedown', function (e) {
                 this.list.changeSelectedElem(this.firstChild);
             });
             li.on("swiperight", function () {
