@@ -87,9 +87,12 @@ var Editor = Class({
         }).hide();
         function changeVertices(that, ix, iy, clientPos) {
             var canvasPos = $('canvas').offset();
-            alert('canvas offset: ' + canvasPos);
+            alert('that: ' + that);
+            alert('that.list: ' + that.list);
+            alert('that.list.selectedElem: ' + that.list.selectedElem);
+            alert('that.list.selectedElem.parentNode: ' + that.list.selectedElem.parentNode);
+            alert('that.list.selectedElem.parentNode.elem: ' + that.list.selectedElem.parentNode.elem);
             var pos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
-            alert(pos.left + ', ' + pos.top);
             var layer = that.list.selectedElem.parentNode.elem;
             alert('layer: ' + layer + '; ' + layer.x + ', ' + layer.y);
             alert(pos.left + ', ' + pos.top);
