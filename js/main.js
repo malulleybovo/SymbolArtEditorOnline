@@ -287,10 +287,8 @@ function initUI() {
     }).on("panzoomend", function () {
         panZoomActive = false;
     });
-    $('body').on("vmousemove", function (event) {
-        alert()
+    $('canvas').on("vmousemove", function (event) {
         if (panZoomActive) {
-            alert('zoom active');
             event.stopPropagation();
         }
     });
