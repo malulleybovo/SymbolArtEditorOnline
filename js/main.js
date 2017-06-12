@@ -278,15 +278,18 @@ function initUI() {
         maxScale: this.ZOOM_MAX,
         increment: this.ZOOM_STEP,
         which: 2,
-        cursor: 'pointer'
+        cursor: 'pointer',
+        disableOneFingerZoom: true
     }).on("panzoomzoom", function (e, panzoom, scale, opts) {
         e.stopImmediatePropagation();
         $('canvas')[0].editor.zoom = scale;
         $(list.selectedElem).parent().trigger('mousedown'); // Update editor box
-    }).on("panzoomstart", function () {
+    }).on("panzoomstart", function (e, panzoom, event, touches) {
         panZoomActive = true;
     }).on("panzoomend", function () {
         panZoomActive = false;
+    }).on("panzoompan", function () {
+        $(list.selectedElem).parent().trigger('mousedown'); // Update editor box
     });
 
     samlLoader = new SAMLLoader(list);
