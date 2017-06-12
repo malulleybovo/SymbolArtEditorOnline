@@ -102,6 +102,7 @@ var Editor = Class({
         };
 
         $('body').on('vmousedown', function (e) {
+            alert('vmousedown');
             var buttons = $(this).find('button.editor-box-icon');
             if (!buttons.is(":visible")) return;
             if (buttons[0].selected) buttons[0].moving = true;
@@ -109,10 +110,12 @@ var Editor = Class({
             else if (buttons[2].selected) buttons[2].moving = true;
             else if (buttons[3].selected) buttons[3].moving = true;
         }).on('vmousemove', function (e) {
+            alert('vmousemove');
             // Mouse Move for Button Control
             var buttons = $(this).find('button.editor-box-icon');
             if (!buttons.is(":visible")) return;
             if (buttons[0].moving) {
+                alert('button 0 moving');
                 var pos = {
                     left: Math.round(e.clientX),
                     top: Math.round(e.clientY)
@@ -124,6 +127,7 @@ var Editor = Class({
                 layerCtrl.v1.updateDisplay();
             }
             else if (buttons[1].moving) {
+                alert('button 1 moving');
                 var pos = {
                     left: Math.round(e.clientX),
                     top: Math.round(e.clientY)
@@ -135,6 +139,7 @@ var Editor = Class({
                 layerCtrl.v3.updateDisplay();
             }
             else if (buttons[2].moving) {
+                alert('button 2 moving');
                 var pos = {
                     left: Math.round(e.clientX),
                     top: Math.round(e.clientY)
@@ -146,6 +151,7 @@ var Editor = Class({
                 layerCtrl.v7.updateDisplay();
             }
             else if (buttons[3].moving) {
+                alert('button 3 moving');
                 var pos = {
                     left: Math.round(e.clientX),
                     top: Math.round(e.clientY)
