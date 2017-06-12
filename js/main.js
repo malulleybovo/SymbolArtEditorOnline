@@ -287,11 +287,6 @@ function initUI() {
     }).on("panzoomend", function () {
         panZoomActive = false;
     });
-    $('canvas').on("vmousemove", function (event) {
-        if (panZoomActive) {
-            event.stopPropagation();
-        }
-    });
 
     samlLoader = new SAMLLoader(list);
 

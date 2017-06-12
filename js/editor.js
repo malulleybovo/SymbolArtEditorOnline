@@ -422,7 +422,8 @@ var Editor = Class({
         canvas[0].movingFolder = folder;
 
         canvas.on('vmousedown', function (e) {
-            if ($('canvas')[0].list.selectedElem.parentNode.elem.type == 'g') {
+            if (!panZoomActive
+                && $('canvas')[0].list.selectedElem.parentNode.elem.type == 'g') {
                 this.mouseMoving = true;
                 this.prevPos = { x: e.clientX, y: e.clientY };
             }
