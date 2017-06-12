@@ -279,7 +279,7 @@ function initUI() {
         increment: this.ZOOM_STEP,
         which: 2,
         cursor: 'pointer',
-        disableOneFingerZoom: true
+        disableOneFingerPan: true
     }).on("panzoomzoom", function (e, panzoom, scale, opts) {
         e.stopImmediatePropagation();
         $('canvas')[0].editor.zoom = scale;
