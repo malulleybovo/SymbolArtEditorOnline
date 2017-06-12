@@ -270,6 +270,9 @@ function initUI() {
             list.editor.decrSize();
         }
     }
+
+    // Mobile Zooming Controller
+    panZoomActive = false;
     $(UINodeList['Canvas Container']).panzoom({
         minScale: this.ZOOM_MIN,
         maxScale: this.ZOOM_MAX,
@@ -279,7 +282,17 @@ function initUI() {
         e.stopImmediatePropagation();
         $('canvas')[0].editor.zoom = scale;
         $(list.selectedElem).parent().trigger('mousedown'); // Update editor box
+    }).on("panzoomstart", function () {
+        panZoomActive = true;
+    }).on("panzoomend", function () {
+        panZoomActive = false;
     });
+    document.body.addEventListener("mousemove", allowMouseMove, true);
+    function allowMouseMove(event) {
+        if (panZoomActive) {
+            event.stopPropagation();
+        }
+    }
 
     samlLoader = new SAMLLoader(list);
 
