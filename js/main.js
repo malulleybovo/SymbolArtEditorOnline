@@ -276,9 +276,8 @@ function initUI() {
         increment: this.ZOOM_STEP,
         disablePan: true
     }).on("panzoomzoom", function (e, panzoom, scale, opts) {
+        alert('zoom');
         e.stopImmediatePropagation();
-        e.preventDefault();
-        $(UINodeList['Canvas Container']).panzoom("resetZoom");
         //if (!e.ctrlKey) return;
         var editor = $('canvas')[0].editor;
         alert(e.deltaY);
