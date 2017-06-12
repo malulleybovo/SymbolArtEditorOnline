@@ -287,12 +287,13 @@ function initUI() {
     }).on("panzoomend", function () {
         panZoomActive = false;
     });
-    document.body.addEventListener("mousemove", allowMouseMove, true);
-    function allowMouseMove(event) {
+    $('body').on("vmousemove", function (event) {
+        alert()
         if (panZoomActive) {
+            alert('zoom active');
             event.stopPropagation();
         }
-    }
+    });
 
     samlLoader = new SAMLLoader(list);
 
