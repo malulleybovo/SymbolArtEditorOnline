@@ -276,18 +276,9 @@ function initUI() {
         increment: this.ZOOM_STEP,
         disablePan: true
     }).on("panzoomzoom", function (e, panzoom, scale, opts) {
-        alert('zoom');
         e.stopImmediatePropagation();
-        //if (!e.ctrlKey) return;
-        var editor = $('canvas')[0].editor;
-        alert(e.deltaY);
-        alert(editor);
-        if (e.deltaY < 0) { // Zoom +
-            editor.incrSize();
-        }
-        else { // Zoom -
-            editor.decrSize();
-        }
+        $('canvas')[0].editor.zoom = scale;
+        $(this.list.selectedElem).parent().trigger('mousedown'); // Update editor box
     });
 
     samlLoader = new SAMLLoader(list);
