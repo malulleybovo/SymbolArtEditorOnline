@@ -259,14 +259,12 @@ var Editor = Class({
         quad.layerData = layerData;
         quad.interactive = true;
         quad.on('mousedown', function (evtData) {
-            alert('mouse started');
             this.isMoving = true;
             this.origClickX = evtData.data.originalEvent.offsetX;
             this.origClickY = evtData.data.originalEvent.offsetY;
             this.origX = this.x;
             this.origY = this.y;
         }).on('touchstart', function (evtData) {
-            alert('touch started');
             this.isMoving = true;
             var newPosition = evtData.data.getLocalPosition(this.parent);
             this.origClickX = newPosition.x;
@@ -275,7 +273,6 @@ var Editor = Class({
             this.origY = this.y;
         });
         quad.on('mousemove', function (evtData) {
-            alert('mouse moved');
             if (this.isMoving) {
                 this.layerData.layer;
                 this.x = Math.round(evtData.data.originalEvent.offsetX - (this.origClickX - this.origX));
@@ -289,7 +286,6 @@ var Editor = Class({
                 $(this.editor.list.selectedElem).parent().trigger('mousedown'); // Update editor box
             }
         }).on('touchmove', function (evtData) {
-            alert('touch moved');
             if (this.isMoving) {
                 this.layerData.layer;
                 var newPosition = evtData.data.getLocalPosition(this.parent);
