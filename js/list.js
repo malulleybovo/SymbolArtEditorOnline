@@ -28,11 +28,11 @@ var List = Class({
 
         this.movingElem = null;
         this.selectedElem = null;
-        this.changeSelectedElem = function (tag) {
-            if (tag.tagName == "A" || tag.tagName == "H2") {
+        this.changeSelectedElem = function (elem) {
+            if (elem.tagName == "A" || elem.tagName == "H2") {
                 if (this.selectedElem != null) $(this.selectedElem).css("filter", "brightness(100%)");
-                $(tag).css("filter", "brightness(80%)");
-                this.selectedElem = tag;
+                $(elem).css("filter", "brightness(80%)");
+                this.selectedElem = elem;
             }
         };
 
