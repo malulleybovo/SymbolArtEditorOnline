@@ -115,13 +115,14 @@ var Editor = Class({
             var buttons = $(this).find('button.editor-box-icon');
             if (!buttons.is(":visible")) return;
             if (buttons[0].moving) {
+                alert(e.clientX+','+e.clientY);
                 var pos = {
                     left: Math.round(e.clientX),
                     top: Math.round(e.clientY)
                 }
+                alert(pos.left + ', ' + pos.top);
                 $(buttons[0]).css({ top: (pos.top - 22.8), left: (pos.left - 14.8) });
                 changeVertices(buttons[0], 0, 1, pos);
-                alert(pos.left + ', ' + pos.top);
                 var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
                 layerCtrl.v0.updateDisplay();
                 layerCtrl.v1.updateDisplay();
