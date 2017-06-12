@@ -428,7 +428,9 @@ var Editor = Class({
                 this.prevPos = { x: e.clientX, y: e.clientY };
             }
         }).on('vmousemove', function (e) {
-            if (this.mouseMoving) {
+            alert(panZoomActive);
+            if (!panZoomActive
+                && this.mouseMoving) {
                 var canvas = $('canvas')[0];
                 var list = canvas.list;
                 var editor = canvas.editor;
