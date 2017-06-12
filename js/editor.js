@@ -265,12 +265,14 @@ var Editor = Class({
             this.origX = this.x;
             this.origY = this.y;
         }).on('touchstart', function (evtData) {
-            this.isMoving = true;
-            var newPosition = evtData.data.getLocalPosition(this.parent);
-            this.origClickX = newPosition.x;
-            this.origClickY = newPosition.y;
-            this.origX = this.x;
-            this.origY = this.y;
+            if (!panZoomActive) {
+                this.isMoving = true;
+                var newPosition = evtData.data.getLocalPosition(this.parent);
+                this.origClickX = newPosition.x;
+                this.origClickY = newPosition.y;
+                this.origX = this.x;
+                this.origY = this.y;
+            }
         });
         quad.on('mousemove', function (evtData) {
             if (this.isMoving) {
@@ -286,7 +288,7 @@ var Editor = Class({
                 $(this.editor.list.selectedElem).parent().trigger('mousedown'); // Update editor box
             }
         }).on('touchmove', function (evtData) {
-            if (this.isMoving) {
+            if (!panZoomActive && this.isMoving) {
                 this.layerData.layer;
                 var newPosition = evtData.data.getLocalPosition(this.parent);
                 this.x = Math.round(newPosition.x - (this.origClickX - this.origX));
@@ -428,7 +430,6 @@ var Editor = Class({
                 this.prevPos = { x: e.clientX, y: e.clientY };
             }
         }).on('vmousemove', function (e) {
-            alert(panZoomActive);
             if (!panZoomActive
                 && this.mouseMoving) {
                 var canvas = $('canvas')[0];
