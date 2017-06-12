@@ -87,8 +87,11 @@ var Editor = Class({
         }).hide();
         function changeVertices(that, ix, iy, clientPos) {
             var canvasPos = $('canvas').offset();
+            alert('canvas offset: ' + canvasPos);
             var pos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
+            alert(pos.left + ', ' + pos.top);
             var layer = that.list.selectedElem.parentNode.elem;
+            alert('layer: ' + layer + '; ' + layer.x + ', ' + layer.y);
             alert(pos.left + ', ' + pos.top);
             layer.vertices[ix] = Math.round((pos.left / that.list.editor.zoom) - layer.x);
             layer.vertices[iy] = Math.round((pos.top / that.list.editor.zoom) - layer.y);
@@ -115,17 +118,15 @@ var Editor = Class({
             var buttons = $(this).find('button.editor-box-icon');
             if (!buttons.is(":visible")) return;
             if (buttons[0].moving) {
-                alert(e.clientX+','+e.clientY);
                 var pos = {
                     left: Math.round(e.clientX),
                     top: Math.round(e.clientY)
                 }
-                alert(pos.left + ', ' + pos.top);
-                $(buttons[0]).css({ top: (pos.top - 22.8), left: (pos.left - 14.8) });
                 changeVertices(buttons[0], 0, 1, pos);
                 var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
                 layerCtrl.v0.updateDisplay();
                 layerCtrl.v1.updateDisplay();
+                $(buttons[0]).css({ top: (pos.top - 22.8), left: (pos.left - 14.8) });
             }
             else if (buttons[1].moving) {
                 var pos = {
