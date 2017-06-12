@@ -276,8 +276,7 @@ function initUI() {
     $(UINodeList['Canvas Container']).panzoom({
         minScale: this.ZOOM_MIN,
         maxScale: this.ZOOM_MAX,
-        increment: this.ZOOM_STEP,
-        disablePan: true
+        increment: this.ZOOM_STEP
     }).on("panzoomzoom", function (e, panzoom, scale, opts) {
         e.stopImmediatePropagation();
         $('canvas')[0].editor.zoom = scale;
