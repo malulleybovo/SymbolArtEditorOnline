@@ -80,6 +80,25 @@ var LayerCtrl = Class({
         this.v5.object = this.activeLayer.vertices;
         this.v6.object = this.activeLayer.vertices;
         this.v7.object = this.activeLayer.vertices;
+
+        this.updateDisplay();
+    },
+    updateDisplay: function () {
+        this.part.updateDisplay();
+        this.posX.updateDisplay();
+        this.posY.updateDisplay();
+        this.scaleX.updateDisplay();
+        this.scaleY.updateDisplay();
+        this.v0.updateDisplay();
+        this.v1.updateDisplay();
+        this.v2.updateDisplay();
+        this.v3.updateDisplay();
+        this.v4.updateDisplay();
+        this.v5.updateDisplay();
+        this.v6.updateDisplay();
+        this.v7.updateDisplay();
+        this.rotation.updateDisplay();
+        this.alpha.updateDisplay();
     },
     hide: function () {
         $(this.gui.domElement).hide();
