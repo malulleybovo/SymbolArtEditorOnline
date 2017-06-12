@@ -278,7 +278,7 @@ function initUI() {
     }).on("panzoomzoom", function (e, panzoom, scale, opts) {
         e.stopImmediatePropagation();
         $('canvas')[0].editor.zoom = scale;
-        $(this.list.selectedElem).parent().trigger('mousedown'); // Update editor box
+        $(list.selectedElem).parent().trigger('mousedown'); // Update editor box
     });
 
     samlLoader = new SAMLLoader(list);
