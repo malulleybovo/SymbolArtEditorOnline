@@ -102,7 +102,6 @@ var Editor = Class({
         };
 
         $('body').on('vmousedown', function (e) {
-            alert('vmousedown');
             var buttons = $(this).find('button.editor-box-icon');
             if (!buttons.is(":visible")) return;
             if (buttons[0].selected) buttons[0].moving = true;
