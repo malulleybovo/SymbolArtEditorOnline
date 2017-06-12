@@ -281,6 +281,8 @@ function initUI() {
         $(UINodeList['Canvas Container']).panzoom("resetZoom");
         //if (!e.ctrlKey) return;
         var editor = $('canvas')[0].editor;
+        alert(e.deltaY);
+        alert(editor);
         if (e.deltaY < 0) { // Zoom +
             editor.incrSize();
         }
