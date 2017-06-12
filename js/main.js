@@ -271,6 +271,14 @@ function initUI() {
         }
     }
 
+    // Editor Viewport Resize Controller
+    UINodeList['Canvas Container'].style.width = window.innerWidth;
+    UINodeList['Canvas Container'].style.height = window.innerHeight;
+    $(window).on('resize', function () {
+        UINodeList['Canvas Container'].style.width = window.innerWidth;
+        UINodeList['Canvas Container'].style.height = window.innerHeight;
+    });
+
     // Mobile Zooming Controller
     panZoomActive = false;
     $(UINodeList['Canvas Container']).panzoom({
