@@ -278,12 +278,14 @@ function initUI() {
     }).on("panzoomzoom", function (e, panzoom, scale, opts) {
         e.stopImmediatePropagation();
         e.preventDefault();
+        $(UINodeList['Canvas Container']).panzoom("resetZoom");
         //if (!e.ctrlKey) return;
+        var editor = $('canvas')[0].editor;
         if (e.deltaY < 0) { // Zoom +
-            list.editor.incrSize();
+            editor.incrSize();
         }
         else { // Zoom -
-            list.editor.decrSize();
+            editor.decrSize();
         }
     });
 
