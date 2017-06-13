@@ -427,31 +427,42 @@ var Editor = Class({
             if (!panZoomActive
                 && $('canvas')[0].list.selectedElem.parentNode.elem.type == 'g') {
                 this.mouseMoving = true;
-                this.prevPos = { x: e.clientX, y: e.clientY };
+
+                this.canvas = $('canvas')[0];
+                this.list = this.canvas.list;
+                this.editor = this.canvas.editor;
+                this.lis = $(this.list.container).find('li');
+                this.lisInGroup = $(this.list.selectedElem.parentNode.parentNode).find('li');
+                this.firstIndex = this.lis.index(this.lisInGroup[0]);
+                this.lastIndex = this.firstIndex + this.lisInGroup.length;
+
+                this.origClickX = e.originalEvent.offsetX;
+                this.origClickY = e.originalEvent.offsetY;
+                this.origX = [];
+                this.origY = [];
+                var layer;
+                for (var i = this.firstIndex; i < this.lastIndex; i++) {
+                    layer = this.editor.layers[i].layer;
+                    this.origX[i] = layer.x;
+                    this.origY[i] = layer.y;
+                }
             }
         }).on('vmousemove', function (e) {
             if (!panZoomActive
                 && this.mouseMoving) {
-                var canvas = $('canvas')[0];
-                var list = canvas.list;
-                var editor = canvas.editor;
-                var lis = $(list.container).find('li');
-                var lisInGroup = $(list.selectedElem.parentNode.parentNode).find('li');
-                var firstIndex = lis.index(lisInGroup[0]);
-                var lastIndex = firstIndex + lisInGroup.length;
-                canvas.layersMoved = [];
-                if (firstIndex == -1) return;
+                this.canvas.layersMoved = [];
+                if (this.firstIndex == -1) return;
                 var layer;
-                for (var i = firstIndex; i < lastIndex; i++) {
-                    layer = list.editor.layers[i].layer;
-                    layer.x += e.clientX - this.prevPos.x;
-                    layer.y += e.clientY - this.prevPos.y;
-                    editor.updateLayer(layer);
-                    canvas.layersMoved.push(layer);
+                for (var i = this.firstIndex; i < this.lastIndex; i++) {
+                    layer = this.editor.layers[i].layer;
+                    layer.x = Math.round(e.originalEvent.offsetX - (this.origClickX - this.origX[i]));
+                    layer.y = Math.round(e.originalEvent.offsetY - (this.origClickY - this.origY[i]));
+                    this.editor.updateLayer(layer);
+                    this.canvas.layersMoved.push(layer);
                 }
-                editor.render();
+                this.editor.render();
             }
-            this.prevPos = { x: e.clientX, y: e.clientY };
+            console.log(e.clientX);
         }).on('vmouseup', function (e) {
             this.mouseMoving = false;
         });
