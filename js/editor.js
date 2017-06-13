@@ -423,7 +423,7 @@ var Editor = Class({
 
         canvas[0].movingFolder = folder;
 
-        canvas.on('vmousedown', function (e) {
+        canvas.unbind().on('vmousedown', function (e) {
             if (!panZoomActive
                 && $('canvas')[0].list.selectedElem.parentNode.elem.type == 'g') {
                 this.mouseMoving = true;
@@ -436,8 +436,15 @@ var Editor = Class({
                 this.firstIndex = this.lis.index(this.lisInGroup[0]);
                 this.lastIndex = this.firstIndex + this.lisInGroup.length;
 
-                this.origClickX = e.originalEvent.offsetX;
-                this.origClickY = e.originalEvent.offsetY;
+                var ev = e.originalEvent.originalEvent;
+                if (ev instanceof MouseEvent) { // Desktop mouse event
+                    this.origClickX = e.originalEvent.offsetX;
+                    this.origClickY = e.originalEvent.offsetY;
+                }
+                else if (ev instanceof TouchEvent) { // Mobile device touch event
+                    this.origClickX = (ev.touches[0].pageX - ev.touches[0].target.offsetLeft);
+                    this.origClickY = (ev.touches[0].pageY - ev.touches[0].target.offsetTop);
+                }
                 this.origX = [];
                 this.origY = [];
                 var layer;
@@ -450,19 +457,27 @@ var Editor = Class({
         }).on('vmousemove', function (e) {
             if (!panZoomActive
                 && this.mouseMoving) {
-                this.canvas.layersMoved = [];
                 if (this.firstIndex == -1) return;
                 var layer;
                 for (var i = this.firstIndex; i < this.lastIndex; i++) {
                     layer = this.editor.layers[i].layer;
-                    layer.x = Math.round(e.originalEvent.offsetX - (this.origClickX - this.origX[i]));
-                    layer.y = Math.round(e.originalEvent.offsetY - (this.origClickY - this.origY[i]));
+                    var ev = e.originalEvent.originalEvent;
+                    if (ev instanceof MouseEvent) { // Desktop mouse event
+                        var clickX = e.originalEvent.offsetX;
+                        var clickY = e.originalEvent.offsetY;
+                        layer.x = Math.round(this.origX[i] + (clickX - this.origClickX));
+                        layer.y = Math.round(this.origY[i] + (clickY - this.origClickY));
+                    }
+                    else if (ev instanceof TouchEvent) { // Mobile device touch event
+                        var clickX = (ev.touches[0].pageX - ev.touches[0].target.offsetLeft);
+                        var clickY = (ev.touches[0].pageY - ev.touches[0].target.offsetTop);
+                        layer.x = Math.round(this.origX[i] + ((clickX - this.origClickX) / this.editor.zoom));
+                        layer.y = Math.round(this.origY[i] + ((clickY - this.origClickY) / this.editor.zoom));
+                    }
                     this.editor.updateLayer(layer);
-                    this.canvas.layersMoved.push(layer);
                 }
                 this.editor.render();
             }
-            console.log(e.clientX);
         }).on('vmouseup', function (e) {
             this.mouseMoving = false;
         });
