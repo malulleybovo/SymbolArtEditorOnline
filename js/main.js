@@ -183,6 +183,7 @@ function initUI() {
             catch (err) {
                 console.error('No editor attached to canvas. It may not have been correctly initialized./n/t' + err.message);
             }
+            editor.selectedLayer = null;
             if (this.elem.type == 'l') {
                 elem = $(this);
                 var myLayer = elem[0].elem;
@@ -204,10 +205,12 @@ function initUI() {
                 (editor.editorBoxIcons.br.css('left', (basePosX + editor.zoom * myLayer.vertices[6] - 93.2) + 'px')
                     .css('top', (basePosY + editor.zoom * myLayer.vertices[7] - 22.8) + 'px'));
                 
-                editor.cPicker[0].selectedLayer = myLayer;
+                editor.selectedLayer = myLayer;
                 editor.layerCtrl.update(myLayer);
-                editor.cPicker[0].editor = editor;
-                $('#colorSelector div').css('backgroundColor', '#' + myLayer.color.toString(16));
+                var layerColor = Math.round(editor.selectedLayer.color);
+                $('#colorSelector')
+                    .spectrum('hide')
+                    .spectrum('set', '#' + layerColor.toString(16));
 
                 editor.showInterface();
                 editor.disableGroupInteraction();
@@ -291,6 +294,18 @@ function initUI() {
     }).on("panzoompan", function () {
         $(list.selectedElem).parent().trigger('mousedown'); // Update editor box
     });
+
+    historyManager = new HistoryManager();
+    historyManager
+        .registerUndoAction('rename',
+        function (ctx) { // UNDO rename
+            ctx.elem.name = ctx.prevName;
+            ctx.domElem.textContent = ctx.prevName;
+        },
+        function (ctx) { // REDO rename
+            ctx.elem.name = ctx.newName;
+            ctx.domElem.textContent = ctx.newName;
+        });
 
     samlLoader = new SAMLLoader(list);
 

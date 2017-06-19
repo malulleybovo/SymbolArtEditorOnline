@@ -15,6 +15,16 @@ h1 {
 
 }
 
+.sa-color-picker-replacer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
+
+.sa-color-picker-container {
+
+}
+
 .highlight {background-color: #CCC;}
 
 .titleScreen {

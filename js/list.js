@@ -56,6 +56,12 @@ var List = Class({
             if (e.keyCode == 113) { // Q
                 console.log(list.toSAML());
             }
+            if (e.keyCode == 116) { // T
+                historyManager.undoAction();
+            }
+            if (e.keyCode == 114) { // R
+                historyManager.redoAction();
+            }
         }
         document.onkeydown = function (e) {
             if (e.keyCode == 9) {
@@ -249,6 +255,15 @@ var List = Class({
                             var prevElem = $(elem[0].prevNode); // Retrieve prev display DOM elem
                             prevElem.text(elem.val()); // Update name of elem in node
                             parent.append(prevElem);
+
+                            // Save undoable action for this rename
+                            historyManager.pushUndoAction('rename', {
+                                'prevName': parent[0].elem.name,
+                                'newName': prevElem.text(),
+                                'elem': parent[0].elem,
+                                'domElem': prevElem[0]
+                            });
+
                             console.log("Changing layer name from \"" + parent[0].elem.name + "\" to \"" + prevElem.text() + "\"");
                             parent[0].elem.name = prevElem.text();
                             parent[0].textbox = false;

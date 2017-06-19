@@ -16,6 +16,8 @@ var Editor = Class({
         this.layers = [];
         this.parts = [];
 
+        this.selectedLayer = null;
+
         for (var i in partsInfo.dataArray) {
             this.parts[i] = new PIXI.Texture(new PIXI.BaseTexture(LoadedImageFiles[partsInfo.dataArray[i] + partsInfo.imgType]));
         }
@@ -24,33 +26,6 @@ var Editor = Class({
         this.SABox.height = 960;
         this.SABox.width = 1920;
         this.stage.addChild(this.SABox);
-
-        // Color Picker
-        this.cPicker = $('<div id="colorSelector" class="no-panning">');
-        this.cPicker.append($('<div style="background-color: rgb(255, 255, 255);">'));
-        this.cPicker.ColorPicker({
-            color: '#ffffff',
-            onShow: function (colpkr) {
-                $(colpkr).fadeIn(100);
-                $(this).ColorPickerSetColor($('#colorSelector')[0].selectedLayer.color.toString(16));
-                return false;
-            },
-            onHide: function (colpkr) {
-                $(colpkr).fadeOut(100);
-                return false;
-            },
-            onChange: function (hsb, hex, rgb) {
-                $('#colorSelector div').css('backgroundColor', '#' + hex);
-                changeColor(hsb, hex, rgb);
-            }
-        }).hide();
-        function changeColor(hsb, hex, rgb) {
-            var picker = $('#colorSelector')[0];
-            var editor = picker.editor;
-            picker.selectedLayer.color = parseInt('0x' + hex);
-            editor.updateLayer(picker.selectedLayer);
-            editor.render();
-        }
 
         // Buttons
         var tl = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-u-l ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
@@ -180,8 +155,69 @@ var Editor = Class({
             $(window.list.selectedElem).parent().trigger('mousedown'); // Update vertex edit button pos
         });
 
-
+        // Color Picker
+        /*this.cPicker = $('<div id="colorSelector" class="no-panning">');
+        this.cPicker.append($('<div style="background-color: rgb(255, 255, 255);">'));
+        this.cPicker.ColorPicker({
+            color: '#ffffff',
+            onShow: function (colpkr) {
+                $(colpkr).fadeIn(100);
+                $(this).ColorPickerSetColor($('#colorSelector')[0].selectedLayer.color.toString(16));
+                return false;
+            },
+            onHide: function (colpkr) {
+                $(colpkr).fadeOut(100);
+                return false;
+            },
+            onChange: function (hsb, hex, rgb) {
+                $('#colorSelector div').css('backgroundColor', '#' + hex);
+                changeColor(hsb, hex, rgb);
+            }
+        }).hide();
+        function changeColor(hsb, hex, rgb) {
+            var picker = $('#colorSelector')[0];
+            var editor = picker.editor;
+            picker.selectedLayer.color = parseInt('0x' + hex);
+            editor.updateLayer(picker.selectedLayer);
+            editor.render();
+        }//*/
+        this.cPicker = $('<input type="text" id="colorSelector" style="width:0; height:0; position:fixed; bottom:0; right:0;" />');
         $('body').append(this.cPicker);
+        this.cPicker.spectrum({
+            color: "#fffffff",
+            showInput: true,
+            showInitial: true,
+            localStorageKey: "spectrum.homepage",
+            showPalette: true,
+            palette: [],
+            replacerClassName: 'sa-color-picker-replacer',
+            containerClassName: 'sa-color-picker-container',
+            preferredFormat: "hex",
+            clickoutFiresChange: false,
+            change: function (color) { updateColor(color); },
+            move: function (color) { updateColor(color); }
+        });
+        $('.sp-replacer').hide();
+        function updateColor(color) {
+            var canvas = $('canvas')[0];
+            if (canvas.editor === undefined) console.error(
+                "Editor canvas could not be found and thus, color picker could not interact with the editor.");
+            else {
+                var editor = canvas.editor;
+                if (editor.selectedLayer !== undefined) {
+                    if (editor.selectedLayer != null) {
+                        var newColor = Math.round(parseInt('0x' + color.toHex()));
+                        editor.selectedLayer.color = newColor;
+                        editor.updateLayer(editor.selectedLayer);
+                        editor.render();
+                    }
+                }
+                else console.warn(
+                    "No currently selected layer is defined. Could not update color picker.");
+            }
+        }
+
+
         $('body').append(this.editorBoxIcons.tl);
         $('body').append(this.editorBoxIcons.tr);
         $('body').append(this.editorBoxIcons.br);
@@ -495,7 +531,7 @@ var Editor = Class({
         this.editorBoxIcons.tr.hide();
         this.editorBoxIcons.bl.hide();
         this.editorBoxIcons.br.hide();
-        this.cPicker.hide();
+        $('.sp-replacer').hide();
     },
     showInterface: function () {
         this.layerCtrl.show();
@@ -503,6 +539,6 @@ var Editor = Class({
         this.editorBoxIcons.tr.show();
         this.editorBoxIcons.bl.show();
         this.editorBoxIcons.br.show();
-        this.cPicker.show();
+        $('.sp-replacer').show();
     }
 });
