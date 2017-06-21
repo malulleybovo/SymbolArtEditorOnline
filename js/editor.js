@@ -60,14 +60,28 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.selected = false;
         }).hide();
-        function changeVertices(that, ix, iy, clientPos) {
-            var canvasPos = $('canvas').offset();
-            var pos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
-            var layer = that.list.selectedElem.parentNode.elem;
-            layer.vertices[ix] = Math.round((pos.left / that.list.editor.zoom) - layer.x);
-            layer.vertices[iy] = Math.round((pos.top / that.list.editor.zoom) - layer.y);
-            that.list.editor.updateLayer(layer);
-            that.list.editor.render();
+        function changeVertices(index, clientPos) {
+            var canvas = $('canvas');
+            var canvasPos = canvas.offset();
+            var editor = canvas[0].editor;
+            var relPos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
+            var layer = list.selectedElem.parentNode.elem;
+
+            var thisVerIndex = 2 * index, oppositeVerIndex = 6 - 2 * index;
+
+            var dPos = {
+                x: Math.round((relPos.left / editor.zoom) - layer.x) - layer.vertices[thisVerIndex],
+                y: Math.round((relPos.top / editor.zoom) - layer.y) - layer.vertices[thisVerIndex + 1]
+            }
+            layer.vertices[thisVerIndex] += dPos.x;
+            layer.vertices[thisVerIndex + 1] += dPos.y;
+            layer.vertices[oppositeVerIndex] -= dPos.x;
+            layer.vertices[oppositeVerIndex + 1] -= dPos.y;
+
+            editor.updateLayer(layer);
+            editor.render();
+
+            return dPos;
         }
         this.editorBoxIcons = {
             tl: tl,
@@ -87,49 +101,54 @@ var Editor = Class({
             // Mouse Move for Button Control
             var buttons = $(this).find('button.editor-box-icon');
             if (!buttons.is(":visible")) return;
+
+            var pos = {
+                left: Math.round(e.clientX),
+                top: Math.round(e.clientY)
+            }
             if (buttons[0].moving) {
-                var pos = {
-                    left: Math.round(e.clientX),
-                    top: Math.round(e.clientY)
-                }
-                $(buttons[0]).css({ top: (pos.top - 22.8), left: (pos.left - 14.8) });
-                changeVertices(buttons[0], 0, 1, pos);
+                changeVertices(0, pos);
+
+                var editor = $('canvas')[0].editor;
+                editor.refreshLayerEditBoxButton(0);
+                editor.refreshLayerEditBoxButton(3);
+
                 var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
-                layerCtrl.v0.updateDisplay();
-                layerCtrl.v1.updateDisplay();
+                layerCtrl.sheer0x.updateDisplay();
+                layerCtrl.sheer0y.updateDisplay();
             }
             else if (buttons[1].moving) {
-                var pos = {
-                    left: Math.round(e.clientX),
-                    top: Math.round(e.clientY)
-                }
-                $(buttons[1]).css({ top: (pos.top - 22.8), left: (pos.left - 54) });
-                changeVertices(buttons[1], 2, 3, pos);
+                changeVertices(1, pos);
+
+                var editor = $('canvas')[0].editor;
+                editor.refreshLayerEditBoxButton(1);
+                editor.refreshLayerEditBoxButton(2);
+
                 var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
-                layerCtrl.v2.updateDisplay();
-                layerCtrl.v3.updateDisplay();
+                layerCtrl.sheer1x.updateDisplay();
+                layerCtrl.sheer1y.updateDisplay();
             }
             else if (buttons[2].moving) {
-                var pos = {
-                    left: Math.round(e.clientX),
-                    top: Math.round(e.clientY)
-                }
-                $(buttons[2]).css({ top: (pos.top - 22.8), left: (pos.left - 93.2) });
-                changeVertices(buttons[2], 6, 7, pos);
+                changeVertices(3, pos);
+
+                var editor = $('canvas')[0].editor;
+                editor.refreshLayerEditBoxButton(0);
+                editor.refreshLayerEditBoxButton(3);
+
                 var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
-                layerCtrl.v6.updateDisplay();
-                layerCtrl.v7.updateDisplay();
+                layerCtrl.sheer0x.updateDisplay();
+                layerCtrl.sheer0y.updateDisplay();
             }
             else if (buttons[3].moving) {
-                var pos = {
-                    left: Math.round(e.clientX),
-                    top: Math.round(e.clientY)
-                }
-                $(buttons[3]).css({ top: (pos.top - 22.8), left: (pos.left - 132.4) });
-                changeVertices(buttons[3], 4, 5, pos);
+                changeVertices(2, pos);
+
+                var editor = $('canvas')[0].editor;
+                editor.refreshLayerEditBoxButton(1);
+                editor.refreshLayerEditBoxButton(2);
+
                 var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
-                layerCtrl.v4.updateDisplay();
-                layerCtrl.v5.updateDisplay();
+                layerCtrl.sheer1x.updateDisplay();
+                layerCtrl.sheer1y.updateDisplay();
             }
         }).on('vmouseup', function (e) {
             var buttons = $(this).find('button.editor-box-icon');
@@ -540,5 +559,51 @@ var Editor = Class({
         this.editorBoxIcons.bl.show();
         this.editorBoxIcons.br.show();
         $('.sp-replacer').show();
+    },
+    refreshLayerEditBox: function () {
+        var offset = $('canvas').offset();
+        var basePosX = offset.left + this.zoom * this.selectedLayer.x;
+        var basePosY = offset.top + this.zoom * this.selectedLayer.y;
+        this.editorBoxIcons.tl.css('left', (basePosX + this.zoom * this.selectedLayer.vertices[0] - 14.8) + 'px')
+            .css('top', (basePosY + this.zoom * this.selectedLayer.vertices[1] - 22.8) + 'px');
+        this.editorBoxIcons.tr.css('left', (basePosX + this.zoom * this.selectedLayer.vertices[2] - 54) + 'px')
+            .css('top', (basePosY + this.zoom * this.selectedLayer.vertices[3] - 22.8) + 'px');
+        this.editorBoxIcons.bl.css('left', (basePosX + this.zoom * this.selectedLayer.vertices[4] - 132.4) + 'px')
+            .css('top', (basePosY + this.zoom * this.selectedLayer.vertices[5] - 22.8) + 'px');
+        this.editorBoxIcons.br.css('left', (basePosX + this.zoom * this.selectedLayer.vertices[6] - 93.2) + 'px')
+            .css('top', (basePosY + this.zoom * this.selectedLayer.vertices[7] - 22.8) + 'px');
+    },
+    refreshLayerEditBoxButton: function (index) {
+        var sel = {};
+        sel.index = 2 * index;
+        switch (index) {
+            case 0:
+                sel.obj = this.editorBoxIcons.tl; sel.offset = 14.8;
+                break;
+            case 1:
+                sel.obj = this.editorBoxIcons.tr; sel.offset = 54;
+                break;
+            case 2:
+                sel.obj = this.editorBoxIcons.bl; sel.offset = 132.4;
+                break;
+            case 3:
+                sel.obj = this.editorBoxIcons.br; sel.offset = 93.2;
+                break;
+            default:
+                console.warn(
+                    'Editor.refreshLayerEditBoxButton: Could not refresh edit box button of index "'
+                    + index + '".');
+                return;
+        }
+
+        var offset = $('canvas').offset();
+        var posX = offset.left
+            + this.zoom * (this.selectedLayer.x + this.selectedLayer.vertices[sel.index])
+            - sel.offset;
+        var posY = offset.top
+            + this.zoom * (this.selectedLayer.y + this.selectedLayer.vertices[sel.index + 1])
+            - 22.8;
+        sel.obj.css('left', posX + 'px')
+            .css('top', posY + 'px');
     }
 });

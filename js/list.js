@@ -2,7 +2,7 @@ var groupID = 0;
 var layerID = 0;
 
 var List = Class({
-    initialize: function (headerName, groupName, editorContainer, elemMousedownCallback) {
+    initialize: function (headerName, groupName, editorContainer) {
         // Initialize Canvas Control
         this.page = $(document.getElementById('canvasctrl'));
 
@@ -123,7 +123,69 @@ var List = Class({
             }
         }
 
-        this.elemMousedownCallback = elemMousedownCallback;
+        this.elemMousedownEvtHandler = function (e) {
+            var elem;
+            var canvas = $('canvas')[0];
+            var editor;
+            try {
+                editor = canvas.editor;
+            }
+            catch (err) {
+                console.error('Canvas could not be found. It may not have been correctly initialized./n/t' + err.message);
+            }
+            try {
+                var testEditor = editor.zoom;
+            }
+            catch (err) {
+                console.error('No editor attached to canvas. It may not have been correctly initialized./n/t' + err.message);
+            }
+            editor.selectedLayer = null;
+            if (this.elem.type == 'l') {
+                elem = $(this);
+                var myLayer = elem[0].elem;
+                try {
+                    var testMyLayer = myLayer.x;
+                }
+                catch (err) {
+                    console.error('Selected layer was not found./n/t' + err.message);
+                }
+
+                editor.selectedLayer = myLayer;
+                editor.refreshLayerEditBox();
+                editor.layerCtrl.update(myLayer);
+                var layerColor = Math.round(editor.selectedLayer.color);
+                $('#colorSelector')
+                    .spectrum('hide')
+                    .spectrum('set', '#' + layerColor.toString(16));
+
+                editor.showInterface();
+                editor.disableGroupInteraction();
+                editor.enableInteraction(myLayer);
+            }
+            else if (this.elem.type == 'g') {
+                elem = $(this.parentNode);
+                editor.hideInterface();
+                editor.disableInteraction();
+                editor.enableGroupInteraction(this.elem);
+
+            }
+            else {
+                return; // Something bad happened
+            }
+            var index = elem.index();
+            elem[0].group.activeElem = index;
+            console.log("Selected elem. \"" + elem[0].group.elems[elem[0].group.activeElem].name + "\" from group \"" + elem[0].group.name + "\"");
+            switch (e.which) {
+                case 1: // Left click
+                    break;
+                case 2: // Mid click
+                    break;
+                case 3: // Right click
+                    break;
+                default:
+                    break;
+            }
+        };
         this.createGroupNode = function (name, subGroup, group, parentGroup, folder) {
             var groupFolder = $('<div data-role="collapsible" id="' + groupID + '">'); groupID++;
             var header = $('<h2 class="context-menu-group">' + name + '</h2>');
@@ -134,7 +196,7 @@ var List = Class({
             header[0].group = group;
             header[0].elem = group.elems[group.activeElem];
             header[0].parentFolder = folder; // Get reference to collapsible
-            $(header).mousedown(this.elemMousedownCallback);
+            $(header).mousedown(this.elemMousedownEvtHandler);
             header.on("swiperight", function () {
                 $(this).contextMenu();
             });
@@ -190,7 +252,7 @@ var List = Class({
             li[0].parentFolder = folder;
             li[0].elem = group.elems[group.activeElem];
             li[0].list = this;
-            $(li).mousedown(this.elemMousedownCallback);
+            $(li).mousedown(this.elemMousedownEvtHandler);
             // Show menu when right clicked
             li.on('vmousedown', function (e) {
                 this.list.changeSelectedElem(this.firstChild);
@@ -544,7 +606,7 @@ var List = Class({
             header[0].group = parentGroup;
             header[0].elem = parentGroup.elems[index];
             header[0].parentFolder = parentFolder[0].parentNode; // Get reference to collapsible
-            $(header).mousedown(this.elemMousedownCallback);
+            $(header).mousedown(this.elemMousedownEvtHandler);
             menuType = 'SubGroupMenu';
         }
         else {
@@ -580,7 +642,7 @@ var List = Class({
                 li[0].group = group;
                 li[0].parentFolder = groupFolder[0];
                 li[0].elem = group.elems[i];
-                $(li).mousedown(this.elemMousedownCallback);
+                $(li).mousedown(this.elemMousedownEvtHandler);
                 li.on("swiperight", function () {
                     $(this).contextMenu();
                 });

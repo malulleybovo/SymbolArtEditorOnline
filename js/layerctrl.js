@@ -15,6 +15,7 @@ var LayerCtrl = Class({
 
         this.quadChangeCallback = function (val) {
             val = Math.round(val); // Make sure it is an integer
+            this.object[this.oppositeIndex] = 64 - val;
             this.object[this.property] = val;
             var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
             var editor = layerCtrl.editor;
@@ -42,23 +43,19 @@ var LayerCtrl = Class({
         this.scaleX = this.scale.add(this.activeLayer, 'scaleX').min(1).step(0.1).listen();
         this.scaleY = this.scale.add(this.activeLayer, 'scaleY').min(1).step(0.1).listen();
 
-        this.vertices = this.gui.addFolder('vertices');
-        this.v0 = this.vertices.add(this.activeLayer.vertices, '0').step(1)
-            .name('top left X').onChange(this.quadChangeCallback);
-        this.v1 = this.vertices.add(this.activeLayer.vertices, '1').step(1)
-            .name('top left Y').onChange(this.quadChangeCallback);
-        this.v2 = this.vertices.add(this.activeLayer.vertices, '2').step(1)
-            .name('top right X').onChange(this.quadChangeCallback);
-        this.v3 = this.vertices.add(this.activeLayer.vertices, '3').step(1)
-            .name('top left Y').onChange(this.quadChangeCallback);
-        this.v4 = this.vertices.add(this.activeLayer.vertices, '4').step(1)
-            .name('bottom left X').onChange(this.quadChangeCallback);
-        this.v5 = this.vertices.add(this.activeLayer.vertices, '5').step(1)
-            .name('bottom left Y').onChange(this.quadChangeCallback);
-        this.v6 = this.vertices.add(this.activeLayer.vertices, '6').step(1)
-            .name('bottom right X').onChange(this.quadChangeCallback);
-        this.v7 = this.vertices.add(this.activeLayer.vertices, '7').step(1)
-            .name('bottom right Y').onChange(this.quadChangeCallback);
+        this.vertices = this.gui.addFolder('vertex sheer');
+        this.sheer0x = this.vertices.add(this.activeLayer.vertices, '0').step(1)
+            .name('\\ diag. X').onChange(this.quadChangeCallback);
+        this.sheer0x.oppositeIndex = 6;
+        this.sheer0y = this.vertices.add(this.activeLayer.vertices, '1').step(1)
+            .name('\\ diag. Y').onChange(this.quadChangeCallback);
+        this.sheer0y.oppositeIndex = 7;
+        this.sheer1x = this.vertices.add(this.activeLayer.vertices, '4').step(1)
+            .name('/ diag. X').onChange(this.quadChangeCallback);
+        this.sheer1x.oppositeIndex = 2;
+        this.sheer1y = this.vertices.add(this.activeLayer.vertices, '3').step(1)
+            .name('/ diag. Y').onChange(this.quadChangeCallback);
+        this.sheer1y.oppositeIndex = 5;
 
         this.rotation = this.gui.add(this.activeLayer, 'rotation').min(0).step(0.1).listen();
         this.alpha = this.gui.add(this.activeLayer, 'alpha').min(0).step(1).max(7).listen();
@@ -72,14 +69,10 @@ var LayerCtrl = Class({
         this.scaleY.object = this.activeLayer;
         this.rotation.object = this.activeLayer;
         this.alpha.object = this.activeLayer;
-        this.v0.object = this.activeLayer.vertices;
-        this.v1.object = this.activeLayer.vertices;
-        this.v2.object = this.activeLayer.vertices;
-        this.v3.object = this.activeLayer.vertices;
-        this.v4.object = this.activeLayer.vertices;
-        this.v5.object = this.activeLayer.vertices;
-        this.v6.object = this.activeLayer.vertices;
-        this.v7.object = this.activeLayer.vertices;
+        this.sheer0x.object = this.activeLayer.vertices;
+        this.sheer0y.object = this.activeLayer.vertices;
+        this.sheer1y.object = this.activeLayer.vertices;
+        this.sheer1x.object = this.activeLayer.vertices;
 
         this.updateDisplay();
     },
@@ -89,14 +82,10 @@ var LayerCtrl = Class({
         this.posY.updateDisplay();
         this.scaleX.updateDisplay();
         this.scaleY.updateDisplay();
-        this.v0.updateDisplay();
-        this.v1.updateDisplay();
-        this.v2.updateDisplay();
-        this.v3.updateDisplay();
-        this.v4.updateDisplay();
-        this.v5.updateDisplay();
-        this.v6.updateDisplay();
-        this.v7.updateDisplay();
+        this.sheer0x.updateDisplay();
+        this.sheer0y.updateDisplay();
+        this.sheer1y.updateDisplay();
+        this.sheer1x.updateDisplay();
         this.rotation.updateDisplay();
         this.alpha.updateDisplay();
     },
