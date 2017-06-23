@@ -1,17 +1,7 @@
 ﻿////////////////////////////////////////////////////////////////////////////////
 //
-//  Project: Binary State Parser
-//  File: main.js
-//  Executable file: binaryStateParser.html
-//  Known Compatibility: Google Chrome
-//  Author: Arthur Malulley Bovolim de Oliveira
-//  Description: Website that takes is a local file, parses it as text, and
-//      runs a checker that firstly detects if file content follows the right 
-//      format (only 0s, 1s, and new line characters are allowed and all lines
-//      have to have the same number of character, or 'bits') and then checks
-//      if file content contains all possible combinations (or states) of 0s 
-//      and 1s for a N-bit binary number (except 0), in which N is determined 
-//      by the number of of characters, or bits, in the first number in file.
+//  Project: Symbol Art Editor Online
+//  Author: Arthur Malulley
 //
 ////////////////////////////////////////////////////////////////////////////////
 var imgWidth = 176;
@@ -22,7 +12,7 @@ var groupNum = 0;
 $(document).delegate(".no-panning", "scrollstart", false);
 // Quick Controls Variables
 function initConsts() {
-    title = "Symbol Art Editor";
+    title = "Symbol Art Editor Online";
     description = "Tap Button to Start";
     CANVAS_W = 192;
     CANVAS_W_STEP = 24;
@@ -33,39 +23,15 @@ function initConsts() {
     mousedown = false;
 }
 
-/********************************************************
-* 
-* Function : convertToBKMAPP
-* 
-* Description : 
-*      
-* Parameters :
-* 
-* Return : 
-* 
-********************************************************/
-function convertToBKMAPP(data) {
-    var res = "";
-
-    var urls = data.split('\n');
-    for (var i = 0; i < urls.length - 1; i++) {
-        var url = urls[i].trim();
-
-        res += newBoxKey + "\n\r\n\r" + url + "\n\r\n\r";
-
-    }
-    console.log(res);
-}
-
 window.onload = function () {
-    initDocument();
     initConsts();
+    initDocument();
     initGlobalVars();
     initUI();
 }
 
 function initDocument() {
-    document.title = "Symbol Art Editor";
+    document.title = title;
 
     // Get reference to head and body of the document
     HTMLHead = document.getElementsByTagName('head')[0];
