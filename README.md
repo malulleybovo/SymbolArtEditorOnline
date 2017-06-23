@@ -5,7 +5,7 @@ This is purely a fan-made application developed to let other fans and  have fun 
 ##### Currently under development, but available for testing and usage at your own risk and by your own curiosity.
 ##### Tell me your ideas if you think about an extra feature I have not thought about already. Also, if you have knowledge about how *.sar* files are formatted, please enlighten me so I can add support for it.
 
-## Play with it at [Symbol Art Editor Online](https://malulleybovo.github.io/Symbol_Art_Editor/)
+## Play with it at [Symbol Art Editor Online](https://malulleybovo.github.io/Symbol_Art_Editor_Online/)
 
 ### Usage: (Currently in Alpha Version so I cannot guarantee 100% satisfaction just yet!)
 - Top Left Icon Shows/Hides the Layer Manager
