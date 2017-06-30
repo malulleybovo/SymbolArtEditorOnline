@@ -4,6 +4,8 @@ var Editor = Class({
         this.ZOOM_STEP = 0.4;
         this.ZOOM_MAX = 5;
         this.ZOOM_MIN = 1;
+        this.MIN_VTX_VARIATION = 3;
+        this.disableSmallVtxChange = false;
 
         this.list = list;
 
@@ -33,7 +35,11 @@ var Editor = Class({
         tl[0].list = list;
         tl[0].editor = this;
         tl.on('vmousedown', function () {
-            if (!panZoomActive) this.editor.currBtnDown = 0;
+            if (!panZoomActive) {
+                this.editor.currBtnDown = 0;
+                if (!this.editor.disableSmallVtxChange)
+                    this.editor.origEditbtnPos = this.editor.layerCtrl.activeLayer.vertices.slice(0);
+            }
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
@@ -42,7 +48,11 @@ var Editor = Class({
         tr[0].list = list;
         tr[0].editor = this;
         tr.on('vmousedown', function () {
-            if (!panZoomActive) this.editor.currBtnDown = 1;
+            if (!panZoomActive) {
+                this.editor.currBtnDown = 1;
+                if (!this.editor.disableSmallVtxChange)
+                    this.editor.origEditbtnPos = this.editor.layerCtrl.activeLayer.vertices.slice(0);
+            }
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
@@ -51,7 +61,11 @@ var Editor = Class({
         br[0].list = list;
         br[0].editor = this;
         br.on('vmousedown', function () {
-            if (!panZoomActive) this.editor.currBtnDown = 2;
+            if (!panZoomActive) {
+                this.editor.currBtnDown = 2;
+                if (!this.editor.disableSmallVtxChange)
+                    this.editor.origEditbtnPos = this.editor.layerCtrl.activeLayer.vertices.slice(0);
+            }
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
@@ -60,7 +74,11 @@ var Editor = Class({
         bl[0].list = list;
         bl[0].editor = this;
         bl.on('vmousedown', function () {
-            if (!panZoomActive) this.editor.currBtnDown = 3;
+            if (!panZoomActive) {
+                this.editor.currBtnDown = 3;
+                if (!this.editor.disableSmallVtxChange)
+                    this.editor.origEditbtnPos = this.editor.layerCtrl.activeLayer.vertices.slice(0);
+            }
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
@@ -68,8 +86,12 @@ var Editor = Class({
         var btn_l = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-l ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
         btn_l[0].list = list;
         btn_l[0].editor = this;
-        btn_l.on('vmousedown', function () {
-            if (!panZoomActive) this.editor.currBtnDown = 4;
+        btn_l.on('vmousedown', function (e) {
+            if (!panZoomActive) {
+                this.editor.currBtnDown = 4;
+                if (!this.editor.disableSmallVtxChange)
+                    this.editor.origEditbtnPos = this.editor.layerCtrl.activeLayer.vertices.slice(0);
+            }
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
@@ -77,8 +99,12 @@ var Editor = Class({
         var btn_u = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-u ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
         btn_u[0].list = list;
         btn_u[0].editor = this;
-        btn_u.on('vmousedown', function () {
-            if (!panZoomActive) this.editor.currBtnDown = 5;
+        btn_u.on('vmousedown', function (e) {
+            if (!panZoomActive) {
+                this.editor.currBtnDown = 5;
+                if (!this.editor.disableSmallVtxChange)
+                    this.editor.origEditbtnPos = this.editor.layerCtrl.activeLayer.vertices.slice(0);
+            }
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
@@ -86,8 +112,12 @@ var Editor = Class({
         var btn_r = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-r ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
         btn_r[0].list = list;
         btn_r[0].editor = this;
-        btn_r.on('vmousedown', function () {
-            if (!panZoomActive) this.editor.currBtnDown = 6;
+        btn_r.on('vmousedown', function (e) {
+            if (!panZoomActive) {
+                this.editor.currBtnDown = 6;
+                if (!this.editor.disableSmallVtxChange)
+                    this.editor.origEditbtnPos = this.editor.layerCtrl.activeLayer.vertices.slice(0);
+            }
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
@@ -95,13 +125,17 @@ var Editor = Class({
         var btn_d = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-d ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
         btn_d[0].list = list;
         btn_d[0].editor = this;
-        btn_d.on('vmousedown', function () {
-            if (!panZoomActive) this.editor.currBtnDown = 7;
+        btn_d.on('vmousedown', function (e) {
+            if (!panZoomActive) {
+                this.editor.currBtnDown = 7;
+                if (!this.editor.disableSmallVtxChange)
+                    this.editor.origEditbtnPos = this.editor.layerCtrl.activeLayer.vertices.slice(0);
+            }
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        function diagStretch(index, clientPos) {
+        function diagStretch(index, clientPos, origVtxs) {
             var canvas = $('canvas');
             var canvasPos = canvas.offset();
             var editor = canvas[0].editor;
@@ -118,38 +152,58 @@ var Editor = Class({
             layer.vertices[thisVerIndex + 1] += dPos.y;
             layer.vertices[oppositeVerIndex] -= dPos.x;
             layer.vertices[oppositeVerIndex + 1] -= dPos.y;
+            if (!editor.disableSmallVtxChange) {
+                if (Math.abs(layer.vertices[thisVerIndex] - origVtxs[thisVerIndex]) < editor.MIN_VTX_VARIATION) {
+                    layer.vertices[thisVerIndex] = origVtxs[thisVerIndex];
+                    layer.vertices[oppositeVerIndex] = origVtxs[oppositeVerIndex];
+                }
+                if (Math.abs(layer.vertices[thisVerIndex + 1] - origVtxs[thisVerIndex + 1]) < editor.MIN_VTX_VARIATION) {
+                    layer.vertices[thisVerIndex + 1] = origVtxs[thisVerIndex + 1];
+                    layer.vertices[oppositeVerIndex + 1] = origVtxs[oppositeVerIndex + 1];
+                }
+            }
 
             editor.updateLayer(layer);
             editor.render();
         }
-        function sideStretch(index, clientPos) {
+        function sideStretch(index, clientPos, origVtxs) {
             var corner1Index, corner2Index;
             var isHorizontal;
             switch (index) {
-                case 0: corner1Index = 0; corner2Index = 4; isHorizontal = true; break; // left
-                case 1: corner1Index = 1; corner2Index = 3; isHorizontal = false; break; // up
-                case 2: corner1Index = 2; corner2Index = 6; isHorizontal = true; break; // right
-                case 3: corner1Index = 5; corner2Index = 7; isHorizontal = false; break; // down
+                case 0: corner1Index = 0; corner2Index = 4; break; // left
+                case 1: corner1Index = 0; corner2Index = 2; break; // up
+                case 2: corner1Index = 2; corner2Index = 6; break; // right
+                case 3: corner1Index = 4; corner2Index = 6; break; // down
                 default:
                     return;
             }
             var canvas = $('canvas');
             var canvasPos = canvas.offset();
             var editor = canvas[0].editor;
-            var relPos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
             var layer = list.selectedElem.parentNode.elem;
 
-            var dPos;
-            if (isHorizontal) {
-                dPos =  Math.round((relPos.left / editor.zoom) - layer.x)
-                    - ((layer.vertices[corner1Index] + layer.vertices[corner2Index]) / 2);
+            var relPos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
+            var dPos = {
+                x: Math.round((relPos.left / editor.zoom) - layer.x)
+                    - ((layer.vertices[corner1Index] + layer.vertices[corner2Index]) / 2),
+                y: Math.round((relPos.top / editor.zoom) - layer.y)
+                    - ((layer.vertices[corner1Index + 1] + layer.vertices[corner2Index + 1]) / 2)
+            };
+
+            layer.vertices[corner1Index] += dPos.x;
+            layer.vertices[corner2Index] += dPos.x;
+            layer.vertices[corner1Index + 1] += dPos.y;
+            layer.vertices[corner2Index + 1] += dPos.y;
+            if (!editor.disableSmallVtxChange) {
+                if (Math.abs(layer.vertices[corner1Index] - origVtxs[corner1Index]) < editor.MIN_VTX_VARIATION) {
+                    layer.vertices[corner1Index] = origVtxs[corner1Index];
+                    layer.vertices[corner2Index] = origVtxs[corner2Index];
+                }
+                if (Math.abs(layer.vertices[corner1Index + 1] - origVtxs[corner1Index + 1]) < editor.MIN_VTX_VARIATION) {
+                    layer.vertices[corner1Index + 1] = origVtxs[corner1Index + 1];
+                    layer.vertices[corner2Index + 1] = origVtxs[corner2Index + 1];
+                }
             }
-            else {
-                dPos = Math.round((relPos.top / editor.zoom) - layer.y)
-                    - ((layer.vertices[corner1Index] + layer.vertices[corner2Index]) / 2);
-            }
-            layer.vertices[corner1Index] += dPos;
-            layer.vertices[corner2Index] += dPos;
 
             editor.updateLayer(layer);
             editor.render();
@@ -170,9 +224,13 @@ var Editor = Class({
             var buttons = $(this).find('button.editor-box-icon');
             if (!buttons.is(":visible")) return;
 
-            var btnActive = $('canvas')[0].editor.currBtnDown;
+            var editor = $('canvas')[0].editor;
+            var btnActive = editor.currBtnDown;
             // Check if should proceed
-            if (btnActive < 0) return; // Avoids useless computation
+            if (btnActive < 0) {
+                return; // Avoids useless computation
+            }
+            var origEditbtnPos = editor.origEditbtnPos;
 
             var pos = {
                 left: Math.round(e.clientX),
@@ -180,28 +238,18 @@ var Editor = Class({
             }
             switch (btnActive) {
                 case 0: // top left button
-                    diagStretch(0, pos);
-                    break;
                 case 1: // top right button
-                    diagStretch(1, pos);
+                    diagStretch(btnActive, pos, origEditbtnPos);
                     break;
                 case 2: // bottom right button
-                    diagStretch(3, pos);
-                    break;
                 case 3: // bottom left button
-                    diagStretch(2, pos);
+                    diagStretch(5 - btnActive, pos, origEditbtnPos);
                     break;
                 case 4: // left button
-                    sideStretch(0, pos);
-                    break;
                 case 5: // top button
-                    sideStretch(1, pos);
-                    break;
                 case 6: // right button
-                    sideStretch(2, pos);
-                    break;
                 case 7: // bottom button
-                    sideStretch(3, pos);
+                    sideStretch(btnActive - 4, pos, origEditbtnPos);
                     break;
                 default:
                     break;

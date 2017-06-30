@@ -18,20 +18,81 @@ var LayerCtrl = Class({
             move: function () {
                 this.layerCtrl.functions.update(this.layerCtrl);
             },
-            sheer: function () {
-                this.layerCtrl.activeLayer.vertices[this.v1]--;
-                this.layerCtrl.activeLayer.vertices[this.v2]++;
+            diagStretchMore: function () {
+                this.object.diagStretch(this, 1);
                 this.object.update(this.layerCtrl);
             },
+            diagStretchLess: function () {
+                this.object.diagStretch(this, -1);
+                this.object.update(this.layerCtrl);
+            },
+            diagStretch: function (that, amount) {
+                var v1, v2;
+                switch (that.diagNum) {
+                    case 0:
+                        v1 = 0; v2 = 6;
+                        break;
+                    case 1:
+                        v1 = 2; v2 = 4;
+                        break;
+                    default:
+                        return;
+                }
+                var v = that.layerCtrl.activeLayer.vertices;
+                var vOffset = 0;
+                if (!that.isHoriz) vOffset++;
+                if (v[v1 + vOffset] <= v[v2 + vOffset]) amount = -amount;
+                v[v1 + vOffset] += amount;
+                v[v2 + vOffset] -= amount;
+            },
             sideStretchMore: function () {
-                this.layerCtrl.activeLayer.vertices[this.v1]++;
-                this.layerCtrl.activeLayer.vertices[this.v2]++;
+                this.object.sideStretch(this, 1);
                 this.object.update(this.layerCtrl);
             },
             sideStretchLess: function () {
-                this.layerCtrl.activeLayer.vertices[this.v1]--;
-                this.layerCtrl.activeLayer.vertices[this.v2]--;
+                this.object.sideStretch(this, -1);
                 this.object.update(this.layerCtrl);
+            },
+            sideStretch: function (that, amount) {
+                var arbiterV = 0;
+                var testV;
+                var v1, v2;
+                switch (that.sideNum) {
+                    case 0:
+                    case 1:
+                        v1 = 2 * that.sideNum; v2 = v1 + 4;
+                        testV = 2; 
+                        break;
+                    case 2:
+                    case 3:
+                        v1 = 4 * (that.sideNum - 2); v2 = v1 + 2;
+                        testV = 4;
+                        break;
+                    default:
+                        return;
+                }
+                var v = that.layerCtrl.activeLayer.vertices;
+                var ang = Math.atan((v[arbiterV + 1] - v[testV + 1]) / (v[arbiterV] - v[testV]));
+                if (ang < Math.PI / 3 && ang > -Math.PI / 3) {
+                    if (v[testV] <= v[arbiterV]) {
+                        v[v1] -= amount;
+                        v[v2] -= amount;
+                    }
+                    else {
+                        v[v1] += amount;
+                        v[v2] += amount;
+                    }
+                }
+                if (ang > Math.PI / 6 || ang < -Math.PI / 6) {
+                    if (v[testV + 1] <= v[arbiterV + 1]) {
+                        v[v1 + 1] -= amount;
+                        v[v2 + 1] -= amount;
+                    }
+                    else {
+                        v[v1 + 1] += amount;
+                        v[v2 + 1] += amount;
+                    }
+                }
             },
             update: function (layerCtrl) {
                 var editor = layerCtrl.editor;
@@ -65,62 +126,62 @@ var LayerCtrl = Class({
         this.vStretchFolder = this.gui.addFolder('diagonal stretch');
 
         this.vStretch1plus = this.vStretchFolder.add(this.functions, 'trigger')
-            .name('\u2196 \u2198 X+').onChange(this.functions.sheer);
-        this.vStretch1plus.layerCtrl = this; this.vStretch1plus.v1 = 0; this.vStretch1plus.v2 = 6;
+            .name('\u2196 \u2198 Horiz+').onChange(this.functions.diagStretchMore);
+        this.vStretch1plus.layerCtrl = this; this.vStretch1plus.diagNum = 0; this.vStretch1plus.isHoriz = true;
         this.vStretch1minus = this.vStretchFolder.add(this.functions, 'trigger')
-            .name('\u2196 \u2198 X-').onChange(this.functions.sheer);
-        this.vStretch1minus.layerCtrl = this; this.vStretch1minus.v1 = 6; this.vStretch1minus.v2 = 0;
+            .name('\u2196 \u2198 Horiz-').onChange(this.functions.diagStretchLess);
+        this.vStretch1minus.layerCtrl = this; this.vStretch1minus.diagNum = 0; this.vStretch1minus.isHoriz = true;
 
         this.vStretch2plus = this.vStretchFolder.add(this.functions, 'trigger')
-            .name('\u2196 \u2198 Y+').onChange(this.functions.sheer);
-        this.vStretch2plus.layerCtrl = this; this.vStretch2plus.v1 = 1; this.vStretch2plus.v2 = 7;
+            .name('\u2196 \u2198 Vert+').onChange(this.functions.diagStretchMore);
+        this.vStretch2plus.layerCtrl = this; this.vStretch2plus.diagNum = 0; this.vStretch2plus.isHoriz = false;
         this.vStretch2minus = this.vStretchFolder.add(this.functions, 'trigger')
-            .name('\u2196 \u2198 Y-').onChange(this.functions.sheer);
-        this.vStretch2minus.layerCtrl = this; this.vStretch2minus.v1 = 7; this.vStretch2minus.v2 = 1;
+            .name('\u2196 \u2198 Vert-').onChange(this.functions.diagStretchLess);
+        this.vStretch2minus.layerCtrl = this; this.vStretch2minus.diagNum = 0; this.vStretch2minus.isHoriz = false;
 
         this.vStretch3plus = this.vStretchFolder.add(this.functions, 'trigger')
-            .name('\u2199 \u2197 X+').onChange(this.functions.sheer);
-        this.vStretch3plus.layerCtrl = this; this.vStretch3plus.v1 = 4; this.vStretch3plus.v2 = 2;
+            .name('\u2199 \u2197 Horiz+').onChange(this.functions.diagStretchMore);
+        this.vStretch3plus.layerCtrl = this; this.vStretch3plus.diagNum = 1; this.vStretch3plus.isHoriz = true;
         this.vStretch3minus = this.vStretchFolder.add(this.functions, 'trigger')
-            .name('\u2199 \u2197 X-').onChange(this.functions.sheer);
-        this.vStretch3minus.layerCtrl = this; this.vStretch3minus.v1 = 2; this.vStretch3minus.v2 = 4;
+            .name('\u2199 \u2197 Horiz-').onChange(this.functions.diagStretchLess);
+        this.vStretch3minus.layerCtrl = this; this.vStretch3minus.diagNum = 1; this.vStretch3minus.isHoriz = true;
 
         this.vStretch4plus = this.vStretchFolder.add(this.functions, 'trigger')
-            .name('\u2199 \u2197 Y+').onChange(this.functions.sheer);
-        this.vStretch4plus.layerCtrl = this; this.vStretch4plus.v1 = 3; this.vStretch4plus.v2 = 5;
+            .name('\u2199 \u2197 Vert+').onChange(this.functions.diagStretchMore);
+        this.vStretch4plus.layerCtrl = this; this.vStretch4plus.diagNum = 1; this.vStretch4plus.isHoriz = false;
         this.vStretch4minus = this.vStretchFolder.add(this.functions, 'trigger')
-            .name('\u2199 \u2197 Y-').onChange(this.functions.sheer);
-        this.vStretch4minus.layerCtrl = this; this.vStretch4minus.v1 = 5; this.vStretch4minus.v2 = 3;
+            .name('\u2199 \u2197 Vert-').onChange(this.functions.diagStretchLess);
+        this.vStretch4minus.layerCtrl = this; this.vStretch4minus.diagNum = 1; this.vStretch4minus.isHoriz = false;
 
         this.sideStretchFolder = this.gui.addFolder('side stretch');
 
         this.sideStretchLPlus = this.sideStretchFolder.add(this.functions, 'trigger')
-            .name('left+').onChange(this.functions.sideStretchLess);
-        this.sideStretchLPlus.layerCtrl = this; this.sideStretchLPlus.v1 = 0; this.sideStretchLPlus.v2 = 4;
+            .name('\u2190 +').onChange(this.functions.sideStretchLess);
+        this.sideStretchLPlus.layerCtrl = this; this.sideStretchLPlus.sideNum = 0;
         this.sideStretchLMinus = this.sideStretchFolder.add(this.functions, 'trigger')
-            .name('left-').onChange(this.functions.sideStretchMore);
-        this.sideStretchLMinus.layerCtrl = this; this.sideStretchLMinus.v1 = 0; this.sideStretchLMinus.v2 = 4;
+            .name('\u2190 -').onChange(this.functions.sideStretchMore);
+        this.sideStretchLMinus.layerCtrl = this; this.sideStretchLMinus.sideNum = 0;
 
         this.sideStretchRPlus = this.sideStretchFolder.add(this.functions, 'trigger')
-            .name('right+').onChange(this.functions.sideStretchMore);
-        this.sideStretchRPlus.layerCtrl = this; this.sideStretchRPlus.v1 = 2; this.sideStretchRPlus.v2 = 6;
+            .name('\u2192 +').onChange(this.functions.sideStretchMore);
+        this.sideStretchRPlus.layerCtrl = this; this.sideStretchRPlus.sideNum = 1;
         this.sideStretchRMinus = this.sideStretchFolder.add(this.functions, 'trigger')
-            .name('right-').onChange(this.functions.sideStretchLess);
-        this.sideStretchRMinus.layerCtrl = this; this.sideStretchRMinus.v1 = 2; this.sideStretchRMinus.v2 = 6;
+            .name('\u2192 -').onChange(this.functions.sideStretchLess);
+        this.sideStretchRMinus.layerCtrl = this; this.sideStretchRMinus.sideNum = 1;
 
         this.sideStretchUPlus = this.sideStretchFolder.add(this.functions, 'trigger')
-            .name('up+').onChange(this.functions.sideStretchLess);
-        this.sideStretchUPlus.layerCtrl = this; this.sideStretchUPlus.v1 = 1; this.sideStretchUPlus.v2 = 3;
+            .name('\u2191 +').onChange(this.functions.sideStretchLess);
+        this.sideStretchUPlus.layerCtrl = this; this.sideStretchUPlus.sideNum = 2;
         this.sideStretchUMinus = this.sideStretchFolder.add(this.functions, 'trigger')
-            .name('up-').onChange(this.functions.sideStretchMore);
-        this.sideStretchUMinus.layerCtrl = this; this.sideStretchUMinus.v1 = 1; this.sideStretchUMinus.v2 = 3;
+            .name('\u2191 -').onChange(this.functions.sideStretchMore);
+        this.sideStretchUMinus.layerCtrl = this; this.sideStretchUMinus.sideNum = 2;
 
         this.sideStretchDPlus = this.sideStretchFolder.add(this.functions, 'trigger')
-            .name('down+').onChange(this.functions.sideStretchMore);
-        this.sideStretchDPlus.layerCtrl = this; this.sideStretchDPlus.v1 = 5; this.sideStretchDPlus.v2 = 7;
+            .name('\u2193 +').onChange(this.functions.sideStretchMore);
+        this.sideStretchDPlus.layerCtrl = this; this.sideStretchDPlus.sideNum = 3;
         this.sideStretchDMinus = this.sideStretchFolder.add(this.functions, 'trigger')
-            .name('down-').onChange(this.functions.sideStretchLess);
-        this.sideStretchDMinus.layerCtrl = this; this.sideStretchDMinus.v1 = 5; this.sideStretchDMinus.v2 = 7;
+            .name('\u2193 -').onChange(this.functions.sideStretchLess);
+        this.sideStretchDMinus.layerCtrl = this; this.sideStretchDMinus.sideNum = 3;
 
         this.rotation = this.gui.add(this.activeLayer, 'rotation').min(0).step(0.1).listen();
         this.alpha = this.gui.add(this.activeLayer, 'alpha').min(0).step(1).max(7).listen();
