@@ -19,7 +19,10 @@ var SAMLLoader = Class({
     load: function (SAMLText) {
         // TODO
         var xmlTags = SAMLText.match(/<\?xml([ ]+[A-Z|a-z][A-Z|a-z|0-9|_]*[A-Z|a-z|0-9]*="[^"|\n]+")*[ ]*\?>/g);
-        if (xmlTags.length > 0) {
+        if (xmlTags == null || xmlTags.length <= 0) {
+            // No xml tag found
+        }
+        else {
             // Found an xml tag
             // TODO
         }
@@ -30,20 +33,21 @@ var SAMLLoader = Class({
         // Get all tags found in string
         var tags = SAMLText.match(/<[^\n|<]*>/g);
         var nestingLvl = 0;
+        var isValid = false;
         for (var i = 0; i < tags.length; i++) {
             var tag = tags[i];
-            if (/<layer>|<layer [^\n|<]*>/.test(tag)) { // if <layer>
+            if (isValid && /<layer>|<layer [^\n|<]*>/.test(tag)) { // if <layer>
                 contextMenuCallback('insert layer', null, null, $(currFolder.firstChild));
                 var newLayerNode = currFolder.lastChild.firstChild.lastChild;
                 this.setupElem(newLayerNode, tag, 'layer');
             }
-            else if (/<g>|<g [^\n|<]*>/.test(tag)) { // if <g>
+            else if (isValid && /<g>|<g [^\n|<]*>/.test(tag)) { // if <g>
                 contextMenuCallback('insert group', null, null, $(currFolder.firstChild));
                 currFolder = currFolder.lastChild.firstChild.lastChild;
                 this.setupElem(currFolder, tag, 'g');
                 nestingLvl++;
             }
-            else if (/<\/([a-z|A-Z]+[0-9]?)>/.test(tag)) {
+            else if (isValid && /<\/([a-z|A-Z]+[0-9]?)>/.test(tag)) {
                 if (/<\/g>/.test(tag)) { // if </g>
                     if (nestingLvl > 0) {
                         currFolder = currFolder.parentNode.parentNode.parentNode;
@@ -56,12 +60,15 @@ var SAMLLoader = Class({
             }
             else if (/<sa>|<sa [^\n|<]*>/.test(tag)) {
                 this.setupElem(mainFolder, tag, 'sa');
+                isValid = true;
             }
         }
 
+        if (nestingLvl > 0) alert('Loaded file was malformed, it may not be compatible.');
+
         this.editor.render();
 
-        return null;
+        return isValid;
     },
     setupElem: function (node, tag, type) {
         // Get all key="value" pairs in tag

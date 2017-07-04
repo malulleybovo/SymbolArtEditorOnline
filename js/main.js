@@ -97,7 +97,7 @@ function initUI() {
     });
     UI.landing.menu.append(UI.landing.menu.loadAppButton);
 
-    UI.fileHandler = $('<input type="file" class="hidden">');
+    UI.fileHandler = $('<input type="file" accept=".saml" class="hidden">');
     UI.fileHandler.change(function (e) {
         UI.landing.animate({
             opacity: 0
