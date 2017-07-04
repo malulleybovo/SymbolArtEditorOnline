@@ -68,13 +68,41 @@ var LayerCtrl = Class({
                         v1 = 4 * (that.sideNum - 2); v2 = v1 + 2;
                         testV = 4;
                         break;
+                    case 4: // Sheer Top Side +
+                    case 5: // Sheer Right Side +
+                    case 6: // Sheer Left Side +
+                    case 7: // Sheer Bottom Side +
+                        arbiterV = 2 * (that.sideNum - 4);
+                        testV = (arbiterV + (2 * (that.sideNum - 3))) % 10;
+                        v1 = arbiterV; v2 = testV;
+                        break;
+                    case 8: // Sheer Bottom Side -
+                        v1 = 0; v2 = 4;
+                        testV = arbiterV;
+                        arbiterV = 4;
+                        break;
+                    case 9: // Sheer Bottom Side -
+                        v1 = 0; v2 = 4;
+                        testV = arbiterV;
+                        arbiterV = 4;
+                        break;
+                    case 10: // Sheer Bottom Side -
+                        v1 = 0; v2 = 4;
+                        testV = arbiterV;
+                        arbiterV = 4;
+                        break;
+                    case 11: // Sheer Bottom Side -
+                        v1 = 0; v2 = 4;
+                        testV = arbiterV;
+                        arbiterV = 4;
+                        break;
                     default:
                         return;
                 }
                 var v = that.layerCtrl.activeLayer.vertices;
                 var ang = Math.atan((v[arbiterV + 1] - v[testV + 1]) / (v[arbiterV] - v[testV]));
                 if (ang < Math.PI / 3 && ang > -Math.PI / 3) {
-                    if (v[testV] <= v[arbiterV]) {
+                    if (that.sideNum < 4 && v[testV] <= v[arbiterV]) {
                         v[v1] -= amount;
                         v[v2] -= amount;
                     }
@@ -84,7 +112,7 @@ var LayerCtrl = Class({
                     }
                 }
                 if (ang > Math.PI / 6 || ang < -Math.PI / 6) {
-                    if (v[testV + 1] <= v[arbiterV + 1]) {
+                    if (that.sideNum < 4 && v[testV + 1] <= v[arbiterV + 1]) {
                         v[v1 + 1] -= amount;
                         v[v2 + 1] -= amount;
                     }
@@ -182,6 +210,33 @@ var LayerCtrl = Class({
         this.sideStretchDMinus = this.sideStretchFolder.add(this.functions, 'trigger')
             .name('\u2193 -').onChange(this.functions.sideStretchLess);
         this.sideStretchDMinus.layerCtrl = this; this.sideStretchDMinus.sideNum = 3;
+
+        this.sideSheerFolder = this.gui.addFolder('side sheer');
+
+        this.sideSheerLPlus = this.sideSheerFolder.add(this.functions, 'trigger')
+            .name('\u2190 Right/Down').onChange(this.functions.sideStretchMore);
+        this.sideSheerLPlus.layerCtrl = this; this.sideSheerLPlus.sideNum = 6;
+        this.sideSheerLMinus = this.sideSheerFolder.add(this.functions, 'trigger')
+            .name('\u2190 Left/Up').onChange(this.functions.sideStretchLess);
+        this.sideSheerLMinus.layerCtrl = this; this.sideSheerLMinus.sideNum = 6;
+        this.sideSheerRPlus = this.sideSheerFolder.add(this.functions, 'trigger')
+            .name('\u2192 Right/Down').onChange(this.functions.sideStretchLess);
+        this.sideSheerRPlus.layerCtrl = this; this.sideSheerRPlus.sideNum = 5;
+        this.sideSheerRMinus = this.sideSheerFolder.add(this.functions, 'trigger')
+            .name('\u2192 Left/Up').onChange(this.functions.sideStretchMore);
+        this.sideSheerRMinus.layerCtrl = this; this.sideSheerRMinus.sideNum = 5;
+        this.sideSheerUPlus = this.sideSheerFolder.add(this.functions, 'trigger')
+            .name('\u2191 Right/Down').onChange(this.functions.sideStretchMore);
+        this.sideSheerUPlus.layerCtrl = this; this.sideSheerUPlus.sideNum = 4;
+        this.sideSheerUMinus = this.sideSheerFolder.add(this.functions, 'trigger')
+            .name('\u2191 Left/Up').onChange(this.functions.sideStretchLess);
+        this.sideSheerUMinus.layerCtrl = this; this.sideSheerUMinus.sideNum = 4;
+        this.sideSheerDPlus = this.sideSheerFolder.add(this.functions, 'trigger')
+            .name('\u2193 Right/Down').onChange(this.functions.sideStretchLess);
+        this.sideSheerDPlus.layerCtrl = this; this.sideSheerDPlus.sideNum = 7;
+        this.sideSheerDMinus = this.sideSheerFolder.add(this.functions, 'trigger')
+            .name('\u2193 Left/Up').onChange(this.functions.sideStretchMore);
+        this.sideSheerDMinus.layerCtrl = this; this.sideSheerDMinus.sideNum = 7;
 
         this.rotation = this.gui.add(this.activeLayer, 'rotation').min(0).step(0.1).listen();
         this.alpha = this.gui.add(this.activeLayer, 'alpha').min(0).step(1).max(7).listen();
