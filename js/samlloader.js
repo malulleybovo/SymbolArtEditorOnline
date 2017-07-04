@@ -64,7 +64,7 @@ var SAMLLoader = Class({
             }
         }
 
-        if (nestingLvl > 0) alert('Loaded file was malformed, it may not be compatible.');
+        if (!isValid || nestingLvl > 0) alert('Loaded file is malformed, it may not be compatible.');
 
         this.editor.render();
 
