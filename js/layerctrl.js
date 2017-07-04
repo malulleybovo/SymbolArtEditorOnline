@@ -18,6 +18,35 @@ var LayerCtrl = Class({
             move: function () {
                 this.layerCtrl.functions.update(this.layerCtrl);
             },
+            horizFlip: function () {
+                this.object.flip(0, this.layerCtrl.activeLayer.vertices);
+                this.object.update(this.layerCtrl);
+            },
+            vertFlip: function () {
+                this.object.flip(1, this.layerCtrl.activeLayer.vertices);
+                this.object.update(this.layerCtrl);
+            },
+            flip: function (typeNum, v) {
+                var dist, step;
+                switch (typeNum) {
+                    case 0: // Horizontal Flip
+                        dist = 2; step = 4;
+                        break;
+                    case 1: // Vertical Flip
+                        dist = 4; step = 2;
+                        break;
+                    default:
+                        return;
+                }
+                for (var i = 0; i < 2; i++) {
+                    var oldIndex = step * i;
+                    var newIndex = (oldIndex + dist) % v.length;
+                    var temp = v[newIndex];
+                    v[newIndex] = v[oldIndex]; v[oldIndex] = temp;
+                    temp = v[newIndex + 1];
+                    v[newIndex + 1] = v[oldIndex + 1]; v[oldIndex + 1] = temp;
+                }
+            },
             diagStretchMore: function () {
                 this.object.diagStretch(this, 1);
                 this.object.update(this.layerCtrl);
@@ -150,6 +179,15 @@ var LayerCtrl = Class({
         this.scale = this.gui.addFolder('scale');
         this.scaleX = this.scale.add(this.activeLayer, 'scaleX').min(1).step(0.1).listen();
         this.scaleY = this.scale.add(this.activeLayer, 'scaleY').min(1).step(0.1).listen();
+
+        this.flipsFolder = this.gui.addFolder('flip');
+
+        this.horizFlip = this.flipsFolder.add(this.functions, 'trigger')
+            .name('horizontal').onChange(this.functions.horizFlip);
+        this.horizFlip.layerCtrl = this;
+        this.horizFlip = this.flipsFolder.add(this.functions, 'trigger')
+            .name('vertical').onChange(this.functions.vertFlip);
+        this.horizFlip.layerCtrl = this;
 
         this.vStretchFolder = this.gui.addFolder('diagonal stretch');
 
