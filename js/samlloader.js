@@ -256,6 +256,7 @@ var SAMLLoader = Class({
         }
         if (type == 'layer') {
             this.editor.updateLayer(node.elem);
+            this.editor.disableInteraction(node.elem);
         }
 
         function hexToRgb(hex) {
