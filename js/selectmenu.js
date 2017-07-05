@@ -43,9 +43,9 @@
             // Open selected menu
             SelectMenu.activeMenu = SelectMenu.menus[index];
             $('body').prepend(SelectMenu.activeMenu.container);
-            return 0;
+            return SelectMenu.activeMenu;
         }
-        return -1;
+        return null;
     },
     isMenuActive: function (index) {
         if (index >= 0 && index < SelectMenu.menus.length

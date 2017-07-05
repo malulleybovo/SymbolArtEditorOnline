@@ -255,8 +255,9 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
 
 .sp-container {
     border-radius: 0;
-    background-color: #ECECEC;
-    border: solid 1px #f0c49B;
+    background-color: #2c2c2c;
+    border: solid 1px #2fa1d6;
+    border-radius: 5px 0px 0px 5px;
     padding: 0;
 }
 .sp-container, .sp-container button, .sp-container input, .sp-color, .sp-hue, .sp-clear {
@@ -290,7 +291,7 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
    width: 100%;
    background:transparent;
    border-radius: 3px;
-   color: #222;
+   color: #f3f3f3;
 }
 .sp-input:focus  {
     border: 1px solid orange;
@@ -308,12 +309,12 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
 }
 .sp-picker-container {
     width: 172px;
-    border-left: solid 1px #fff;
+    border-left: solid 1px #2c2c2c;
 }
 
 /* Palettes */
 .sp-palette-container {
-    border-right: solid 1px #ccc;
+    border-right: solid 1px #2c2c2c;
 }
 
 .sp-palette-only .sp-palette-container {
@@ -370,14 +371,15 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
     display:inline-block;
     *zoom: 1;
     *display: inline;
-    border: solid 1px #91765d;
-    background: #eee;
-    color: #333;
+    border: solid 1px #2fa1d6;
+    border-radius: 5px 0px 0px 5px;
+    background: #2c2c2c;
+    color: #2fa1d6;
     vertical-align: middle;
 }
 .sp-replacer:hover, .sp-replacer.sp-active {
-    border-color: #F0C49B;
-    color: #111;
+    color: #f3f3f3;
+    background: #2fa1d6;
 }
 .sp-replacer.sp-disabled {
     cursor:default;
@@ -399,6 +401,7 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
     margin-right: 5px;
     float:left;
     z-index: 0;
+    border-radius: 2.5px;
 }
 
 .sp-palette {
@@ -419,34 +422,20 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
 
 /* Buttons: http://hellohappy.org/css3-buttons/ */
 .sp-container button {
-  background-color: #eeeeee;
-  background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
-  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
-  background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
-  background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
-  background-image: linear-gradient(to bottom, #eeeeee, #cccccc);
-  border: 1px solid #ccc;
-  border-bottom: 1px solid #bbb;
+  background-color: #2c2c2c;
+  border: 1px solid #2fa1d6;
   border-radius: 3px;
-  color: #333;
+  color: #2fa1d6;
   font-size: 14px;
   line-height: 1;
   padding: 5px 4px;
   text-align: center;
-  text-shadow: 0 1px 0 #eee;
   vertical-align: middle;
 }
 .sp-container button:hover {
-    background-color: #dddddd;
-    background-image: -webkit-linear-gradient(top, #dddddd, #bbbbbb);
-    background-image: -moz-linear-gradient(top, #dddddd, #bbbbbb);
-    background-image: -ms-linear-gradient(top, #dddddd, #bbbbbb);
-    background-image: -o-linear-gradient(top, #dddddd, #bbbbbb);
-    background-image: linear-gradient(to bottom, #dddddd, #bbbbbb);
-    border: 1px solid #bbb;
-    border-bottom: 1px solid #999;
+    background-color: #2fa1d6;
+    color: #f3f3f3;
     cursor: pointer;
-    text-shadow: 0 1px 0 #ddd;
 }
 .sp-container button:active {
     border: 1px solid #aaa;
@@ -485,6 +474,7 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
     display:block;
     position:absolute;
     top:0;left:0;bottom:0;right:0;
+    border-radius: 2.5px;
 }
 
 .sp-palette .sp-thumb-inner {

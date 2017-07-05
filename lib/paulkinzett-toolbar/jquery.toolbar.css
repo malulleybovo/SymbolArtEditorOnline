@@ -5,7 +5,7 @@
 }
 
 .btn-toolbar {
-  background: #000;
+  background: #2c2c2c;
   width: 20px;
   height: 20px;
   text-align: center;
@@ -15,11 +15,11 @@
   transition: none;
 }
 .btn-toolbar > i {
-  color: #02baf2;
+  color: #2fa1d6;
   font-size: 16px;
 }
 .btn-toolbar:hover {
-  background: #02baf2;
+  background: #2fa1d6;
   cursor: pointer;
 }
 .btn-toolbar:hover > i {
@@ -29,10 +29,10 @@
   background-color: #009dcd;
 }
 .btn-toolbar-primary.pressed {
-  background-color: #02baf2;
+  background-color: #2fa1d6;
 }
 .btn-toolbar-primary:hover {
-  background-color: #02baf2;
+  background-color: #2fa1d6;
 }
 .btn-toolbar-primary > i {
   color: white;
@@ -122,7 +122,7 @@
   color: white;
 }
 .tool-container {
-  background-color: #1a1a1a;
+  background-color: #2c2c2c;
   background-size: 100% 100%;
   border-radius: 6px;
   position: absolute;
@@ -148,11 +148,11 @@
   transition: none;
 }
 .tool-item > .fa {
-  color: #b2c6cd;
+  color: #2fa1d6;
 }
 .tool-item.selected,
 .tool-item:hover {
-  background: #02baf2;
+  background: #2fa1d6;
 }
 .tool-item.selected > .fa,
 .tool-item:hover > .fa {
@@ -214,19 +214,19 @@
   margin-top: -7px;
 }
 .toolbar-primary {
-  background-color: #02baf2;
+  background-color: #2fa1d6;
 }
 .toolbar-primary.tool-top .arrow {
-  border-color: #02baf2 transparent transparent;
+  border-color: #2fa1d6 transparent transparent;
 }
 .toolbar-primary.tool-bottom .arrow {
-  border-color: transparent transparent #02baf2;
+  border-color: transparent transparent #2fa1d6;
 }
 .toolbar-primary.tool-left .arrow {
-  border-color: transparent transparent transparent #02baf2;
+  border-color: transparent transparent transparent #2fa1d6;
 }
 .toolbar-primary.tool-right .arrow {
-  border-color: transparent #02baf2 transparent transparent;
+  border-color: transparent #2fa1d6 transparent transparent;
 }
 .toolbar-primary .tool-item > .fa {
   color: white;

@@ -2,14 +2,15 @@ var Layer = Class({
     initialize: function (name, part, color, x, y, scale, rotation, vertices, alpha) {
         this.type = 'l';
         this.name = name;
+        var halfSize = 64 * 3;
         (part !== undefined) ? this.part = part : this.part = 0;
         (color !== undefined) ? this.color = color : this.color = 0xffffff;
         (scale !== undefined && scale.x !== undefined) ? this.scaleX = scale.x : this.scaleX = 1;
         (scale !== undefined && scale.y !== undefined) ? this.scaleY = scale.y : this.scaleY = 1;
-        (x !== undefined) ? this.x = x : this.x = (1920 - (this.scaleX * 64)) / 2;
-        (y !== undefined) ? this.y = y : this.y = (960 - (this.scaleY * 64)) / 2;
+        (x !== undefined) ? this.x = x : this.x = (1920 - (this.scaleX * halfSize)) / 2;
+        (y !== undefined) ? this.y = y : this.y = (960 - (this.scaleY * halfSize)) / 2;
         (rotation !== undefined) ? this.rotation = rotation : this.rotation = 0;
-        (vertices !== undefined) ? this.vertices = vertices : this.vertices = [0, 0, 64, 0, 0, 64, 64, 64];
+        (vertices !== undefined) ? this.vertices = vertices : this.vertices = [0, 0, halfSize, 0, 0, halfSize, halfSize, halfSize];
         (alpha !== undefined) ? this.alpha = alpha : this.alpha = 7;
     },
     update: function (quad) {
@@ -40,8 +41,10 @@ var Layer = Class({
             y: 480 // = 960 / 2
         };
         for (var i = 0; i < this.vertices.length; i += 2) {
-            absVertices.push(this.x - origin.x + this.scaleX * this.vertices[i]);
-            absVertices.push(this.y - origin.y + this.scaleY * this.vertices[i + 1]);
+            var vx = Math.round((this.x - origin.x + this.scaleX * this.vertices[i]) / CANVAS_PIXEL_SCALE);
+            var vy = Math.round((this.y - origin.y + this.scaleY * this.vertices[i + 1]) / CANVAS_PIXEL_SCALE);
+            absVertices.push(vx);
+            absVertices.push(vy);
         }
         return absVertices;
     },

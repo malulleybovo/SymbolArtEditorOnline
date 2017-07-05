@@ -185,7 +185,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[0] = value + 32;
+                        node.elem.vertices[0] = (value + 32) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'lty':
@@ -195,7 +195,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[1] = value + 32;
+                        node.elem.vertices[1] = (value + 32) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'lbx':
@@ -205,7 +205,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[4] = value + 32;
+                        node.elem.vertices[4] = (value + 32) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'lby':
@@ -215,7 +215,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[5] = value + 32;
+                        node.elem.vertices[5] = (value + 32) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'rtx':
@@ -225,7 +225,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[2] = value + 32;
+                        node.elem.vertices[2] = (value + 32) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'rty':
@@ -235,7 +235,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[3] = value + 32;
+                        node.elem.vertices[3] = (value + 32) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'rbx':
@@ -245,7 +245,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[6] = value + 32;
+                        node.elem.vertices[6] = (value + 32) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'rby':
@@ -255,7 +255,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[7] = value + 32;
+                        node.elem.vertices[7] = (value + 32) * CANVAS_PIXEL_SCALE;
                     }
                     break;
             }

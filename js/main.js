@@ -54,10 +54,6 @@ function initDocument() {
     GoogleMaterialIcons.setAttribute('href', 'https://fonts.googleapis.com/icon?family=Material+Icons');
     HTMLHead.appendChild(GoogleMaterialIcons);
 
-    CSSFileLink2 = document.createElement('link');
-    CSSFileLink2.setAttribute('rel', 'stylesheet');
-    CSSFileLink2.setAttribute('href', 'https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css');
-    HTMLHead.appendChild(CSSFileLink2);
 }
 
 function initGlobalVars() {

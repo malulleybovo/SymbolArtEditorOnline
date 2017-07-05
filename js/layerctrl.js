@@ -16,6 +16,17 @@ var LayerCtrl = Class({
         this.functions = {
             trigger: function () { },
             move: function () {
+                var layer = this.layerCtrl.activeLayer;
+                switch (this.motionType) {
+                    case 0:
+                        layer.x += CANVAS_PIXEL_SCALE; break;
+                    case 1:
+                        layer.x -= CANVAS_PIXEL_SCALE; break;
+                    case 2:
+                        layer.y += CANVAS_PIXEL_SCALE; break;
+                    case 3:
+                        layer.y -= CANVAS_PIXEL_SCALE; break;
+                }
                 this.layerCtrl.functions.update(this.layerCtrl);
             },
             horizFlip: function () {
@@ -48,11 +59,11 @@ var LayerCtrl = Class({
                 }
             },
             diagStretchMore: function () {
-                this.object.diagStretch(this, 1);
+                this.object.diagStretch(this, CANVAS_PIXEL_SCALE);
                 this.object.update(this.layerCtrl);
             },
             diagStretchLess: function () {
-                this.object.diagStretch(this, -1);
+                this.object.diagStretch(this, -CANVAS_PIXEL_SCALE);
                 this.object.update(this.layerCtrl);
             },
             diagStretch: function (that, amount) {
@@ -75,79 +86,68 @@ var LayerCtrl = Class({
                 v[v2 + vOffset] -= amount;
             },
             sideStretchMore: function () {
-                this.object.sideStretch(this, 1);
+                this.object.sideStretch(this, CANVAS_PIXEL_SCALE);
                 this.object.update(this.layerCtrl);
             },
             sideStretchLess: function () {
-                this.object.sideStretch(this, -1);
+                this.object.sideStretch(this, -CANVAS_PIXEL_SCALE);
                 this.object.update(this.layerCtrl);
             },
             sideStretch: function (that, amount) {
                 var arbiterV = 0;
                 var testV;
-                var v1, v2;
+                var vtx_i = undefined;
                 switch (that.sideNum) {
                     case 0:
+                        vtx_i = [0, 4, 2, 6];
                     case 1:
-                        v1 = 2 * that.sideNum; v2 = v1 + 4;
+                        vtx_i = vtx_i || [2, 6, 0, 4];
                         testV = 2; 
                         break;
                     case 2:
+                        vtx_i = [0, 2, 4, 6];
                     case 3:
-                        v1 = 4 * (that.sideNum - 2); v2 = v1 + 2;
+                        vtx_i = vtx_i || [4, 6, 0, 2];
                         testV = 4;
                         break;
-                    case 4: // Sheer Top Side +
-                    case 5: // Sheer Right Side +
-                    case 6: // Sheer Left Side +
-                    case 7: // Sheer Bottom Side +
-                        arbiterV = 2 * (that.sideNum - 4);
-                        testV = (arbiterV + (2 * (that.sideNum - 3))) % 10;
-                        v1 = arbiterV; v2 = testV;
-                        break;
-                    case 8: // Sheer Bottom Side -
-                        v1 = 0; v2 = 4;
-                        testV = arbiterV;
-                        arbiterV = 4;
-                        break;
-                    case 9: // Sheer Bottom Side -
-                        v1 = 0; v2 = 4;
-                        testV = arbiterV;
-                        arbiterV = 4;
-                        break;
-                    case 10: // Sheer Bottom Side -
-                        v1 = 0; v2 = 4;
-                        testV = arbiterV;
-                        arbiterV = 4;
-                        break;
-                    case 11: // Sheer Bottom Side -
-                        v1 = 0; v2 = 4;
-                        testV = arbiterV;
-                        arbiterV = 4;
+                    case 4: // Sheer Top Side
+                        vtx_i = [0, 2, 4, 6];
+                    case 5: // Sheer Right Side
+                        vtx_i = vtx_i || [2, 6, 0, 4];
+                    case 6: // Sheer Left Side
+                        vtx_i = vtx_i || [4, 0, 2, 6];
+                    case 7: // Sheer Bottom Side
+                        vtx_i = vtx_i || [6, 4, 0, 2];
+                        arbiterV = vtx_i[0];
+                        testV = vtx_i[1];
                         break;
                     default:
                         return;
                 }
                 var v = that.layerCtrl.activeLayer.vertices;
                 var ang = Math.atan((v[arbiterV + 1] - v[testV + 1]) / (v[arbiterV] - v[testV]));
-                if (ang < Math.PI / 3 && ang > -Math.PI / 3) {
+                if (!isNaN(ang) && (ang < Math.PI / 3 && ang > -Math.PI / 3)) {
                     if (that.sideNum < 4 && v[testV] <= v[arbiterV]) {
-                        v[v1] -= amount;
-                        v[v2] -= amount;
+                        that.layerCtrl.activeLayer.x -= amount / 2;
+                        v[vtx_i[0]] -= amount / 2; v[vtx_i[1]] -= amount / 2;
+                        v[vtx_i[2]] += amount / 2; v[vtx_i[3]] += amount / 2;
                     }
                     else {
-                        v[v1] += amount;
-                        v[v2] += amount;
+                        that.layerCtrl.activeLayer.x += amount / 2;
+                        v[vtx_i[0]] += amount / 2; v[vtx_i[1]] += amount / 2;
+                        v[vtx_i[2]] -= amount / 2; v[vtx_i[3]] -= amount / 2;
                     }
                 }
-                if (ang > Math.PI / 6 || ang < -Math.PI / 6) {
+                if (!isNaN(ang) && (ang > Math.PI / 6 || ang < -Math.PI / 6)) {
                     if (that.sideNum < 4 && v[testV + 1] <= v[arbiterV + 1]) {
-                        v[v1 + 1] -= amount;
-                        v[v2 + 1] -= amount;
+                        that.layerCtrl.activeLayer.y -= amount / 2;
+                        v[vtx_i[0] + 1] -= amount / 2; v[vtx_i[1] + 1] -= amount / 2;
+                        v[vtx_i[2] + 1] += amount / 2; v[vtx_i[3] + 1] += amount / 2;
                     }
                     else {
-                        v[v1 + 1] += amount;
-                        v[v2 + 1] += amount;
+                        that.layerCtrl.activeLayer.y += amount / 2;
+                        v[vtx_i[0] + 1] += amount / 2; v[vtx_i[1] + 1] += amount / 2;
+                        v[vtx_i[2] + 1] -= amount / 2; v[vtx_i[3] + 1] -= amount / 2;
                     }
                 }
             },
@@ -168,19 +168,25 @@ var LayerCtrl = Class({
         };
         this.part = this.gui.add(this.partManager, 'part');
 
-        this.pos = this.gui.addFolder('position');
-        this.posX = this.pos.add(this.activeLayer, 'x').step(1)
-            .name('X').onChange(this.functions.move);
-        this.posX.layerCtrl = this;
-        this.posY = this.pos.add(this.activeLayer, 'y').step(1)
-            .name('Y').onChange(this.functions.move);
-        this.posY.layerCtrl = this;
+        this.pos = this.gui.addFolder('move');
+        this.posYMinus = this.pos.add(this.functions, 'trigger')
+            .name('upward').onChange(this.functions.move);
+        this.posYMinus.layerCtrl = this; this.posYMinus.motionType = 3;
+        this.posXPlus = this.pos.add(this.functions, 'trigger')
+            .name('rightward').onChange(this.functions.move);
+        this.posXPlus.layerCtrl = this; this.posXPlus.motionType = 0;
+        this.posXMinus = this.pos.add(this.functions, 'trigger')
+            .name('leftward').onChange(this.functions.move);
+        this.posXMinus.layerCtrl = this; this.posXMinus.motionType = 1;
+        this.posYPlus = this.pos.add(this.functions, 'trigger')
+            .name('downward').onChange(this.functions.move);
+        this.posYPlus.layerCtrl = this; this.posYPlus.motionType = 2;
 
         this.scale = this.gui.addFolder('scale');
         this.scaleX = this.scale.add(this.activeLayer, 'scaleX').min(1).step(0.1).listen();
         this.scaleY = this.scale.add(this.activeLayer, 'scaleY').min(1).step(0.1).listen();
 
-        this.flipsFolder = this.gui.addFolder('flip');
+        this.flipsFolder = this.gui.addFolder('flip symbol');
 
         this.horizFlip = this.flipsFolder.add(this.functions, 'trigger')
             .name('horizontal').onChange(this.functions.horizFlip);
@@ -282,8 +288,6 @@ var LayerCtrl = Class({
     update: function (layer) {
         this.activeLayer = layer;
         this.partselectmenu.update(this.activeLayer.part);
-        this.posX.object = this.activeLayer;
-        this.posY.object = this.activeLayer;
         this.scaleX.object = this.activeLayer;
         this.scaleY.object = this.activeLayer;
         this.rotation.object = this.activeLayer;
@@ -293,8 +297,6 @@ var LayerCtrl = Class({
     },
     updateDisplay: function () {
         this.part.updateDisplay();
-        this.posX.updateDisplay();
-        this.posY.updateDisplay();
         this.scaleX.updateDisplay();
         this.scaleY.updateDisplay();
         this.rotation.updateDisplay();

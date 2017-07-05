@@ -26,6 +26,6 @@
     },
     toggle: function () {
         this.selectmenu.setActiveMenu(1);
-        this.selectmenu.toggle();
+        setTimeout(this.selectmenu.toggle, 100);
     }
 });

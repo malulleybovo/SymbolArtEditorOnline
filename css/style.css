@@ -2,13 +2,8 @@
 
 body {
     margin: 0;
-    background-color: lightblue;
+    background-color: black !important;
     overflow: hidden;
-}
-
-h1 {
-    color: navy;
-    margin-left: 20px;
 }
 
 .no-panning {
@@ -81,6 +76,10 @@ h1 {
     background-color: white;
 }
 
+.editor-canvas-border {
+    box-shadow: 0px 0px 30px #2fa1d6;
+}
+
 .canvas-box {
     position : absolute;
     left: 50%;
@@ -111,12 +110,9 @@ h1 {
 
 .button {
     position: fixed;
-    color: #02baf2;
+    color: #2fa1d6;
     text-shadow: none;
     border-radius: 0px 0px 5px 0px;
-}
-.button.selected {
-    color: black;
 }
 
 .button-highlight{
@@ -167,6 +163,7 @@ h1 {
     float: left;
     width: 20%;
     height: 100%;
+    border-right: 1px solid #2fa1d6;
 }
 #canvascontainer {
     background-color: black;
@@ -197,6 +194,7 @@ white { color: white; }
     left: 0;
     right: 0;
     margin: 0 auto;
+    border: 1px solid #2fa1d6;
 }
 
 .ui-dialog .ui-dialog-buttonpane { 
@@ -216,7 +214,7 @@ white { color: white; }
     left: 0;
     background-color: #111;
     overflow: auto;
-    transition: 0.1s;
+    transition: 0.1s ease-in-out;
 }
 
 #sidenav .menu {

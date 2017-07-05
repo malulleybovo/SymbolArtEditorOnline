@@ -36,6 +36,6 @@
     },
     toggle: function () {
         this.selectmenu.setActiveMenu(0);
-        this.selectmenu.toggle();
+        setTimeout(this.selectmenu.toggle, 100);
     }
 });

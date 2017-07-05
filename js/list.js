@@ -30,8 +30,8 @@ var List = Class({
         this.selectedElem = null;
         this.changeSelectedElem = function (elem) {
             if (elem.tagName == "A" || elem.tagName == "H2") {
-                if (this.selectedElem != null) $(this.selectedElem).css("filter", "brightness(100%)");
-                $(elem).css("filter", "brightness(80%)");
+                if (this.selectedElem != null) $(this.selectedElem).css("filter", "invert(0%)");
+                $(elem).css("filter", "invert(100%)");
                 this.selectedElem = elem;
             }
         };
@@ -40,13 +40,6 @@ var List = Class({
         this.toggleButton = $('<i id="canvasctrlbutton" class="material-icons button layer1 no-highlight cursor-pointer">&#xE8EF;</i>');
         this.toggleButton.click(function () {
             $(".sidebar.left").trigger("sidebar:toggle");
-            var $this = $(this);
-            if ($this.hasClass('selected')) {
-                $this.removeClass('selected');
-            }
-            else {
-                $this.addClass('selected');
-            }
         });
         $(HTMLBody).append(this.toggleButton);
         document.onkeypress = function (e) {

@@ -1,10 +1,11 @@
 var Editor = Class({
     initialize: function (parent, list) {
-        this.zoom = 1;
-        this.ZOOM_STEP = 0.4;
-        this.ZOOM_MAX = 5;
-        this.ZOOM_MIN = 1;
-        this.MIN_VTX_VARIATION = 3;
+        CANVAS_PIXEL_SCALE = 3;
+        this.ZOOM_STEP = 0.35;
+        this.ZOOM_MIN = 0.3;
+        this.ZOOM_MAX = this.ZOOM_MIN + 12 * this.ZOOM_STEP; // = 4.5
+        this.zoom = this.ZOOM_MIN + 2 * this.ZOOM_STEP; // = 1
+        this.MIN_VTX_VARIATION = 2 * CANVAS_PIXEL_SCALE;
         this.disableSmallVtxChange = false;
 
         this.list = list;
@@ -161,8 +162,8 @@ var Editor = Class({
             var thisVerIndex = 2 * index, oppositeVerIndex = 6 - 2 * index;
 
             var dPos = {
-                x: Math.round((relPos.left / editor.zoom) - layer.x) - layer.vertices[thisVerIndex],
-                y: Math.round((relPos.top / editor.zoom) - layer.y) - layer.vertices[thisVerIndex + 1]
+                x: roundPosition((relPos.left / editor.zoom) - layer.x - layer.vertices[thisVerIndex]),
+                y: roundPosition((relPos.top / editor.zoom) - layer.y - layer.vertices[thisVerIndex + 1])
             }
             layer.vertices[thisVerIndex] += dPos.x;
             layer.vertices[thisVerIndex + 1] += dPos.y;
@@ -200,10 +201,10 @@ var Editor = Class({
 
             var relPos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
             var dPos = {
-                x: Math.round(((relPos.left / editor.zoom) - layer.x
-                    - ((layer.vertices[corner1Index] + layer.vertices[corner2Index]) / 2)) / 2),
-                y: Math.round(((relPos.top / editor.zoom) - layer.y
-                    - ((layer.vertices[corner1Index + 1] + layer.vertices[corner2Index + 1]) / 2)) / 2)
+                x: roundPosition(((relPos.left / editor.zoom) - layer.x
+                    - ((layer.vertices[corner1Index] + layer.vertices[corner2Index]) / 2))) / 2,
+                y: roundPosition(((relPos.top / editor.zoom) - layer.y
+                    - ((layer.vertices[corner1Index + 1] + layer.vertices[corner2Index + 1]) / 2))) / 2
             };
 
             layer.x += dPos.x;
@@ -216,7 +217,6 @@ var Editor = Class({
             layer.vertices[vi4] -= dPos.x;
             layer.vertices[vi3 + 1] -= dPos.y;
             layer.vertices[vi4 + 1] -= dPos.y;
-            console.log(layer.vertices[corner1Index + 1] + ',' + dPos.y + ',' + origValues.vtces[corner1Index + 1]);
             if (!editor.disableSmallVtxChange) {
                 if (Math.abs((layer.vertices[corner1Index] + layer.x) 
                     - (origValues.vtces[corner1Index] + origValues.x)) 
@@ -241,9 +241,6 @@ var Editor = Class({
             }
 
             editor.updateLayer(layer);
-            var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
-            layerCtrl.posX.updateDisplay();
-            layerCtrl.posY.updateDisplay();
             editor.render();
         }
         this.editorBoxIcons = {
@@ -366,6 +363,7 @@ var Editor = Class({
         // Add Toolbar
         this.toolbar = new Toolbar();
 
+        $('canvas').addClass('editor-canvas-border');
         $('canvas')[0].editor = this;
 
         this.render();
@@ -378,7 +376,7 @@ var Editor = Class({
         this.renderer.render(this.stage);
     },
     incrSize: function () {
-        if (this.zoom < this.ZOOM_MAX) {
+        if (Math.round(this.zoom * 100) < this.ZOOM_MAX * 100) {
             this.zoom += this.ZOOM_STEP;
 
             var scale = 'scale(' + this.zoom + ', ' + this.zoom + ')';
@@ -388,7 +386,7 @@ var Editor = Class({
         }
     },
     decrSize: function () {
-        if (this.zoom > this.ZOOM_MIN) {
+        if (Math.round(this.zoom * 100) > this.ZOOM_MIN * 100) {
             this.zoom -= this.ZOOM_STEP;
 
             var scale = 'scale(' + this.zoom + ', ' + this.zoom + ')';
@@ -453,26 +451,20 @@ var Editor = Class({
         quad.on('mousemove', function (evtData) {
             if (this.isMoving) {
                 this.layerData.layer;
-                this.x = Math.round(evtData.data.originalEvent.offsetX - (this.origClickX - this.origX));
-                this.y = Math.round(evtData.data.originalEvent.offsetY - (this.origClickY - this.origY));
+                this.x = this.origX + roundPosition(evtData.data.originalEvent.offsetX - this.origClickX);
+                this.y = this.origY + roundPosition(evtData.data.originalEvent.offsetY - this.origClickY);
                 this.editor.render();
                 this.layerData.layer.update(this);
-                var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
-                layerCtrl.posX.updateDisplay();
-                layerCtrl.posY.updateDisplay();
                 $(this.editor.list.selectedElem).parent().trigger('mousedown'); // Update editor box
             }
         }).on('touchmove', function (evtData) {
             if (!panZoomActive && this.isMoving) {
                 this.layerData.layer;
                 var newPosition = evtData.data.getLocalPosition(this.parent);
-                this.x = Math.round(newPosition.x - (this.origClickX - this.origX));
-                this.y = Math.round(newPosition.y - (this.origClickY - this.origY));
+                this.x = this.origX + roundPosition(newPosition.x - this.origClickX);
+                this.y = this.origY + roundPosition(newPosition.y - this.origClickY);
                 this.editor.render();
                 this.layerData.layer.update(this);
-                var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
-                layerCtrl.posX.updateDisplay();
-                layerCtrl.posY.updateDisplay();
                 $(this.editor.list.selectedElem).parent().trigger('mousedown'); // Update editor box
             }
         });
@@ -639,14 +631,14 @@ var Editor = Class({
                     if (ev instanceof MouseEvent) { // Desktop mouse event
                         var clickX = e.originalEvent.offsetX;
                         var clickY = e.originalEvent.offsetY;
-                        layer.x = Math.round(this.origX[i] + (clickX - this.origClickX));
-                        layer.y = Math.round(this.origY[i] + (clickY - this.origClickY));
+                        layer.x = roundPosition(this.origX[i] + (clickX - this.origClickX));
+                        layer.y = roundPosition(this.origY[i] + (clickY - this.origClickY));
                     }
                     else if (ev instanceof TouchEvent) { // Mobile device touch event
                         var clickX = (ev.touches[0].pageX - ev.touches[0].target.offsetLeft);
                         var clickY = (ev.touches[0].pageY - ev.touches[0].target.offsetTop);
-                        layer.x = Math.round(this.origX[i] + ((clickX - this.origClickX) / this.editor.zoom));
-                        layer.y = Math.round(this.origY[i] + ((clickY - this.origClickY) / this.editor.zoom));
+                        layer.x = roundPosition(this.origX[i] + ((clickX - this.origClickX) / this.editor.zoom));
+                        layer.y = roundPosition(this.origY[i] + ((clickY - this.origClickY) / this.editor.zoom));
                     }
                     this.editor.updateLayer(layer);
                 }
@@ -694,20 +686,20 @@ var Editor = Class({
         var v = this.selectedLayer.vertices;
         this.editorBoxIcons.tl.css('left', (basePosX + this.zoom * v[0] - 14.8) + 'px')
             .css('top', (basePosY + this.zoom * v[1] - 22.8) + 'px');
-        this.editorBoxIcons.tr.css('left', (basePosX + this.zoom * v[2] - 54) + 'px')
+        this.editorBoxIcons.tr.css('left', (basePosX + this.zoom * v[2] - 14.8) + 'px')
             .css('top', (basePosY + this.zoom * v[3] - 22.8) + 'px');
-        this.editorBoxIcons.bl.css('left', (basePosX + this.zoom * v[4] - 134) + 'px')
+        this.editorBoxIcons.bl.css('left', (basePosX + this.zoom * v[4] - 14.8) + 'px')
             .css('top', (basePosY + this.zoom * v[5] - 22.8) + 'px');
-        this.editorBoxIcons.br.css('left', (basePosX + this.zoom * v[6] - 93.2) + 'px')
+        this.editorBoxIcons.br.css('left', (basePosX + this.zoom * v[6] - 14.8) + 'px')
             .css('top', (basePosY + this.zoom * v[7] - 22.8) + 'px');
 
-        this.editorBoxIcons.left.css('left', (basePosX + (this.zoom * (v[0] + v[4]) - 350) / 2) + 'px')
+        this.editorBoxIcons.left.css('left', (basePosX + (this.zoom * (v[0] + v[4]) - 29.6) / 2) + 'px')
             .css('top', (basePosY + (this.zoom * (v[1] + v[5])) / 2 - 22.8) + 'px');
-        this.editorBoxIcons.up.css('left', (basePosX + (this.zoom * (v[0] + v[2]) - 430) / 2) + 'px')
+        this.editorBoxIcons.up.css('left', (basePosX + (this.zoom * (v[0] + v[2]) - 29.6) / 2) + 'px')
             .css('top', (basePosY + (this.zoom * (v[1] + v[3])) / 2 - 22.8) + 'px');
-        this.editorBoxIcons.right.css('left', (basePosX + (this.zoom * (v[2] + v[6]) - 508) / 2) + 'px')
+        this.editorBoxIcons.right.css('left', (basePosX + (this.zoom * (v[2] + v[6]) - 29.6) / 2) + 'px')
             .css('top', (basePosY + (this.zoom * (v[3] + v[7])) / 2 - 22.8) + 'px');
-        this.editorBoxIcons.down.css('left', (basePosX + (this.zoom * (v[4] + v[6]) - 590) / 2) + 'px')
+        this.editorBoxIcons.down.css('left', (basePosX + (this.zoom * (v[4] + v[6]) - 29.6) / 2) + 'px')
             .css('top', (basePosY + (this.zoom * (v[5] + v[7])) / 2 - 22.8) + 'px');
     },
     refreshLayerEditBoxButton: function (index) {
@@ -744,3 +736,7 @@ var Editor = Class({
             .css('top', posY + 'px');
     }
 });
+
+function roundPosition (val) {
+    return Math.round(val / CANVAS_PIXEL_SCALE) * CANVAS_PIXEL_SCALE;
+}
