@@ -90,7 +90,11 @@ var Editor = Class({
             if (!panZoomActive) {
                 this.editor.currBtnDown = 4;
                 if (!this.editor.disableSmallVtxChange)
-                    this.editor.origEditbtnPos = this.editor.layerCtrl.activeLayer.vertices.slice(0);
+                    this.editor.origEditbtn = {
+                        vtces: this.editor.layerCtrl.activeLayer.vertices.slice(0),
+                        x: this.editor.layerCtrl.activeLayer.x,
+                        y: this.editor.layerCtrl.activeLayer.y
+                    };
             }
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
@@ -103,7 +107,11 @@ var Editor = Class({
             if (!panZoomActive) {
                 this.editor.currBtnDown = 5;
                 if (!this.editor.disableSmallVtxChange)
-                    this.editor.origEditbtnPos = this.editor.layerCtrl.activeLayer.vertices.slice(0);
+                    this.editor.origEditbtn = {
+                        vtces: this.editor.layerCtrl.activeLayer.vertices.slice(0),
+                        x: this.editor.layerCtrl.activeLayer.x,
+                        y: this.editor.layerCtrl.activeLayer.y
+                    };
             }
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
@@ -116,7 +124,11 @@ var Editor = Class({
             if (!panZoomActive) {
                 this.editor.currBtnDown = 6;
                 if (!this.editor.disableSmallVtxChange)
-                    this.editor.origEditbtnPos = this.editor.layerCtrl.activeLayer.vertices.slice(0);
+                    this.editor.origEditbtn = {
+                        vtces: this.editor.layerCtrl.activeLayer.vertices.slice(0),
+                        x: this.editor.layerCtrl.activeLayer.x,
+                        y: this.editor.layerCtrl.activeLayer.y
+                    };
             }
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
@@ -129,7 +141,11 @@ var Editor = Class({
             if (!panZoomActive) {
                 this.editor.currBtnDown = 7;
                 if (!this.editor.disableSmallVtxChange)
-                    this.editor.origEditbtnPos = this.editor.layerCtrl.activeLayer.vertices.slice(0);
+                    this.editor.origEditbtn = {
+                        vtces: this.editor.layerCtrl.activeLayer.vertices.slice(0),
+                        x: this.editor.layerCtrl.activeLayer.x,
+                        y: this.editor.layerCtrl.activeLayer.y
+                    };
             }
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
@@ -166,14 +182,14 @@ var Editor = Class({
             editor.updateLayer(layer);
             editor.render();
         }
-        function sideStretch(index, clientPos, origVtxs) {
-            var corner1Index, corner2Index;
+        function sideStretch(index, clientPos, origValues) {
+            var corner1Index, corner2Index, vi3, vi4;
             var isHorizontal;
             switch (index) {
-                case 0: corner1Index = 0; corner2Index = 4; break; // left
-                case 1: corner1Index = 0; corner2Index = 2; break; // up
-                case 2: corner1Index = 2; corner2Index = 6; break; // right
-                case 3: corner1Index = 4; corner2Index = 6; break; // down
+                case 0: corner1Index = 0; corner2Index = 4; vi3 = 2; vi4 = 6; break; // left
+                case 1: corner1Index = 0; corner2Index = 2; vi3 = 4; vi4 = 6; break; // up
+                case 2: corner1Index = 2; corner2Index = 6; vi3 = 0; vi4 = 4; break; // right
+                case 3: corner1Index = 4; corner2Index = 6; vi3 = 0; vi4 = 2; break; // down
                 default:
                     return;
             }
@@ -184,28 +200,50 @@ var Editor = Class({
 
             var relPos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
             var dPos = {
-                x: Math.round((relPos.left / editor.zoom) - layer.x)
-                    - ((layer.vertices[corner1Index] + layer.vertices[corner2Index]) / 2),
-                y: Math.round((relPos.top / editor.zoom) - layer.y)
-                    - ((layer.vertices[corner1Index + 1] + layer.vertices[corner2Index + 1]) / 2)
+                x: Math.round(((relPos.left / editor.zoom) - layer.x
+                    - ((layer.vertices[corner1Index] + layer.vertices[corner2Index]) / 2)) / 2),
+                y: Math.round(((relPos.top / editor.zoom) - layer.y
+                    - ((layer.vertices[corner1Index + 1] + layer.vertices[corner2Index + 1]) / 2)) / 2)
             };
 
+            layer.x += dPos.x;
+            layer.y += dPos.y;
             layer.vertices[corner1Index] += dPos.x;
             layer.vertices[corner2Index] += dPos.x;
             layer.vertices[corner1Index + 1] += dPos.y;
             layer.vertices[corner2Index + 1] += dPos.y;
+            layer.vertices[vi3] -= dPos.x;
+            layer.vertices[vi4] -= dPos.x;
+            layer.vertices[vi3 + 1] -= dPos.y;
+            layer.vertices[vi4 + 1] -= dPos.y;
+            console.log(layer.vertices[corner1Index + 1] + ',' + dPos.y + ',' + origValues.vtces[corner1Index + 1]);
             if (!editor.disableSmallVtxChange) {
-                if (Math.abs(layer.vertices[corner1Index] - origVtxs[corner1Index]) < editor.MIN_VTX_VARIATION) {
-                    layer.vertices[corner1Index] = origVtxs[corner1Index];
-                    layer.vertices[corner2Index] = origVtxs[corner2Index];
+                if (Math.abs((layer.vertices[corner1Index] + layer.x) 
+                    - (origValues.vtces[corner1Index] + origValues.x)) 
+                    < editor.MIN_VTX_VARIATION) {
+
+                    layer.x = origValues.x;
+                    layer.vertices[corner1Index] = origValues.vtces[corner1Index];
+                    layer.vertices[corner2Index] = origValues.vtces[corner2Index];
+                    layer.vertices[vi3] = origValues.vtces[vi3];
+                    layer.vertices[vi4] = origValues.vtces[vi4];
                 }
-                if (Math.abs(layer.vertices[corner1Index + 1] - origVtxs[corner1Index + 1]) < editor.MIN_VTX_VARIATION) {
-                    layer.vertices[corner1Index + 1] = origVtxs[corner1Index + 1];
-                    layer.vertices[corner2Index + 1] = origVtxs[corner2Index + 1];
+                if (Math.abs((layer.vertices[corner1Index + 1] + layer.y)
+                    - (origValues.vtces[corner1Index + 1] + origValues.y))
+                    < editor.MIN_VTX_VARIATION) {
+
+                    layer.y = origValues.y;
+                    layer.vertices[corner1Index + 1] = origValues.vtces[corner1Index + 1];
+                    layer.vertices[corner2Index + 1] = origValues.vtces[corner2Index + 1];
+                    layer.vertices[vi3 + 1] = origValues.vtces[vi3 + 1];
+                    layer.vertices[vi4 + 1] = origValues.vtces[vi4 + 1];
                 }
             }
 
             editor.updateLayer(layer);
+            var layerCtrl = $('#' + layerCtrlID)[0].layerCtrl;
+            layerCtrl.posX.updateDisplay();
+            layerCtrl.posY.updateDisplay();
             editor.render();
         }
         this.editorBoxIcons = {
@@ -230,7 +268,6 @@ var Editor = Class({
             if (btnActive < 0) {
                 return; // Avoids useless computation
             }
-            var origEditbtnPos = editor.origEditbtnPos;
 
             var pos = {
                 left: Math.round(e.clientX),
@@ -239,17 +276,17 @@ var Editor = Class({
             switch (btnActive) {
                 case 0: // top left button
                 case 1: // top right button
-                    diagStretch(btnActive, pos, origEditbtnPos);
+                    diagStretch(btnActive, pos, editor.origEditbtnPos);
                     break;
                 case 2: // bottom right button
                 case 3: // bottom left button
-                    diagStretch(5 - btnActive, pos, origEditbtnPos);
+                    diagStretch(5 - btnActive, pos, editor.origEditbtnPos);
                     break;
                 case 4: // left button
                 case 5: // top button
                 case 6: // right button
                 case 7: // bottom button
-                    sideStretch(btnActive - 4, pos, origEditbtnPos);
+                    sideStretch(btnActive - 4, pos, editor.origEditbtn);
                     break;
                 default:
                     break;
