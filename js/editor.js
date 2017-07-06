@@ -326,7 +326,8 @@ var Editor = Class({
             preferredFormat: "hex",
             clickoutFiresChange: false,
             change: function (color) { updateColor(color); },
-            move: function (color) { updateColor(color); }
+            move: function (color) { updateColor(color); },
+            hide: function (color) { updateColor(color); }
         });
         $('.sp-replacer').hide();
         function updateColor(color) {

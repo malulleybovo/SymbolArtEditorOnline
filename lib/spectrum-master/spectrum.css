@@ -397,7 +397,7 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
     position:relative;
     width:25px;
     height: 20px;
-    border: solid 1px #222;
+    border: solid 1px transparent;
     margin-right: 5px;
     float:left;
     z-index: 0;
@@ -413,6 +413,7 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
     height: 16px;
     margin:2px 1px;
     border: solid 1px #d0d0d0;
+    border-radius: 3.5px;
 }
 
 .sp-container {
@@ -468,7 +469,6 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
 
 .sp-preview, .sp-alpha, .sp-thumb-el {
     position:relative;
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAGUlEQVQYV2M4gwH+YwCGIasIUwhT25BVBADtzYNYrHvv4gAAAABJRU5ErkJggg==);
 }
 .sp-preview-inner, .sp-alpha-inner, .sp-thumb-inner {
     display:block;
