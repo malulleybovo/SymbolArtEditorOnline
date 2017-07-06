@@ -2,15 +2,15 @@ var Layer = Class({
     initialize: function (name, part, color, x, y, scale, rotation, vertices, alpha) {
         this.type = 'l';
         this.name = name;
-        var halfSize = 64 * 3;
+        var halfSize = 64 * 3 / 2;
         (part !== undefined) ? this.part = part : this.part = 0;
         (color !== undefined) ? this.color = color : this.color = 0xffffff;
         (scale !== undefined && scale.x !== undefined) ? this.scaleX = scale.x : this.scaleX = 1;
         (scale !== undefined && scale.y !== undefined) ? this.scaleY = scale.y : this.scaleY = 1;
-        (x !== undefined) ? this.x = x : this.x = (1920 - (this.scaleX * halfSize)) / 2;
-        (y !== undefined) ? this.y = y : this.y = (960 - (this.scaleY * halfSize)) / 2;
+        (x !== undefined) ? this.x = x : this.x = EDITOR_SIZE.x / 2;
+        (y !== undefined) ? this.y = y : this.y = EDITOR_SIZE.y / 2;
         (rotation !== undefined) ? this.rotation = rotation : this.rotation = 0;
-        (vertices !== undefined) ? this.vertices = vertices : this.vertices = [0, 0, halfSize, 0, 0, halfSize, halfSize, halfSize];
+        (vertices !== undefined) ? this.vertices = vertices : this.vertices = [-halfSize, -halfSize, halfSize, -halfSize, -halfSize, halfSize, halfSize, halfSize];
         (alpha !== undefined) ? this.alpha = alpha : this.alpha = 7;
     },
     update: function (quad) {

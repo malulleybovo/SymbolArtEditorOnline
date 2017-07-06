@@ -1,5 +1,6 @@
 var Editor = Class({
     initialize: function (parent, list) {
+        EDITOR_SIZE = { x: 1920, y: 960 };
         CANVAS_PIXEL_SCALE = 3;
         this.ZOOM_STEP = 0.35;
         this.ZOOM_MIN = 0.3;
@@ -11,7 +12,7 @@ var Editor = Class({
         this.list = list;
 
         //Create the renderer
-        this.renderer = PIXI.autoDetectRenderer(1920, 960, { transparent: true });
+        this.renderer = PIXI.autoDetectRenderer(EDITOR_SIZE.x, EDITOR_SIZE.y, { transparent: true });
         this.renderer.backgroundColor = 0xb8d1d6;
 
         //Create a container object called the `this.stage`
@@ -452,6 +453,7 @@ var Editor = Class({
         quad.on('mousemove', function (evtData) {
             if (this.isMoving) {
                 this.layerData.layer;
+                console.log(evtData.data.originalEvent.offsetX);
                 this.x = this.origX + roundPosition(evtData.data.originalEvent.offsetX - this.origClickX);
                 this.y = this.origY + roundPosition(evtData.data.originalEvent.offsetY - this.origClickY);
                 this.editor.render();

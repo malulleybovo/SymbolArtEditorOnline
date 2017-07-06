@@ -38,24 +38,28 @@ var LayerCtrl = Class({
                 this.object.update(this.layerCtrl);
             },
             flip: function (typeNum, v) {
-                var dist, step;
+                var scale;
                 switch (typeNum) {
                     case 0: // Horizontal Flip
-                        dist = 2; step = 4;
+                        scale = [-1, 1];
                         break;
                     case 1: // Vertical Flip
-                        dist = 4; step = 2;
+                        scale = [1, -1];
                         break;
                     default:
                         return;
                 }
-                for (var i = 0; i < 2; i++) {
+                /*for (var i = 0; i < 2; i++) {
                     var oldIndex = step * i;
                     var newIndex = (oldIndex + dist) % v.length;
                     var temp = v[newIndex];
                     v[newIndex] = v[oldIndex]; v[oldIndex] = temp;
                     temp = v[newIndex + 1];
                     v[newIndex + 1] = v[oldIndex + 1]; v[oldIndex + 1] = temp;
+                }//*/
+                for (var i = 0; i < 4; i++) {
+                    v[2 * i] *= scale[0];
+                    v[2 * i + 1] *= scale[1];
                 }
             },
             diagStretchMore: function () {
@@ -110,13 +114,13 @@ var LayerCtrl = Class({
                         vtx_i = vtx_i || [4, 6, 0, 2];
                         testV = 4;
                         break;
-                    case 4: // Sheer Top Side
+                    case 4: // Shear Top Side
                         vtx_i = [0, 2, 4, 6];
-                    case 5: // Sheer Right Side
+                    case 5: // Shear Right Side
                         vtx_i = vtx_i || [2, 6, 0, 4];
-                    case 6: // Sheer Left Side
+                    case 6: // Shear Left Side
                         vtx_i = vtx_i || [4, 0, 2, 6];
-                    case 7: // Sheer Bottom Side
+                    case 7: // Shear Bottom Side
                         vtx_i = vtx_i || [6, 4, 0, 2];
                         arbiterV = vtx_i[0];
                         testV = vtx_i[1];
@@ -255,32 +259,32 @@ var LayerCtrl = Class({
             .name('\u2193 -').onChange(this.functions.sideStretchLess);
         this.sideStretchDMinus.layerCtrl = this; this.sideStretchDMinus.sideNum = 3;
 
-        this.sideSheerFolder = this.gui.addFolder('side sheer');
+        this.sideShearFolder = this.gui.addFolder('side shear');
 
-        this.sideSheerLPlus = this.sideSheerFolder.add(this.functions, 'trigger')
+        this.sideShearLPlus = this.sideShearFolder.add(this.functions, 'trigger')
             .name('\u2190 Right/Down').onChange(this.functions.sideStretchMore);
-        this.sideSheerLPlus.layerCtrl = this; this.sideSheerLPlus.sideNum = 6;
-        this.sideSheerLMinus = this.sideSheerFolder.add(this.functions, 'trigger')
+        this.sideShearLPlus.layerCtrl = this; this.sideShearLPlus.sideNum = 6;
+        this.sideShearLMinus = this.sideShearFolder.add(this.functions, 'trigger')
             .name('\u2190 Left/Up').onChange(this.functions.sideStretchLess);
-        this.sideSheerLMinus.layerCtrl = this; this.sideSheerLMinus.sideNum = 6;
-        this.sideSheerRPlus = this.sideSheerFolder.add(this.functions, 'trigger')
+        this.sideShearLMinus.layerCtrl = this; this.sideShearLMinus.sideNum = 6;
+        this.sideShearRPlus = this.sideShearFolder.add(this.functions, 'trigger')
             .name('\u2192 Right/Down').onChange(this.functions.sideStretchLess);
-        this.sideSheerRPlus.layerCtrl = this; this.sideSheerRPlus.sideNum = 5;
-        this.sideSheerRMinus = this.sideSheerFolder.add(this.functions, 'trigger')
+        this.sideShearRPlus.layerCtrl = this; this.sideShearRPlus.sideNum = 5;
+        this.sideShearRMinus = this.sideShearFolder.add(this.functions, 'trigger')
             .name('\u2192 Left/Up').onChange(this.functions.sideStretchMore);
-        this.sideSheerRMinus.layerCtrl = this; this.sideSheerRMinus.sideNum = 5;
-        this.sideSheerUPlus = this.sideSheerFolder.add(this.functions, 'trigger')
+        this.sideShearRMinus.layerCtrl = this; this.sideShearRMinus.sideNum = 5;
+        this.sideShearUPlus = this.sideShearFolder.add(this.functions, 'trigger')
             .name('\u2191 Right/Down').onChange(this.functions.sideStretchMore);
-        this.sideSheerUPlus.layerCtrl = this; this.sideSheerUPlus.sideNum = 4;
-        this.sideSheerUMinus = this.sideSheerFolder.add(this.functions, 'trigger')
+        this.sideShearUPlus.layerCtrl = this; this.sideShearUPlus.sideNum = 4;
+        this.sideShearUMinus = this.sideShearFolder.add(this.functions, 'trigger')
             .name('\u2191 Left/Up').onChange(this.functions.sideStretchLess);
-        this.sideSheerUMinus.layerCtrl = this; this.sideSheerUMinus.sideNum = 4;
-        this.sideSheerDPlus = this.sideSheerFolder.add(this.functions, 'trigger')
+        this.sideShearUMinus.layerCtrl = this; this.sideShearUMinus.sideNum = 4;
+        this.sideShearDPlus = this.sideShearFolder.add(this.functions, 'trigger')
             .name('\u2193 Right/Down').onChange(this.functions.sideStretchLess);
-        this.sideSheerDPlus.layerCtrl = this; this.sideSheerDPlus.sideNum = 7;
-        this.sideSheerDMinus = this.sideSheerFolder.add(this.functions, 'trigger')
+        this.sideShearDPlus.layerCtrl = this; this.sideShearDPlus.sideNum = 7;
+        this.sideShearDMinus = this.sideShearFolder.add(this.functions, 'trigger')
             .name('\u2193 Left/Up').onChange(this.functions.sideStretchMore);
-        this.sideSheerDMinus.layerCtrl = this; this.sideSheerDMinus.sideNum = 7;
+        this.sideShearDMinus.layerCtrl = this; this.sideShearDMinus.sideNum = 7;
 
         this.rotation = this.gui.add(this.activeLayer, 'rotation').min(0).step(0.1).listen();
         this.alpha = this.gui.add(this.activeLayer, 'alpha').min(0).step(1).max(7).listen();
