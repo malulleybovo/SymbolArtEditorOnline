@@ -73,6 +73,7 @@ var SAMLLoader = Class({
     setupElem: function (node, tag, type) {
         // Get all key="value" pairs in tag
         var pairs = tag.match(/([A-Z|a-z][A-Z|a-z|0-9|_]*[A-Z|a-z|0-9]*="[^"|\n]+")+/g);
+        var rawVtces = [];
         for (var i = 0; i < pairs.length; i++) {
             var keyValue = pairs[i].split('=');
             var key = keyValue[0];
@@ -185,7 +186,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[0] = (value + 32) * CANVAS_PIXEL_SCALE;
+                        rawVtces[0] = (value) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'lty':
@@ -195,7 +196,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[1] = (value + 32) * CANVAS_PIXEL_SCALE;
+                        rawVtces[1] = (value) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'lbx':
@@ -205,7 +206,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[4] = (value + 32) * CANVAS_PIXEL_SCALE;
+                        rawVtces[4] = (value) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'lby':
@@ -215,7 +216,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[5] = (value + 32) * CANVAS_PIXEL_SCALE;
+                        rawVtces[5] = (value) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'rtx':
@@ -225,7 +226,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[2] = (value + 32) * CANVAS_PIXEL_SCALE;
+                        rawVtces[2] = (value) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'rty':
@@ -235,7 +236,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[3] = (value + 32) * CANVAS_PIXEL_SCALE;
+                        rawVtces[3] = (value) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'rbx':
@@ -245,7 +246,7 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[6] = (value + 32) * CANVAS_PIXEL_SCALE;
+                        rawVtces[6] = (value) * CANVAS_PIXEL_SCALE;
                     }
                     break;
                 case 'rby':
@@ -255,11 +256,20 @@ var SAMLLoader = Class({
                             // Invalid Input
                             break;
                         }
-                        node.elem.vertices[7] = (value + 32) * CANVAS_PIXEL_SCALE;
+                        rawVtces[7] = (value) * CANVAS_PIXEL_SCALE;
                     }
                     break;
             }
 
+        }
+        if (rawVtces.length == 8) {
+            var x = roundPosition(rawVtces[0] + rawVtces[6]) / 2;
+            var y = roundPosition(rawVtces[1] + rawVtces[7]) / 2;
+            node.elem.x += x; node.elem.y += y;
+            for (var i = 0; i < rawVtces.length; i += 2) {
+                node.elem.vertices[i] = rawVtces[i] - x;
+                node.elem.vertices[i + 1] = rawVtces[i + 1] - y;
+            }
         }
         if (type == 'layer') {
             this.editor.updateLayer(node.elem);

@@ -37,8 +37,8 @@ var Layer = Class({
     getAbsVertices: function () {
         var absVertices = [];
         var origin = {
-            x: 960, // = 1920 / 2
-            y: 480 // = 960 / 2
+            x: EDITOR_SIZE.x / 2, // = 1920 / 2
+            y: EDITOR_SIZE.y / 2 // = 960 / 2
         };
         for (var i = 0; i < this.vertices.length; i += 2) {
             var vx = Math.round((this.x - origin.x + this.scaleX * this.vertices[i]) / CANVAS_PIXEL_SCALE);
