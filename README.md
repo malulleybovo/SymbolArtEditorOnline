@@ -7,19 +7,22 @@ This is purely a fan-made application developed to let other fans and  have fun 
 
 ## Play with it at [Symbol Art Editor Online](https://malulleybovo.github.io/SymbolArtEditorOnline/)
 
-### Usage: (Currently in Alpha Version so I cannot guarantee 100% satisfaction just yet!)
-- Top Left Icon Shows/Hides the Layer Manager
-- Add, Rename, and Delete Layers and Groups by *Right Clicking* (or *Swiping Right*) any Group/Layer in the Layer Manager
-- Drag Layer or Group *Clicked* (*Tapped*) into Another Spot in Layer Manager to Change Position of Symbol (Priority)
+### Usage: (Version 1.0 Coming Soon ! ! !)
+- *Click* (*Tap*) Plus Icon on Landing Screen to Create a Symbol Art from Scratch, or the Upload Icon to Select a Valid *.saml* File and Continue Working on an Existing Symbol Art (Works on Both Desktop and Mobile Devices)
+- Top Left Icon on Editor Shows/Hides the Layer Manager
+- Add, Rename, and Delete Layers and Groups by *Right Clicking* (or *Swiping Right* for iOS and *Tap and Hold* for Android) any Group/Layer in the Layer Manager
+- Drag Layer or Group *Clicked* (*Tapped*) into Another Spot in Layer Manager to Change Position (Layer priority) of Symbol (Note: Not yet available for mobile devices) 
 - *Click* (*Tap*) a Layer on Layer Manager to Enable Editing It and Display the Layer Controller, the Color Picker, and the Layer Edit Box Where the Symbol is in Image
     - Drag Buttons in Edit Box to Perform Their Actions
     - Drag Symbol Itself to Move it Across Image
     - Select the Color Picker to Change the Color of the Symbol Selected
+    - (In Progress) Press and Hold *Space Bar* to Highlight Which Layer is Currently Being Edited
 - *Click* (*Tap*) a Group on Layer Manager to Enable Editing It
     - Drag the Group of Symbols to Move All the Contained Symbols Across Image
 - Center Bottom Musical Note Icon Shows Sound Manager Menu
     - List Icon Shows/Hides List of Available Sounds
     - Volume Icon Plays the Currently Selected Sound
+- Use *Mouse Wheel* and *Middle Click and Hold* (*Pinch and Zoom*) for Zooming In/Out and Panning Through the Editor
 
 ### Features:
 - Touch Screen Support ! ! ! (70-80% functionality is supported so far)
@@ -34,13 +37,15 @@ This is purely a fan-made application developed to let other fans and  have fun 
     - Pick Selected Layer/Group by Clicking (Tapping)
     - Delete Layer/Group
     - Rename Layer/Group
+    - (Upcoming) Copy / Paste Layers
 - Symbol Edit Box to Manipulate the Symbol
     - Drag to Move Symbol Around
     - Stretch Symbol (Diagonally or by Side) using Respective Draggable Buttons on Screen
     - (Upcoming) Resize Symbol using Respective Draggable Button on Screen
     - (Upcoming) Rotate Symbol using Respective Draggable Button on Screen
 - Layer Controller on Top Right Corner of Screen
-    - Pick from a Huge Selection of Symbols
+    - Pick from a Huge Selection of Symbols (Almost\* All Available for now)
+    - Flip Symbol Horizontally and/or Vertically
     - Perform Fine Changes in the Position of the Symbol Selected
     - Perform Fine Stretched in Every Available Direction
     - (Upcoming) Perform Fine Scales
@@ -57,3 +62,8 @@ This is purely a fan-made application developed to let other fans and  have fun 
 
 ### Acknowledgement:
     TODO
+    
+# *Have Fun~*
+## And Happy Art Crafting !
+#### With regards, the developer,
+### Arthur.
