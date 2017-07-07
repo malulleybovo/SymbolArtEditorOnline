@@ -41,25 +41,14 @@ var LayerCtrl = Class({
                 var scale;
                 switch (typeNum) {
                     case 0: // Horizontal Flip
-                        scale = [-1, 1];
-                        break;
+                        scale = [-1, 1]; break;
                     case 1: // Vertical Flip
-                        scale = [1, -1];
-                        break;
+                        scale = [1, -1]; break;
                     default:
                         return;
                 }
-                /*for (var i = 0; i < 2; i++) {
-                    var oldIndex = step * i;
-                    var newIndex = (oldIndex + dist) % v.length;
-                    var temp = v[newIndex];
-                    v[newIndex] = v[oldIndex]; v[oldIndex] = temp;
-                    temp = v[newIndex + 1];
-                    v[newIndex + 1] = v[oldIndex + 1]; v[oldIndex + 1] = temp;
-                }//*/
                 for (var i = 0; i < 4; i++) {
-                    v[2 * i] *= scale[0];
-                    v[2 * i + 1] *= scale[1];
+                    v[2 * i] *= scale[0]; v[2 * i + 1] *= scale[1];
                 }
             },
             diagStretchMore: function () {
@@ -101,6 +90,10 @@ var LayerCtrl = Class({
                 var arbiterV = 0;
                 var testV;
                 var vtx_i = undefined;
+                // isLeftOrTop purely modifies boolean expressions in shearing to save code space
+                // idxOffset purely tweaks the indices used in shearing to save code space
+                var isLeftOrTop, idxOffset;
+                var v = that.layerCtrl.activeLayer.vertices;
                 switch (that.sideNum) {
                     case 0:
                         vtx_i = [0, 4, 2, 6];
@@ -115,23 +108,73 @@ var LayerCtrl = Class({
                         testV = 4;
                         break;
                     case 4: // Shear Top Side
-                        vtx_i = [0, 2, 4, 6];
+                        isLeftOrTop = true; idxOffset = 1;
                     case 5: // Shear Right Side
-                        vtx_i = vtx_i || [2, 6, 0, 4];
+                        if (isLeftOrTop === undefined) isLeftOrTop = false;
+                        if (idxOffset === undefined) idxOffset = 0;
                     case 6: // Shear Left Side
-                        vtx_i = vtx_i || [4, 0, 2, 6];
+                        if (isLeftOrTop === undefined) isLeftOrTop = true;
+                        if (idxOffset === undefined) idxOffset = 0;
                     case 7: // Shear Bottom Side
-                        vtx_i = vtx_i || [6, 4, 0, 2];
+                        if (isLeftOrTop === undefined) isLeftOrTop = false;
+                        if (idxOffset === undefined) idxOffset = 1;
+                        var posivites = [], negatives = [], testBool;
+                        // Out of all 4 vertices, put the indices of the 2 with positive X in one 
+                        // array and the indices of the other two in another array
+                        for (var i = 0; i < v.length; i += 2) {
+                            testBool = v[i + idxOffset] >= 0;
+                            if (isLeftOrTop) testBool = !testBool;
+                            if (testBool && posivites.length < 2) {
+                                posivites.push(i);
+                            }
+                            else negatives.push(i);
+                        }
+                        // sort the two arrays obtained based on isLeftOrTop and idxOffset
+                        testBool = v[posivites[0] + idxOffset] <= v[posivites[1] + idxOffset];
+                        if (isLeftOrTop) testBool = !testBool;
+                        if (testBool) {
+                            var temp = posivites[1];
+                            posivites[1] = posivites[0];
+                            posivites[0] = temp;
+                        }
+                        testBool = v[negatives[0] + idxOffset] <= v[negatives[1] + idxOffset];
+                        if (isLeftOrTop) testBool = !testBool;
+                        if (testBool) {
+                            var temp = negatives[1];
+                            negatives[1] = negatives[0];
+                            negatives[0] = temp;
+                        }
+                        // Account for exceptional cases when symbol looks like:
+                        //   //  \\      /|  |\
+                        //  // or \\ or // or \\  and such. (tricky !)
+                        // //      \\  |/      \|
+                        var slope = (v[posivites[1] + 1 - idxOffset] - v[posivites[0] + 1 - idxOffset]) / (v[posivites[1] + idxOffset] - v[posivites[0] + idxOffset]);
+                        if ((v[posivites[0] + 1 - idxOffset] * v[posivites[1] + 1 - idxOffset]) > 0
+                            && ((v[posivites[0] + idxOffset] * v[posivites[1] + idxOffset]) < 0 || (slope < 1 && slope > -1))) {
+                            var temp = posivites[1];
+                            posivites[1] = negatives[0];
+                            negatives[0] = temp;
+                        }
+                        // Make sure sorting order is maintained because positives array contains 
+                        // indices of vertices that will shear
+                        testBool = v[posivites[0] + 1 - idxOffset] < v[posivites[1] + 1 - idxOffset];
+                        if (isLeftOrTop) testBool = !testBool;
+                        if (testBool) {
+                            var temp = posivites[1];
+                            posivites[1] = posivites[0];
+                            posivites[0] = temp;
+                        }
+                        // Assign values for subsequent shearing
+                        vtx_i = vtx_i || [posivites[0], posivites[1], negatives[0], negatives[1]];
                         arbiterV = vtx_i[0];
                         testV = vtx_i[1];
                         break;
                     default:
                         return;
                 }
-                var v = that.layerCtrl.activeLayer.vertices;
                 var ang = Math.atan((v[arbiterV + 1] - v[testV + 1]) / (v[arbiterV] - v[testV]));
                 if (!isNaN(ang) && (ang < Math.PI / 3 && ang > -Math.PI / 3)) {
-                    if (that.sideNum < 4 && v[testV] <= v[arbiterV]) {
+                    if (v[testV] <= v[arbiterV]) {
                         that.layerCtrl.activeLayer.x -= amount / 2;
                         v[vtx_i[0]] -= amount / 2; v[vtx_i[1]] -= amount / 2;
                         v[vtx_i[2]] += amount / 2; v[vtx_i[3]] += amount / 2;
@@ -143,7 +186,7 @@ var LayerCtrl = Class({
                     }
                 }
                 if (!isNaN(ang) && (ang > Math.PI / 6 || ang < -Math.PI / 6)) {
-                    if (that.sideNum < 4 && v[testV + 1] <= v[arbiterV + 1]) {
+                    if ( v[testV + 1] <= v[arbiterV + 1]) {
                         that.layerCtrl.activeLayer.y -= amount / 2;
                         v[vtx_i[0] + 1] -= amount / 2; v[vtx_i[1] + 1] -= amount / 2;
                         v[vtx_i[2] + 1] += amount / 2; v[vtx_i[3] + 1] += amount / 2;
@@ -262,28 +305,28 @@ var LayerCtrl = Class({
         this.sideShearFolder = this.gui.addFolder('side shear');
 
         this.sideShearLPlus = this.sideShearFolder.add(this.functions, 'trigger')
-            .name('\u2190 Right/Down').onChange(this.functions.sideStretchMore);
+            .name('left upward').onChange(this.functions.sideStretchLess);
         this.sideShearLPlus.layerCtrl = this; this.sideShearLPlus.sideNum = 6;
         this.sideShearLMinus = this.sideShearFolder.add(this.functions, 'trigger')
-            .name('\u2190 Left/Up').onChange(this.functions.sideStretchLess);
+            .name('left downward').onChange(this.functions.sideStretchMore);
         this.sideShearLMinus.layerCtrl = this; this.sideShearLMinus.sideNum = 6;
         this.sideShearRPlus = this.sideShearFolder.add(this.functions, 'trigger')
-            .name('\u2192 Right/Down').onChange(this.functions.sideStretchLess);
+            .name('right upward').onChange(this.functions.sideStretchMore);
         this.sideShearRPlus.layerCtrl = this; this.sideShearRPlus.sideNum = 5;
         this.sideShearRMinus = this.sideShearFolder.add(this.functions, 'trigger')
-            .name('\u2192 Left/Up').onChange(this.functions.sideStretchMore);
+            .name('right downward').onChange(this.functions.sideStretchLess);
         this.sideShearRMinus.layerCtrl = this; this.sideShearRMinus.sideNum = 5;
         this.sideShearUPlus = this.sideShearFolder.add(this.functions, 'trigger')
-            .name('\u2191 Right/Down').onChange(this.functions.sideStretchMore);
+            .name('top rightward').onChange(this.functions.sideStretchMore);
         this.sideShearUPlus.layerCtrl = this; this.sideShearUPlus.sideNum = 4;
         this.sideShearUMinus = this.sideShearFolder.add(this.functions, 'trigger')
-            .name('\u2191 Left/Up').onChange(this.functions.sideStretchLess);
+            .name('top leftward').onChange(this.functions.sideStretchLess);
         this.sideShearUMinus.layerCtrl = this; this.sideShearUMinus.sideNum = 4;
         this.sideShearDPlus = this.sideShearFolder.add(this.functions, 'trigger')
-            .name('\u2193 Right/Down').onChange(this.functions.sideStretchLess);
+            .name('bottom rightward').onChange(this.functions.sideStretchLess);
         this.sideShearDPlus.layerCtrl = this; this.sideShearDPlus.sideNum = 7;
         this.sideShearDMinus = this.sideShearFolder.add(this.functions, 'trigger')
-            .name('\u2193 Left/Up').onChange(this.functions.sideStretchMore);
+            .name('bottom leftward').onChange(this.functions.sideStretchMore);
         this.sideShearDMinus.layerCtrl = this; this.sideShearDMinus.sideNum = 7;
 
         this.rotation = this.gui.add(this.activeLayer, 'rotation').min(0).step(0.1).listen();

@@ -453,7 +453,6 @@ var Editor = Class({
         quad.on('mousemove', function (evtData) {
             if (this.isMoving) {
                 this.layerData.layer;
-                console.log(evtData.data.originalEvent.offsetX);
                 this.x = this.origX + roundPosition(evtData.data.originalEvent.offsetX - this.origClickX);
                 this.y = this.origY + roundPosition(evtData.data.originalEvent.offsetY - this.origClickY);
                 this.editor.render();
