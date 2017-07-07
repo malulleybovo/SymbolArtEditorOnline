@@ -239,8 +239,8 @@ var List = Class({
             return groupFolder;
         };
         this.createLayerNode = function (name, group, folder) {
-            var li = $('<li class="context-menu-layer" class="ui-draggable ui-draggable-handle">');
-            li.append('<a href="#" data-role="button" data-transition="pop" style="text-shadow:none;">' + name + '</a>');
+            var li = $('<li class="context-menu-layer" data-mini="true" class="ui-draggable ui-draggable-handle">');
+            li.append('<a data-mini="true" href="#" data-role="button" data-transition="pop" style="text-shadow:none;">' + name + '</a>');
             li[0].group = group;
             li[0].parentFolder = folder;
             li[0].elem = group.elems[group.activeElem];
@@ -630,8 +630,8 @@ var List = Class({
                 this.displayGroup(group.elems[i], groupFolder[0].list, group, i);
             }
             else if (group.elems[i].type = 'l') {
-                var li = $('<li class="context-menu-layer" id="' + layerID + '">'); layerID++;
-                li.append('<a href="#popupBasic" data-rel="popup" data-role="button" data-inline="true" data-transition="pop">' + group.elems[i].name + '</a>');
+                var li = $('<li data-mini="true" class="context-menu-layer" id="' + layerID + '">'); layerID++;
+                li.append('<a data-mini="true" href="#popupBasic" data-rel="popup" data-role="button" data-inline="true" data-transition="pop">' + group.elems[i].name + '</a>');
                 li[0].group = group;
                 li[0].parentFolder = groupFolder[0];
                 li[0].elem = group.elems[i];
