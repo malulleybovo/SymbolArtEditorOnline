@@ -90,6 +90,7 @@ body {
     transform: translate(-50%, -50%);
     width: 1920px;
     height: 960px;
+    background-image: url('../images/editor_background.png');
 }
 
 .full-size {

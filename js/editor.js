@@ -13,7 +13,6 @@ var Editor = Class({
 
         //Create the renderer
         this.renderer = PIXI.autoDetectRenderer(EDITOR_SIZE.x, EDITOR_SIZE.y, { transparent: true });
-        this.renderer.backgroundColor = 0xb8d1d6;
 
         //Create a container object called the `this.stage`
         this.stage = new PIXI.Container();
@@ -381,8 +380,9 @@ var Editor = Class({
         if (Math.round(this.zoom * 100) < this.ZOOM_MAX * 100) {
             this.zoom += this.ZOOM_STEP;
 
-            var scale = 'scale(' + this.zoom + ', ' + this.zoom + ')';
-            $('canvas').css('transform', scale);
+            var scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
+                + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
+            $('canvas').parent().css('transform', scale);
 
             $(this.list.selectedElem).parent().trigger('mousedown'); // Update editor box
         }
@@ -391,8 +391,9 @@ var Editor = Class({
         if (Math.round(this.zoom * 100) > this.ZOOM_MIN * 100) {
             this.zoom -= this.ZOOM_STEP;
 
-            var scale = 'scale(' + this.zoom + ', ' + this.zoom + ')';
-            $('canvas').css('transform', scale);
+            var scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
+                + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
+            $('canvas').parent().css('transform', scale);
 
             $(this.list.selectedElem).parent().trigger('mousedown'); // Update editor box
         }
