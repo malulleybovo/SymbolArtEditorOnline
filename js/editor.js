@@ -32,7 +32,7 @@ var Editor = Class({
 
         // Buttons
         this.currBtnDown = -1;
-        var tl = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-u-l ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
+        var tl = $('<i class="fa fa-arrow-up fa-border edit-button corner-arrow no-highlight" ondragstart="return false;">');
         tl[0].list = list;
         tl[0].editor = this;
         tl.on('vmousedown', function () {
@@ -45,7 +45,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var tr = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-u-r ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
+        var tr = $('<i class="fa fa-arrow-right fa-border edit-button corner-arrow no-highlight" ondragstart="return false;">');
         tr[0].list = list;
         tr[0].editor = this;
         tr.on('vmousedown', function () {
@@ -58,7 +58,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var br = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-d-r ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
+        var br = $('<i class="fa fa-arrow-down fa-border edit-button corner-arrow no-highlight" ondragstart="return false;">');
         br[0].list = list;
         br[0].editor = this;
         br.on('vmousedown', function () {
@@ -71,7 +71,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var bl = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-d-l ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
+        var bl = $('<i class="fa fa-arrow-left fa-border edit-button corner-arrow no-highlight" ondragstart="return false;">');
         bl[0].list = list;
         bl[0].editor = this;
         bl.on('vmousedown', function () {
@@ -84,7 +84,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var btn_l = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-l ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
+        var btn_l = $('<i class="fa fa-arrow-left fa-border edit-button no-highlight" ondragstart="return false;">');
         btn_l[0].list = list;
         btn_l[0].editor = this;
         btn_l.on('vmousedown', function (e) {
@@ -101,7 +101,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var btn_u = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-u ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
+        var btn_u = $('<i class="fa fa-arrow-up fa-border edit-button no-highlight" ondragstart="return false;">');
         btn_u[0].list = list;
         btn_u[0].editor = this;
         btn_u.on('vmousedown', function (e) {
@@ -118,7 +118,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var btn_r = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-r ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
+        var btn_r = $('<i class="fa fa-arrow-right fa-border edit-button no-highlight" ondragstart="return false;">');
         btn_r[0].list = list;
         btn_r[0].editor = this;
         btn_r.on('vmousedown', function (e) {
@@ -135,12 +135,29 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var btn_d = $('<button class="ui-nodisc-icon ui-alt-icon ui-btn ui-shadow ui-corner-all ui-icon-arrow-d ui-btn-icon-notext ui-btn-inline editor-box-icon no-panning">');
+        var btn_d = $('<i class="fa fa-arrow-down fa-border edit-button no-highlight" ondragstart="false">');
         btn_d[0].list = list;
         btn_d[0].editor = this;
         btn_d.on('vmousedown', function (e) {
             if (!panZoomActive) {
                 this.editor.currBtnDown = 7;
+                if (!this.editor.disableSmallVtxChange)
+                    this.editor.origEditbtn = {
+                        vtces: this.editor.layerCtrl.activeLayer.vertices.slice(0),
+                        x: this.editor.layerCtrl.activeLayer.x,
+                        y: this.editor.layerCtrl.activeLayer.y
+                    };
+            }
+        }).on('vmousemove', function () {
+        }).on('vmouseup', function () {
+            this.editor.currBtnDown = -1;
+        }).hide();
+        var btn_rot = $('<i class="fa fa-repeat fa-border edit-button no-highlight" ondragstart="return false;">');
+        btn_rot[0].list = list;
+        btn_rot[0].editor = this;
+        btn_rot.on('vmousedown', function (e) {
+            if (!panZoomActive) {
+                this.editor.currBtnDown = 8;
                 if (!this.editor.disableSmallVtxChange)
                     this.editor.origEditbtn = {
                         vtces: this.editor.layerCtrl.activeLayer.vertices.slice(0),
@@ -243,6 +260,28 @@ var Editor = Class({
             editor.updateLayer(layer);
             editor.render();
         }
+        function rotate(clientPos, origValues) {
+            var canvas = $('canvas');
+            var canvasPos = canvas.offset();
+            var editor = canvas[0].editor;
+            var layer = list.selectedElem.parentNode.elem;
+
+            var relPos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
+            var dPos = {
+                x: ((relPos.left / editor.zoom) - layer.x),
+                y: ((relPos.top / editor.zoom) - layer.y)
+            };
+            var ang = Math.asin(dPos.x / Math.sqrt((dPos.x * dPos.x) + (dPos.y * dPos.y)));
+            var v = origValues.vtces;
+            if (dPos.y > 0) ang = Math.PI - ang;
+            var sin = Math.sin(ang), cos = Math.cos(ang);
+            for (var i = 0; i < v.length; i += 2) {
+                var x = cos * v[i] - sin * v[i + 1], y = sin * v[i] + cos * v[i + 1];
+                layer.vertices[i] = roundPosition(x); layer.vertices[i + 1] = roundPosition(y);
+            }
+            editor.updateLayer(layer);
+            editor.render();
+        }
         this.editorBoxIcons = {
             tl: tl,
             tr: tr,
@@ -251,12 +290,13 @@ var Editor = Class({
             left: btn_l,
             up: btn_u,
             right: btn_r,
-            down: btn_d
+            down: btn_d,
+            rotation: btn_rot
         };
 
         $('body').on('vmousemove', function (e) {
             // Mouse Move for Button Control
-            var buttons = $(this).find('button.editor-box-icon');
+            var buttons = $(this).find('.edit-button');
             if (!buttons.is(":visible")) return;
 
             var editor = $('canvas')[0].editor;
@@ -265,6 +305,7 @@ var Editor = Class({
             if (btnActive < 0) {
                 return; // Avoids useless computation
             }
+            buttons.css('opacity', 0.2).css('cursor', 'none');
 
             var pos = {
                 left: Math.round(e.clientX),
@@ -285,13 +326,17 @@ var Editor = Class({
                 case 7: // bottom button
                     sideStretch(btnActive - 4, pos, editor.origEditbtn);
                     break;
+                case 8:
+                    rotate(pos, editor.origEditbtn);
+                    break;
                 default:
                     break;
             }
             $('canvas')[0].editor.refreshLayerEditBox();
         }).on('vmouseup', function (e) {
-            var buttons = $(this).find('button.editor-box-icon');
+            var buttons = $(this).find('.edit-button');
             if (!buttons.is(":visible")) return;
+            buttons.css('opacity', 1).css('cursor', 'default');
             // Deactivate any edit box button that may have been used
             $('canvas')[0].editor.currBtnDown = -1;
         })
@@ -320,6 +365,7 @@ var Editor = Class({
         $('body').append(this.editorBoxIcons.up);
         $('body').append(this.editorBoxIcons.right);
         $('body').append(this.editorBoxIcons.down);
+        $('body').append(this.editorBoxIcons.rotation);
         //Add the canvas to the HTML document
         parent.appendChild(this.renderer.view);
 
@@ -630,6 +676,7 @@ var Editor = Class({
         this.editorBoxIcons.up.hide();
         this.editorBoxIcons.right.hide();
         this.editorBoxIcons.down.hide();
+        this.editorBoxIcons.rotation.hide();
     },
     showInterface: function () {
         this.layerCtrl.show();
@@ -641,29 +688,33 @@ var Editor = Class({
         this.editorBoxIcons.up.show();
         this.editorBoxIcons.right.show();
         this.editorBoxIcons.down.show();
+        this.editorBoxIcons.rotation.show();
     },
     refreshLayerEditBox: function () {
         var offset = $('canvas').offset();
         var basePosX = offset.left + this.zoom * this.selectedLayer.x;
         var basePosY = offset.top + this.zoom * this.selectedLayer.y;
         var v = this.selectedLayer.vertices;
-        this.editorBoxIcons.tl.css('left', (basePosX + this.zoom * v[0] - 14.8) + 'px')
-            .css('top', (basePosY + this.zoom * v[1] - 22.8) + 'px');
-        this.editorBoxIcons.tr.css('left', (basePosX + this.zoom * v[2] - 14.8) + 'px')
-            .css('top', (basePosY + this.zoom * v[3] - 22.8) + 'px');
-        this.editorBoxIcons.bl.css('left', (basePosX + this.zoom * v[4] - 14.8) + 'px')
-            .css('top', (basePosY + this.zoom * v[5] - 22.8) + 'px');
-        this.editorBoxIcons.br.css('left', (basePosX + this.zoom * v[6] - 14.8) + 'px')
-            .css('top', (basePosY + this.zoom * v[7] - 22.8) + 'px');
+        this.editorBoxIcons.tl.css('left', (basePosX + this.zoom * v[0] - 11.3) + 'px')
+            .css('top', (basePosY + this.zoom * v[1] - 12.5) + 'px');
+        this.editorBoxIcons.tr.css('left', (basePosX + this.zoom * v[2] - 11.3) + 'px')
+            .css('top', (basePosY + this.zoom * v[3] - 12.5) + 'px');
+        this.editorBoxIcons.bl.css('left', (basePosX + this.zoom * v[4] - 11.3) + 'px')
+            .css('top', (basePosY + this.zoom * v[5] - 12.5) + 'px');
+        this.editorBoxIcons.br.css('left', (basePosX + this.zoom * v[6] - 11.3) + 'px')
+            .css('top', (basePosY + this.zoom * v[7] - 12.5) + 'px');
 
-        this.editorBoxIcons.left.css('left', (basePosX + (this.zoom * (v[0] + v[4]) - 29.6) / 2) + 'px')
-            .css('top', (basePosY + (this.zoom * (v[1] + v[5])) / 2 - 22.8) + 'px');
-        this.editorBoxIcons.up.css('left', (basePosX + (this.zoom * (v[0] + v[2]) - 29.6) / 2) + 'px')
-            .css('top', (basePosY + (this.zoom * (v[1] + v[3])) / 2 - 22.8) + 'px');
-        this.editorBoxIcons.right.css('left', (basePosX + (this.zoom * (v[2] + v[6]) - 29.6) / 2) + 'px')
-            .css('top', (basePosY + (this.zoom * (v[3] + v[7])) / 2 - 22.8) + 'px');
-        this.editorBoxIcons.down.css('left', (basePosX + (this.zoom * (v[4] + v[6]) - 29.6) / 2) + 'px')
-            .css('top', (basePosY + (this.zoom * (v[5] + v[7])) / 2 - 22.8) + 'px');
+        this.editorBoxIcons.left.css('left', (basePosX + (this.zoom * (v[0] + v[4])) / 2 - 11.3) + 'px')
+            .css('top', (basePosY + (this.zoom * (v[1] + v[5])) / 2 - 12.5) + 'px');
+        this.editorBoxIcons.up.css('left', (basePosX + (this.zoom * (v[0] + v[2])) / 2 - 11.3) + 'px')
+            .css('top', (basePosY + (this.zoom * (v[1] + v[3])) / 2 - 12.5) + 'px');
+        this.editorBoxIcons.right.css('left', (basePosX + (this.zoom * (v[2] + v[6])) / 2 - 11.3) + 'px')
+            .css('top', (basePosY + (this.zoom * (v[3] + v[7])) / 2 - 12.5) + 'px');
+        this.editorBoxIcons.down.css('left', (basePosX + (this.zoom * (v[4] + v[6])) / 2 - 11.3) + 'px')
+            .css('top', (basePosY + (this.zoom * (v[5] + v[7])) / 2 - 12.5) + 'px');
+
+        this.editorBoxIcons.rotation.css('left', (basePosX - 11.3) + 'px')
+            .css('top', (basePosY - 42.5) + 'px');
     },
     refreshLayerEditBoxButton: function (index) {
         var sel = {};

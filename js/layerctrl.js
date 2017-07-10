@@ -9,7 +9,7 @@ var LayerCtrl = Class({
         this.gui = new dat.GUI({ autoPlace: false });
         this.gui.domElement.id = layerCtrlID;
         this.gui.domElement.layerCtrl = this;
-        $(this.gui.domElement).addClass("no-panning");
+        $(this.gui.domElement).addClass("no-panning no-highlight");
 
         $('body').append(this.gui.domElement);
 
@@ -219,10 +219,9 @@ var LayerCtrl = Class({
             replacerClassName: 'sa-color-picker-replacer',
             containerClassName: 'sa-color-picker-container',
             preferredFormat: "hex",
-            clickoutFiresChange: false,
+            clickoutFiresChange: true,
             change: function (color) { updateColor(color); },
-            move: function (color) { updateColor(color); },
-            hide: function (color) { updateColor(color); }
+            move: function (color) { updateColor(color); }
         });
         $('.sp-replacer').css('transition', '0.1s ease-in-out');
         function updateColor(color) {
