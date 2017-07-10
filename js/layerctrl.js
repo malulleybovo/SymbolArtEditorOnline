@@ -206,6 +206,44 @@ var LayerCtrl = Class({
             }
         }
 
+        // Color Picker
+        this.cPicker = $('<input type="text" id="colorSelector" style="width:0; height:0; position:fixed; bottom:0; right:0;" />');
+        $('body').append(this.cPicker);
+        this.cPicker.spectrum({
+            color: "#fffffff",
+            showInput: true,
+            showInitial: true,
+            localStorageKey: "spectrum.homepage",
+            showPalette: true,
+            palette: [],
+            replacerClassName: 'sa-color-picker-replacer',
+            containerClassName: 'sa-color-picker-container',
+            preferredFormat: "hex",
+            clickoutFiresChange: false,
+            change: function (color) { updateColor(color); },
+            move: function (color) { updateColor(color); },
+            hide: function (color) { updateColor(color); }
+        });
+        $('.sp-replacer').css('transition', '0.1s ease-in-out');
+        function updateColor(color) {
+            var canvas = $('canvas')[0];
+            if (canvas.editor === undefined) console.error(
+                "Editor canvas could not be found and thus, color picker could not interact with the editor.");
+            else {
+                var editor = canvas.editor;
+                if (editor.selectedLayer !== undefined) {
+                    if (editor.selectedLayer != null) {
+                        var newColor = Math.round(parseInt('0x' + color.toHex()));
+                        editor.selectedLayer.color = newColor;
+                        editor.updateLayer(editor.selectedLayer);
+                        editor.render();
+                    }
+                }
+                else console.warn(
+                    "No currently selected layer is defined. Could not update color picker.");
+            }
+        }
+
         this.partselectmenu = new PartSelectMenu(this);
         this.partManager = {
             part: function () {
@@ -331,6 +369,9 @@ var LayerCtrl = Class({
 
         this.rotation = this.gui.add(this.activeLayer, 'rotation').min(0).step(0.1).listen();
         this.alpha = this.gui.add(this.activeLayer, 'alpha').min(0).step(1).max(7).listen();
+
+        $(this.gui.domElement).addClass('fade');
+        $('.sp-replacer').addClass('fade fadeOut');
     },
     update: function (layer) {
         this.activeLayer = layer;
@@ -350,9 +391,13 @@ var LayerCtrl = Class({
         this.alpha.updateDisplay();
     },
     hide: function () {
-        $(this.gui.domElement).hide();
+        this.partselectmenu.hide();
+        $(this.gui.domElement).addClass('fadeOut');
+        $('.sp-replacer').addClass('fadeOut');
     },
     show: function () {
-        $(this.gui.domElement).show();
+        this.partselectmenu.show();
+        $(this.gui.domElement).removeClass('fadeOut');
+        $('.sp-replacer').removeClass('fadeOut');
     }
 });

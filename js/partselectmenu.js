@@ -29,13 +29,23 @@
     },
     update: function (partNum) {
         // TODO - update selection in list of options based on partNum
-        if (this.selectmenu.isMenuActive(0)) {
-            this.selectmenu.setSelectedOption(partNum);
-        }
+        this.selectmenu.setSelectedOption(partNum, 0);
         //console.log('Not Implemented: PartSelectMenu.update(partNum)');
     },
     toggle: function () {
         this.selectmenu.setActiveMenu(0);
         setTimeout(this.selectmenu.toggle, 100);
+    },
+    isActive: function () {
+        return this.selectmenu.isMenuActive(0);
+    },
+    isOpen: function () {
+        return this.selectmenu.isOpen(0);
+    },
+    hide: function () {
+        this.selectmenu.hide(0);
+    },
+    show: function () {
+        this.selectmenu.show(0);
     }
 });

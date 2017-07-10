@@ -1,10 +1,11 @@
 ﻿var SelectMenu = Class({
     initialize: function () {
         var newMenu = {};
-        newMenu.container = $('<div id="sidenav" class="no-highlight cursor-pointer no-panning">');
+        newMenu.container = $('<div id="sidenav" class="no-highlight cursor-pointer no-panning fade">');
         newMenu.container[0].selectmenu = this;
+        newMenu.width = '170px';
 
-        newMenu.container.list = $('<div class="menu" style="width: 170px;">');
+        newMenu.container.list = $('<div class="menu" style="width: ' + newMenu.width + ';">');
 
         newMenu.closeButton = $('<div class="closebtn">&times;</a>');
         newMenu.closeButton[0].selectmenu = this; // Attach refference to select menu
@@ -54,13 +55,14 @@
         }
         return false;
     },
-    setSelectedOption: function (num) {
-        if (SelectMenu.activeMenu.options.length <= num) return -1;
-        if (SelectMenu.activeMenu.selectedOption != null) {
-            SelectMenu.activeMenu.selectedOption.removeClass('img-highlight').addClass('img-no-highlight');
+    setSelectedOption: function (num, menuIndex) {
+        var menu = SelectMenu.menus[menuIndex] || SelectMenu.activeMenu;
+        if (menu.options.length <= num) return -1;
+        if (menu.selectedOption != null) {
+            menu.selectedOption.removeClass('img-highlight').addClass('img-no-highlight');
         }
-        SelectMenu.activeMenu.selectedOption = SelectMenu.activeMenu.options[num];
-        SelectMenu.activeMenu.selectedOption.removeClass('img-no-highlight').addClass('img-highlight');
+        menu.selectedOption = menu.options[num];
+        menu.selectedOption.removeClass('img-no-highlight').addClass('img-highlight');
         return 0;
     },
     addIconOption: function (url, handler, addonProperties) {
@@ -96,12 +98,28 @@
         SelectMenu.activeMenu.isOpen = !SelectMenu.activeMenu.isOpen;
         var container = $('#sidenav');
         if (SelectMenu.activeMenu.isOpen) {
-            container[0].style.width = "170px";
+            container[0].style.width = SelectMenu.activeMenu.width;
             container.find('.closebtn')[0].style.transform = 'translate(0%, 0%)';
+            $('.sp-replacer').css('transform', 'translate(-' + SelectMenu.activeMenu.width + ', 0)');
         }
         else {
             container[0].style.width = "0px";
             container.find('.closebtn')[0].style.transform = 'translate(300%, 0%)';
+            $('.sp-replacer').css('transform', 'translate(0, 0)');
+        }
+    },
+    isOpen: function (index) {
+        return (index >= 0 && index < SelectMenu.menus.length
+            && SelectMenu.menus[index].isOpen);
+    },
+    hide: function (index) {
+        if (index >= 0 && index < SelectMenu.menus.length) {
+            SelectMenu.menus[index].container.addClass('fadeOut');
+        }
+    },
+    show: function (index) {
+        if (index >= 0 && index < SelectMenu.menus.length) {
+            SelectMenu.menus[index].container.removeClass('fadeOut');
         }
     }
 });
