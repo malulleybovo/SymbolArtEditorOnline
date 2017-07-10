@@ -42,7 +42,7 @@ This is purely a fan-made application developed to let other fans and  have fun 
     - Drag to Move Symbol Around
     - Stretch Symbol (Diagonally or by Side) using Respective Draggable Buttons on Screen
     - (Upcoming) Resize Symbol using Respective Draggable Button on Screen
-    - (Upcoming) Rotate Symbol using Respective Draggable Button on Screen
+    - Rotate Symbol using Respective Draggable Button on Screen
 - Layer Controller on Top Right Corner of Screen
     - Pick from a Huge Selection of Symbols (Almost\* All Available for now)
     - Flip Symbol Horizontally and/or Vertically
