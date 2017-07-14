@@ -169,6 +169,7 @@ img {
 }
 #canvasctrl {
     float: left;
+    min-width: 135px;
     width: 20%;
     height: 100%;
     border-right: 1px solid #2fa1d6;
@@ -181,6 +182,7 @@ img {
 #canvasctrlbutton {
     left: 0;
     top: 0;
+    padding: 4px;
 }
 #layerctrl {
     position: relative;

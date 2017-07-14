@@ -5,6 +5,9 @@ var List = Class({
     initialize: function (headerName, groupName, editorContainer) {
         // Initialize Canvas Control
         this.page = $(document.getElementById('canvasctrl'));
+        this.async = {
+            hasSynced: true
+        };
 
         // Initialize Side Bar
         $(".sidebar.left").sidebar().trigger("sidebar:close");
@@ -37,7 +40,7 @@ var List = Class({
         };
 
         // Create Toggle Button
-        this.toggleButton = $('<i id="canvasctrlbutton" class="material-icons button layer1 no-highlight cursor-pointer">&#xE8EF;</i>');
+        this.toggleButton = $('<i id="canvasctrlbutton" class="material-icons button layer1 no-highlight cursor-pointer no-panning">&#xE8EF;</i>');
         this.toggleButton.click(function () {
             $(".sidebar.left").trigger("sidebar:toggle");
         });
@@ -57,6 +60,7 @@ var List = Class({
             }
         }
         document.onkeydown = function (e) {
+            if (list.isRenamingLayer) return;
             if (e.keyCode == 9) {
                 e.preventDefault(); // Disable TAB
             }
@@ -66,7 +70,6 @@ var List = Class({
                     return;
                 }
 
-                var list = canvas.list;
                 var elem = list.selectedElem.parentNode.elem;
                 list.editor.stage.alpha = 0.1;
                 if (elem.type == 'l') {
@@ -190,6 +193,7 @@ var List = Class({
             header[0].elem = group.elems[group.activeElem];
             header[0].parentFolder = folder; // Get reference to collapsible
             $(header).mousedown(this.elemMousedownEvtHandler);
+            header.click(this.elemMousedownEvtHandler);
             header.on("swiperight", function () {
                 $(this).contextMenu();
             });
@@ -233,6 +237,15 @@ var List = Class({
             header.on("drop", function (event) {
                 event.preventDefault();
                 event.stopPropagation();
+
+                // Save undoable action for move
+                historyManager.pushUndoAction('move', {
+                    'move': this.list.move,
+                    'srcLayer': this.list.movingElem,
+                    'destLayer': this,
+                    'async': this.list.async
+                });
+
                 this.list.move(this.list.movingElem, this);
             });
 
@@ -246,6 +259,7 @@ var List = Class({
             li[0].elem = group.elems[group.activeElem];
             li[0].list = this;
             $(li).mousedown(this.elemMousedownEvtHandler);
+            li.click(this.elemMousedownEvtHandler);
             // Show menu when right clicked
             li.on('vmousedown', function (e) {
                 this.list.changeSelectedElem(this.firstChild);
@@ -277,6 +291,19 @@ var List = Class({
             li.on("drop", function(event) {
                 event.preventDefault();  
                 event.stopPropagation();
+
+                var dest = $(this.list.movingElem).prev()[0];
+                dest = dest || $(this.list.movingElem).next()[0];
+
+                // Save undoable action for move
+                historyManager.pushUndoAction('move', {
+                    'move': this.list.move,
+                    'srcLayer': this.list.movingElem,
+                    'currLayerInSrc': dest,
+                    'destLayer': this,
+                    'async': this.list.async
+                });
+
                 this.list.move(this.list.movingElem, this);
             });
 
@@ -300,6 +327,7 @@ var List = Class({
             input[0].prevValue = parent[0].elem.name;
             input[0].prevNode = elem[0];
             if (parent[0].elem.type == 'g') { parent.parent().collapsible("option", "collapsed", true); }
+            list.isRenamingLayer = true;
             input.keypress(function (e) { // Update contents of layer/group
                 e.stopPropagation();
                 var elem = $(this);
@@ -325,6 +353,7 @@ var List = Class({
                             elem.remove();
                             parent.trigger('create');
                             prevElem.focus();
+                            list.isRenamingLayer = undefined;
                         }
                         else {
                             this.blur();
@@ -361,18 +390,19 @@ var List = Class({
         }
     },
     move: function (srcElem, destElem) {
-        if (srcElem == destElem) return;
+        if (!this.async.hasSynced
+            || srcElem == destElem) return;
         var cssclass = 'testingFirstDOMElem';
         var src;
         var layersToMove = [];
         if (srcElem.elem.type == 'l') {
             src = $(srcElem);
-            layersToMove.push(this.editor.removeLayer(srcElem.elem));
+            layersToMove.push($('canvas')[0].editor.removeLayer(srcElem.elem));
         }
         else if (srcElem.elem.type == 'g') {
             src = $(srcElem).parent();
             for (var i in srcElem.elem.elems) {
-                layersToMove.push(this.editor.removeLayer(srcElem.elem.elems[i]));
+                layersToMove.push($('canvas')[0].editor.removeLayer(srcElem.elem.elems[i]));
             }
         }
         src.addClass(cssclass);
@@ -446,8 +476,12 @@ var List = Class({
                         }
                         editor.render();
                     };
-        src.slideUp(150, callback).slideDown(150, function () {
-            src.mousedown();
+        this.async.hasSynced = false;
+        console.log('Waiting for application to sync again after moving layers.');
+        src.slideUp(100, callback).slideDown(100, function () {
+            src.click();
+            this.list.async.hasSynced = true;
+            console.log('Application synced again after moving layers.');
         });
 
     },
@@ -600,6 +634,7 @@ var List = Class({
             header[0].elem = parentGroup.elems[index];
             header[0].parentFolder = parentFolder[0].parentNode; // Get reference to collapsible
             $(header).mousedown(this.elemMousedownEvtHandler);
+            header.click(this.elemMousedownEvtHandler);
             menuType = 'SubGroupMenu';
         }
         else {
@@ -636,6 +671,7 @@ var List = Class({
                 li[0].parentFolder = groupFolder[0];
                 li[0].elem = group.elems[i];
                 $(li).mousedown(this.elemMousedownEvtHandler);
+                li.click(this.elemMousedownEvtHandler);
                 li.on("swiperight", function () {
                     $(this).contextMenu();
                 });

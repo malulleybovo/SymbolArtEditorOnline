@@ -223,7 +223,8 @@ var LayerCtrl = Class({
             change: function (color) { updateColor(color); },
             move: function (color) { updateColor(color); }
         });
-        $('.sp-replacer').css('transition', '0.1s ease-in-out');
+        $('.sp-replacer').css('transition', '0.1s ease-in-out').addClass('no-panning');
+        $('.sp-container').addClass('no-panning');
         function updateColor(color) {
             var canvas = $('canvas')[0];
             if (canvas.editor === undefined) console.error(

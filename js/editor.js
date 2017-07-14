@@ -32,7 +32,7 @@ var Editor = Class({
 
         // Buttons
         this.currBtnDown = -1;
-        var tl = $('<i class="fa fa-arrow-up fa-border edit-button corner-arrow no-highlight" ondragstart="return false;">');
+        var tl = $('<i class="fa fa-arrow-up fa-border edit-button corner-arrow no-highlight no-panning" ondragstart="return false;">');
         tl[0].list = list;
         tl[0].editor = this;
         tl.on('vmousedown', function () {
@@ -45,7 +45,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var tr = $('<i class="fa fa-arrow-right fa-border edit-button corner-arrow no-highlight" ondragstart="return false;">');
+        var tr = $('<i class="fa fa-arrow-right fa-border edit-button corner-arrow no-highlight no-panning" ondragstart="return false;">');
         tr[0].list = list;
         tr[0].editor = this;
         tr.on('vmousedown', function () {
@@ -58,7 +58,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var br = $('<i class="fa fa-arrow-down fa-border edit-button corner-arrow no-highlight" ondragstart="return false;">');
+        var br = $('<i class="fa fa-arrow-down fa-border edit-button corner-arrow no-highlight no-panning" ondragstart="return false;">');
         br[0].list = list;
         br[0].editor = this;
         br.on('vmousedown', function () {
@@ -71,7 +71,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var bl = $('<i class="fa fa-arrow-left fa-border edit-button corner-arrow no-highlight" ondragstart="return false;">');
+        var bl = $('<i class="fa fa-arrow-left fa-border edit-button corner-arrow no-highlight no-panning" ondragstart="return false;">');
         bl[0].list = list;
         bl[0].editor = this;
         bl.on('vmousedown', function () {
@@ -84,7 +84,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var btn_l = $('<i class="fa fa-arrow-left fa-border edit-button no-highlight" ondragstart="return false;">');
+        var btn_l = $('<i class="fa fa-arrow-left fa-border edit-button no-highlight no-panning" ondragstart="return false;">');
         btn_l[0].list = list;
         btn_l[0].editor = this;
         btn_l.on('vmousedown', function (e) {
@@ -101,7 +101,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var btn_u = $('<i class="fa fa-arrow-up fa-border edit-button no-highlight" ondragstart="return false;">');
+        var btn_u = $('<i class="fa fa-arrow-up fa-border edit-button no-highlight no-panning" ondragstart="return false;">');
         btn_u[0].list = list;
         btn_u[0].editor = this;
         btn_u.on('vmousedown', function (e) {
@@ -118,7 +118,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var btn_r = $('<i class="fa fa-arrow-right fa-border edit-button no-highlight" ondragstart="return false;">');
+        var btn_r = $('<i class="fa fa-arrow-right fa-border edit-button no-highlight no-panning" ondragstart="return false;">');
         btn_r[0].list = list;
         btn_r[0].editor = this;
         btn_r.on('vmousedown', function (e) {
@@ -135,7 +135,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var btn_d = $('<i class="fa fa-arrow-down fa-border edit-button no-highlight" ondragstart="false">');
+        var btn_d = $('<i class="fa fa-arrow-down fa-border edit-button no-highlight no-panning" ondragstart="false">');
         btn_d[0].list = list;
         btn_d[0].editor = this;
         btn_d.on('vmousedown', function (e) {
@@ -152,7 +152,7 @@ var Editor = Class({
         }).on('vmouseup', function () {
             this.editor.currBtnDown = -1;
         }).hide();
-        var btn_rot = $('<i class="fa fa-repeat fa-border edit-button no-highlight" ondragstart="return false;">');
+        var btn_rot = $('<i class="fa fa-repeat fa-border edit-button no-highlight no-panning" ondragstart="return false;">');
         btn_rot[0].list = list;
         btn_rot[0].editor = this;
         btn_rot.on('vmousedown', function (e) {
@@ -341,7 +341,7 @@ var Editor = Class({
             $('canvas')[0].editor.currBtnDown = -1;
         })
         $(window).resize(function () {
-            $(this.list.selectedElem).parent().trigger('mousedown'); // Update editor box
+            $(this.list.selectedElem).parent().click(); // Update editor box
         });
 
         // Initialize Layer Control
@@ -392,7 +392,7 @@ var Editor = Class({
                 + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
             $('canvas').parent().css('transform', scale);
 
-            $(this.list.selectedElem).parent().trigger('mousedown'); // Update editor box
+            $(this.list.selectedElem).parent().click(); // Update editor box
         }
     },
     decrSize: function () {
@@ -403,7 +403,7 @@ var Editor = Class({
                 + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
             $('canvas').parent().css('transform', scale);
 
-            $(this.list.selectedElem).parent().trigger('mousedown'); // Update editor box
+            $(this.list.selectedElem).parent().click(); // Update editor box
         }
     },
     createLayer: function (layer) {

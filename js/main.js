@@ -194,6 +194,32 @@ function initUI() {
             ctx.elem.name = ctx.newName;
             ctx.domElem.textContent = ctx.newName;
         });
+    historyManager
+        .registerUndoAction('move',
+        function (ctx) { // UNDO move
+            if (ctx.async.hasSynced) {
+                ctx.move(ctx.srcLayer, ctx.currLayerInSrc);
+            }
+            else {
+                setTimeout(function () {
+                    list.async.hasSynced = true;
+                }, 1000);
+                console.log('Cannot undo "move" until synchronized.');
+                throw new Error();
+            }
+        },
+        function (ctx) { // REDO move
+            if (ctx.async.hasSynced) {
+                ctx.move(ctx.srcLayer, ctx.destLayer);
+            }
+            else {
+                setTimeout(function () {
+                    list.async.hasSynced = true;
+                }, 1000);
+                console.log('Cannot redo "move" until synchronized.');
+                throw new Error();
+            }
+        });
 
     samlLoader = new SAMLLoader(list);
 

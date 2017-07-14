@@ -1,6 +1,7 @@
 
 var HistoryManager = Class({
     initialize: function () {
+        this.historyStackSize = 40;
         this.undoActions = {};
         this.undoList = [];
         this.redoList = [];
@@ -41,6 +42,11 @@ var HistoryManager = Class({
         if (this.undoActions[actionName] !== undefined) { // Validate action
             savedParams = savedParams || {}; // Make it an object if undefined
             if (typeof savedParams === 'object') {
+                if (this.undoList.length >= this.historyStackSize) {
+                    console.log(
+                        'History Manager: History stack is full. Discarding oldest action saved.');
+                    this.undoList.shift();
+                }
                 this.undoList.push({
                     'actionName': actionName,
                     'params': savedParams
@@ -57,7 +63,16 @@ var HistoryManager = Class({
             var undo = this.undoList.pop();
             this.redoList.push(undo);
             var action = this.undoActions[undo.actionName];
-            action.undoCallback(undo.params);
+            try {
+                action.undoCallback(undo.params);
+                console.log('History Manager: Undid ' + undo.actionName + ' action.');
+            }
+            catch (err) {
+                console.log('History Manager: Could not undo ' + undo.actionName
+                    + ' action. Reverting attempt . . .\nError:');
+                console.log(err);
+                this.undoList.push(this.redoList.pop());
+            }
         }
     },
     redoAction: function () {
@@ -65,7 +80,16 @@ var HistoryManager = Class({
             var redo = this.redoList.pop();
             this.undoList.push(redo);
             var action = this.undoActions[redo.actionName];
-            action.redoCallback(redo.params);
+            try {
+                action.redoCallback(redo.params);
+                console.log('History Manager: Redid ' + redo.actionName + ' action.');
+            }
+            catch (err) {
+                console.log('History Manager: Could not redo ' + redo.actionName
+                    + ' action. Reverting attempt . . .\nError:');
+                console.log(err);
+                this.redoList.push(this.undoList.pop());
+            }
         }
     }
 });
