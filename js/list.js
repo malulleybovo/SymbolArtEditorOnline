@@ -53,10 +53,22 @@ var List = Class({
                 console.log(list.toSAML());
             }
             if (e.keyCode == 116) { // T
+                if (!list.async.hasSynced) return;
                 historyManager.undoAction();
+
+                list.async.hasSynced = false;
+                setTimeout(() => {
+                    list.async.hasSynced = true;
+                }, 500);
             }
-            if (e.keyCode == 114) { // R
+            else if (e.keyCode == 114) { // R
+                if (!list.async.hasSynced) return;
                 historyManager.redoAction();
+
+                list.async.hasSynced = false;
+                setTimeout(() => {
+                    list.async.hasSynced = true;
+                }, 500);
             }
         }
         document.onkeydown = function (e) {
@@ -119,7 +131,7 @@ var List = Class({
             }
         }
 
-        this.elemMousedownEvtHandler = function (e) {
+        this.elemMousedownEvtHandler = function () {
             var elem;
             var canvas = $('canvas')[0];
             var editor;
@@ -147,7 +159,6 @@ var List = Class({
                 }
 
                 editor.selectedLayer = myLayer;
-                editor.refreshLayerEditBox();
                 editor.layerCtrl.update(myLayer);
                 var layerColor = Math.round(editor.selectedLayer.color);
                 $('#colorSelector')
@@ -155,6 +166,7 @@ var List = Class({
                     .spectrum('set', '#' + layerColor.toString(16));
 
                 editor.showInterface();
+                editor.refreshLayerEditBox();
                 editor.disableGroupInteraction();
                 editor.enableInteraction(myLayer);
             }
@@ -171,19 +183,13 @@ var List = Class({
             var index = elem.index();
             elem[0].group.activeElem = index;
             console.log("Selected elem. \"" + elem[0].group.elems[elem[0].group.activeElem].name + "\" from group \"" + elem[0].group.name + "\"");
-            switch (e.which) {
-                case 1: // Left click
-                    break;
-                case 2: // Mid click
-                    break;
-                case 3: // Right click
-                    break;
-                default:
-                    break;
-            }
+            
         };
-        this.createGroupNode = function (name, subGroup, group, parentGroup, folder) {
-            var groupFolder = $('<div data-role="collapsible" id="' + groupID + '">'); groupID++;
+        this.createGroupNode = function (name, subGroup, group, parentGroup, folder, forcedID) {
+            var id = groupID;
+            if (forcedID !== undefined) { id = forcedID; }
+            var groupFolder = $('<div data-role="collapsible" id="' + id + '">');
+            if (forcedID === undefined) groupID++;
             var header = $('<h2 class="context-menu-group">' + name + '</h2>');
             groupFolder.append(header);
             var list = $('<ul data-role="listview" data-divider-theme="b">');
@@ -200,7 +206,7 @@ var List = Class({
             // Show menu when #myDiv is clicked
             header[0].list = this;
             header[0].focusinCallback = this.rename;
-            header.on('vmousedown', function (e) {
+            header.on('click', function (e) {
                 this.list.changeSelectedElem(this.firstChild);
             });
             groupFolder[0].isOpen = false;
@@ -238,21 +244,49 @@ var List = Class({
                 event.preventDefault();
                 event.stopPropagation();
 
+                let movingElem = this.list.movingElem;
+                if (movingElem.tagName == 'H2') movingElem = movingElem.parentNode;
+
+                var dest = $(movingElem).prev()[0];
+                dest = dest || $(movingElem).next()[0];
+                var emptyGroupException = false;
+                if (dest === undefined) {
+                    dest = $(movingElem).parent().parent().parent()[0];
+                    emptyGroupException = true;
+                }
+
                 // Save undoable action for move
                 historyManager.pushUndoAction('move', {
-                    'move': this.list.move,
-                    'srcLayer': this.list.movingElem,
-                    'destLayer': this,
-                    'async': this.list.async
+                    'srcLayerID': movingElem.id,
+                    'currLayerInSrcID': dest.id,
+                    'destLayerID': this.parentNode.id,
+                    'async': this.list.async,
+                    'emptyGroupException': emptyGroupException
                 });
 
                 this.list.move(this.list.movingElem, this);
             });
 
+            // Function to recursively delete all quads in editor pertaining to the removed group
+            this.removeGroupFromEditor = function (group, editor) {
+                for (var i = 0; i < group.elems.length; i++) {
+                    var elem = group.elems[i];
+                    if (elem.type == 'l') {
+                        editor.removeLayer(elem);
+                    }
+                    else if (elem.type == 'g') {
+                        removeGroupFromEditor(elem, editor);
+                    }
+                }
+            }
+
             return groupFolder;
         };
-        this.createLayerNode = function (name, group, folder) {
-            var li = $('<li class="context-menu-layer" data-mini="true" class="ui-draggable ui-draggable-handle">');
+        this.createLayerNode = function (name, group, folder, forcedID) {
+            var id = groupID;
+            if (forcedID !== undefined) { id = forcedID; }
+            var li = $('<li id="' + id + '" class="context-menu-layer" data-mini="true" class="ui-draggable ui-draggable-handle">');
+            if (forcedID === undefined) groupID++;
             li.append('<a data-mini="true" href="#" data-role="button" data-transition="pop" style="text-shadow:none;">' + name + '</a>');
             li[0].group = group;
             li[0].parentFolder = folder;
@@ -261,7 +295,7 @@ var List = Class({
             $(li).mousedown(this.elemMousedownEvtHandler);
             li.click(this.elemMousedownEvtHandler);
             // Show menu when right clicked
-            li.on('vmousedown', function (e) {
+            li.on('click', function (e) {
                 this.list.changeSelectedElem(this.firstChild);
             });
             li.on("swiperight", function () {
@@ -292,16 +326,38 @@ var List = Class({
                 event.preventDefault();  
                 event.stopPropagation();
 
-                var dest = $(this.list.movingElem).prev()[0];
-                dest = dest || $(this.list.movingElem).next()[0];
+                let movingElem = this.list.movingElem;
+                if (movingElem.tagName == 'H2') movingElem = movingElem.parentNode;
+
+                /* Check if moving upward or downward */
+                let src = $(movingElem), dest = $(this);
+                src.addClass('layerCurrentlyMoving');
+                dest.addClass('layerCurrentlyMoving');
+                let $movingLayers = $('.layerCurrentlyMoving');
+                var isForwardMove = true;
+                if ($movingLayers[0] == dest[0]) isForwardMove = false;
+                src.removeClass('layerCurrentlyMoving');
+                dest.removeClass('layerCurrentlyMoving');
+
+                /* Get layer that will now occupy the position of the moved layer */
+                let currLayerInSrc;
+                if (isForwardMove) currLayerInSrc = src.next()[0];
+                else currLayerInSrc = src.prev()[0];
+                // Check for exception where layer moved is the only layer in its group
+                let emptyGroupException = false;
+                if (currLayerInSrc === undefined) {
+                    // Get the parent folder and indicate that this is an exception
+                    currLayerInSrc = src.parent().parent().parent()[0];
+                    emptyGroupException = true;
+                }
 
                 // Save undoable action for move
                 historyManager.pushUndoAction('move', {
-                    'move': this.list.move,
-                    'srcLayer': this.list.movingElem,
-                    'currLayerInSrc': dest,
-                    'destLayer': this,
-                    'async': this.list.async
+                    'srcLayerID': movingElem.id,
+                    'currLayerInSrcID': currLayerInSrc.id,
+                    'destLayerID': this.id,
+                    'async': this.list.async,
+                    'emptyGroupException': emptyGroupException
                 });
 
                 this.list.move(this.list.movingElem, this);
@@ -339,15 +395,24 @@ var List = Class({
                             prevElem.text(elem.val()); // Update name of elem in node
                             parent.append(prevElem);
 
+                            let savedDOMElem = prevElem.parent();
+                            let isLayer = true;
+                            // If renaming a group, move from header to its parent that contains the ID
+                            if (savedDOMElem[0].tagName == 'H2') {
+                                savedDOMElem = savedDOMElem.parent();
+                                isLayer = false;
+                            }
                             // Save undoable action for this rename
                             historyManager.pushUndoAction('rename', {
                                 'prevName': parent[0].elem.name,
                                 'newName': prevElem.text(),
-                                'elem': parent[0].elem,
-                                'domElem': prevElem[0]
+                                'domElemID': savedDOMElem[0].id,
+                                'isLayer': isLayer
                             });
 
-                            console.log("Changing layer name from \"" + parent[0].elem.name + "\" to \"" + prevElem.text() + "\"");
+                            console.log('%cRenamed%c layer "%s" from group "%s" to "%s".',
+                                'color: #2fa1d6', 'color: #f3f3f3', parent[0].elem.name,
+                                parent[0].group.name, prevElem.text());
                             parent[0].elem.name = prevElem.text();
                             parent[0].textbox = false;
                             elem.remove();
@@ -392,8 +457,9 @@ var List = Class({
     move: function (srcElem, destElem) {
         if (!this.async.hasSynced
             || srcElem == destElem) return;
-        var cssclass = 'testingFirstDOMElem';
         var src;
+
+        /* Select layers in editor to move */
         var layersToMove = [];
         if (srcElem.elem.type == 'l') {
             src = $(srcElem);
@@ -405,87 +471,106 @@ var List = Class({
                 layersToMove.push($('canvas')[0].editor.removeLayer(srcElem.elem.elems[i]));
             }
         }
-        src.addClass(cssclass);
 
+        /* Get corrent DOM node with embedded layer information */
         var dest;
-        if (destElem.elem.type == 'l') {
-            dest = $(destElem);
+        if (destElem.tagName == 'UL') {
+            dest = $(destElem.parentNode.parentNode.firstChild);
         }
-        else if (destElem.elem.type == 'g') {
-            dest = $(destElem).parent();
-        }
-        dest.addClass(cssclass);
-
-        // Data movement
-        var srcIndex = src.index();
-        srcElem.group.elems.splice(srcIndex, 1);
-
-        var destIndex = dest.index();
-        var firstElem = $('.' + cssclass + ':first');
-        var isForward = true;
-        if (firstElem[0] == dest[0]) { // if moving element UP/BACKWARD in the list
-            isForward = false;
-            if (destIndex < 0) destIndex = 0;
+        else {
+            if (destElem.elem.type == 'l') {
+                dest = $(destElem);
+            }
+            else if (destElem.elem.type == 'g') {
+                dest = $(destElem).parent();
+            }
         }
 
-        src.removeClass(cssclass);
-        dest.removeClass(cssclass);
+        /* Check if moving upward or downward */
+        src.addClass('layerCurrentlyMoving');
+        dest.addClass('layerCurrentlyMoving');
+        let $movingLayers = $('.layerCurrentlyMoving');
+        var isForwardMove = true;
+        if ($movingLayers[0] == dest[0]) isForwardMove = false;
+        src.removeClass('layerCurrentlyMoving');
+        dest.removeClass('layerCurrentlyMoving');
 
-        if (isForward && destElem.group != srcElem.group) destIndex++;
+        var srcIndex = src.index(), destIndex = dest.index();
+        // Preventive error checking
+        if (srcIndex < 0) throw new Error(
+            'List.move(): Source layer index was not found.');
+        if (destIndex < 0) throw new Error(
+            'List.move(): Target layer index was not found.');
+        if (srcElem.group.elems[srcIndex] != srcElem.elem) throw new Error(
+            'List.move(): Source layer index does not match index in data.');
+        if (destElem.tagName != 'UL' // Doesn't apply to the UL exceptional case
+            && destElem.group.elems[destIndex] != destElem.elem) throw new Error(
+            'List.move(): Target layer index does not match index in data.');
 
-        destElem.group.elems.splice(destIndex, 0, srcElem.elem);
-        console.log("Moved from index " + srcIndex + " to index " + destIndex);
-        srcElem.group = destElem.group;
-        srcElem.elem.parent = destElem.group;
-        srcElem.parentFolder = destElem.parentFolder;
+        var callback = function () {
+            var editor = $('canvas')[0].editor;
 
-        if (!isForward && destIndex > 0) {
-            dest = dest.prev();
-        }
+            /* DOM element movement animation */
+            // Check special case when target is the list and not a layer
+            if (destElem.tagName == 'UL') {
+                let tempLI = $('#temporaryLI');
+                src.insertAfter(tempLI);
+                $('#temporaryLI').remove();
+            }
+            else {
+                $('#temporaryLI').remove();
+                if (isForwardMove) src.insertAfter(dest);
+                else src.insertBefore(dest);
+            }
 
-        // DOM element movement animation
-        var $this = dest,
-                    callback = function () {
+            // Get up-to-date index of target layer after changing the source
+            destIndex = dest.index();
 
-                        if (destIndex > 0) {
-                            src.insertAfter($this);
-                        }
-                        else {
-                            var t = dest.parent();
-                            dest.parent().prepend(src);
-                        }
+            /* Data movement */
+            let srcOrigGroup = srcElem.group;
+            srcElem.group.elems.splice(srcIndex, 1);
 
-                        var lis;
-                        var index;
-                        var editor;
-                        if (srcElem.elem.type == 'l') {
-                            lis = $(this.list.container).find('li');
-                            index = lis.index(srcElem);
-                            editor = this.list.editor;
-                        }
-                        else {
-                            lis = $(this.firstChild.list.container).find('li');
-                            var lisInSrc = $(srcElem.parentNode).find('li');
-                            index = lis.index(lisInSrc[0]);
-                            editor = this.firstChild.list.editor;
-                        }
-                        if (index >= 0) {
-                            for (var i = layersToMove.length - 1; i >= 0; i--) {
-                                editor.addLayerAt(layersToMove[i].layer, index);
-                            }
-                        }
-                        editor.render();
-                    };
+            if (destElem.tagName == 'UL') {
+                let headerNode = dest[0];
+                headerNode.elem.elems.push(srcElem.elem);
+                srcElem.group = headerNode.elem;
+                srcElem.elem.parent = headerNode.elem;
+                srcElem.parentFolder = headerNode.parentNode;
+                destElem = headerNode; // For logging purposes
+            }
+            else {
+                if (isForwardMove) destIndex++;
+                else destIndex--;
+                destElem.group.elems.splice(destIndex, 0, srcElem.elem);
+                srcElem.group = destElem.group;
+                srcElem.elem.parent = destElem.group;
+                srcElem.parentFolder = destElem.parentFolder;
+            }
+
+            editor.refreshDisplay();
+            editor.render();
+
+            /* Logging */
+            let msg = '%cMoved%c layer/group "%s" from index %i of group "%s" to index %i of group "%s"';
+            if (isForwardMove) console.log(msg + ' after layer/group "%s".', 
+                    'color: #2fa1d6', 'color: #f3f3f3', srcElem.elem.name, srcIndex, 
+                    srcOrigGroup.name, destIndex, destElem.group.name, destElem.elem.name);
+            else console.log(msg + ' before layer/group "%s".',
+                    'color: #2fa1d6', 'color: #f3f3f3', srcElem.elem.name, srcIndex,
+                    srcOrigGroup.name, destIndex, destElem.group.name, destElem.elem.name);
+        };
+
         this.async.hasSynced = false;
-        console.log('Waiting for application to sync again after moving layers.');
+        console.log('%cWaiting for application to sync again after moving layers.', 'color: #aaa');
         src.slideUp(100, callback).slideDown(100, function () {
             src.click();
-            this.list.async.hasSynced = true;
-            console.log('Application synced again after moving layers.');
+            list.async.hasSynced = true;
+            console.log('%cApplication synced again after moving layers.', 'color: #aaa');
         });
 
     },
-    addFolder: function (name, folder) {
+    addFolder: function (name, folder, forcedID) {
+        if (!this.async.hasSynced) return;
         if (folder === undefined) folder = this.container[0].firstChild;
         var parentNode = folder.children[1]; // Get list of node elems from folder
 
@@ -495,7 +580,7 @@ var List = Class({
         if (group === undefined) group = this.mainGroup;
 
         var subGroup = group.addSubGroup(name);
-        var groupFolder = this.createGroupNode(name, subGroup, group, parentGroup, folder);
+        var groupFolder = this.createGroupNode(name, subGroup, group, parentGroup, folder, forcedID);
         if (parentNode.firstChild.children.length == 0) {
             $(parentNode.firstChild).append(groupFolder);
         }
@@ -510,8 +595,22 @@ var List = Class({
         }
 
         $(folder).trigger('create');
+        
+        groupFolder.children(":eq(0)").focusin().click();
+
+        if (forcedID === undefined) {
+            // Save undoable action for move
+            historyManager.pushUndoAction('add', {
+                'elemID': groupFolder[0].id
+            });
+        }
+
+        let headerNode = groupFolder[0].firstChild;
+        console.log('%cAdded%c group "%s" in group "%s" at position "%i".',
+            'color: #2fa1d6', 'color: #f3f3f3', headerNode.elem.name, headerNode.group.name,
+            headerNode.group.elems.indexOf(headerNode.elem));
     },
-    addFolderAtEnd: function (name, folder) {
+    addFolderAtEnd: function (name, folder, forcedID) {
         if (folder === undefined) folder = this.container[0].firstChild;
         var parentNode = folder.children[1]; // Get list of node elems from folder
 
@@ -521,12 +620,26 @@ var List = Class({
         if (group === undefined) group = this.mainGroup;
 
         var subGroup = group.addSubGroupAtEnd(name);
-        var groupFolder = this.createGroupNode(name, subGroup, group, parentGroup, folder);
+        var groupFolder = this.createGroupNode(name, subGroup, group, parentGroup, folder, forcedID);
         $(parentNode.firstChild).append(groupFolder);
 
         $(folder).trigger('create');
+
+        groupFolder.children(":eq(0)").focusin().click();
+
+        if (forcedID === undefined) {
+            // Save undoable action for move
+            historyManager.pushUndoAction('add', {
+                'elemID': groupFolder[0].id
+            });
+        }
+
+        let headerNode = groupFolder[0].firstChild;
+        console.log('%cAdded%c group "%s" in group "%s" at position "%i".',
+            'color: #2fa1d6', 'color: #f3f3f3', headerNode.elem.name, headerNode.group.name,
+            headerNode.group.elems.indexOf(headerNode.elem));
     },
-    addElem: function (name, folder) {
+    addElem: function (name, folder, forcedID) {
         if (folder === undefined) folder = this.container[0].firstChild;
         var parentNode = folder.children[1]; // Get list of node elems from folder
 
@@ -536,7 +649,7 @@ var List = Class({
         if (subGroup === undefined) subGroup = this.mainGroup;
 
         var layer = subGroup.addLayer(name);
-        var li = this.createLayerNode(name, subGroup, folder);
+        var li = this.createLayerNode(name, subGroup, folder, forcedID);
         if (parentNode.firstChild.children.length == 0) {
             $(parentNode.firstChild).append(li);
         }
@@ -558,11 +671,22 @@ var List = Class({
         this.editor.render();
 
         li.focusin();
-        li.mousedown();
+        li.click();
+
+        if (forcedID === undefined) {
+            // Save undoable action for move
+            historyManager.pushUndoAction('add', {
+                'elemID': li[0].id
+            });
+        }
+
+        console.log('%cAdded%c layer "%s" in group "%s" at position "%i".',
+            'color: #2fa1d6', 'color: #f3f3f3', li[0].elem.name, li[0].group.name,
+            li[0].group.elems.indexOf(li[0].elem));
 
         return li;
     },
-    addElemAtEnd: function (name, folder) {
+    addElemAtEnd: function (name, folder, forcedID) {
         if (folder === undefined) folder = this.container[0].firstChild;
         var parentNode = folder.children[1]; // Get list of node elems from folder
 
@@ -572,7 +696,7 @@ var List = Class({
         if (subGroup === undefined) subGroup = this.mainGroup;
 
         var layer = subGroup.addLayerAtEnd(name);
-        var li = this.createLayerNode(name, subGroup, folder);
+        var li = this.createLayerNode(name, subGroup, folder, forcedID);
         $(parentNode.firstChild).append(li);
 
         $(folder).trigger('create');
@@ -581,6 +705,20 @@ var List = Class({
         var index = lis.index(li);
         this.editor.addLayerAt(layer, index);
         this.editor.render();
+
+        li.focusin();
+        li.click();
+
+        if (forcedID === undefined) {
+            // Save undoable action for move
+            historyManager.pushUndoAction('add', {
+                'elemID': li[0].id
+            });
+        }
+
+        console.log('%cAdded%c layer "%s" in group "%s" at position "%i".',
+            'color: #2fa1d6', 'color: #f3f3f3', li[0].elem.name, li[0].group.name,
+            li[0].group.elems.indexOf(li[0].elem));
 
         return li;
     },
@@ -603,22 +741,9 @@ var List = Class({
             this.editor.removeLayer(elem);
         }
         else if (elem.type == 'g') {
-            removeGroupFromEditor(elem, this.editor);
+            this.removeGroupFromEditor(elem, this.editor);
         }
         this.editor.render();
-
-        // Function to recursively delete all quads in editor pertaining to the removed group
-        function removeGroupFromEditor(group, editor) {
-            for (var i = 0; i < group.elems.length; i++) {
-                var elem = group.elems[i];
-                if (elem.type == 'l') {
-                    editor.removeLayer(elem);
-                }
-                else if (elem.type == 'g') {
-                    removeGroupFromEditor(elem, editor);
-                }
-            }
-        }
     },
     displayGroup: function (group, parentFolder, parentGroup, index) {
         var contextMenuType = "group";
@@ -679,6 +804,75 @@ var List = Class({
                 list.append(li);
             }
         }
+    },
+    extractSubtree: function (id) {
+        /* Validate parameter */
+        if (id === undefined || id < 0 || id > groupID) return null;
+
+        /* get references from application */
+        let $holder = $('#' + id);
+        let $elem = $holder;
+        if ($elem.length == 0) return null;
+        let isLayer = true;
+        if ($elem[0].tagName == 'DIV') {
+            isLayer = false;
+            $elem = $($elem[0].firstChild);
+        }
+        let dataElem = $elem[0].elem;
+        let parentFolderID = $holder.parent().parent().parent()[0].id;
+
+        /* extract data from application */
+        // remove DOM subtree
+        $holder.detach();
+        // remove data
+        let dataGroup = dataElem.parent;
+        let indexInGroup = dataGroup.elems.indexOf(dataElem);
+        if (indexInGroup > -1) {
+            dataGroup.elems.splice(indexInGroup, 1);
+        }
+        else return null;
+
+        this.editor.refreshDisplay();
+        this.editor.render();
+
+        return {
+            subtreeDOMid: id,
+            parentDOMid: parentFolderID,
+            subtreeDOM: $holder[0],
+            parentDOM: $elem[0].parentFolder,
+            isLayer: isLayer,
+            indexInGroup: indexInGroup,
+            dataGroup: dataGroup,
+            dataElem: dataElem
+        }
+    },
+    insertSubtree: function (extr) {
+        /* Validate parameter */
+        if (extr.subtreeDOMid === undefined || extr.parentDOMid === undefined
+            || extr.subtreeDOM === undefined || extr.parentDOM === undefined
+            || extr.isLayer === undefined || extr.indexInGroup === undefined
+            || extr.dataGroup === undefined || extr.dataElem === undefined) return -1;
+
+        /* insert subtree into application */
+        // insert DOM subtree
+        let $parentFolder = $('#' + extr.parentDOMid);
+        if ($parentFolder[0] != extr.parentDOM) return -2;
+        let $parentDOMList = $($parentFolder[0].children[1].firstChild);
+        if (extr.indexInGroup <= 0) { // Check if inserting at first position
+            $parentDOMList.prepend(extr.subtreeDOM);
+        }
+        else { // If not, add at the specified index
+            $parentDOMList.children().eq(extr.indexInGroup - 1).after(extr.subtreeDOM);
+        }
+        // insert data
+        if (extr.indexInGroup > -1) {
+            extr.dataGroup.elems.splice(extr.indexInGroup, 0, extr.dataElem);
+        }
+
+        this.editor.refreshDisplay();
+        this.editor.render();
+
+        return 0;
     },
     toSAML: function () {
         var saml = '<?xml version="1.0" encoding="utf-8"?>\n<sa name="' + this.mainGroup.name + '" visible="true" version="4" author="0" width="192" height="96" sound="0">';

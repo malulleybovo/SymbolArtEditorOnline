@@ -10,6 +10,7 @@ var Editor = Class({
         this.disableSmallVtxChange = false;
 
         this.list = list;
+        this.mainGroup = list.mainGroup;
 
         //Create the renderer
         this.renderer = PIXI.autoDetectRenderer(EDITOR_SIZE.x, EDITOR_SIZE.y, { transparent: true });
@@ -341,7 +342,7 @@ var Editor = Class({
             $('canvas')[0].editor.currBtnDown = -1;
         })
         $(window).resize(function () {
-            $(this.list.selectedElem).parent().click(); // Update editor box
+            $('canvas')[0].editor.refreshLayerEditBox();
         });
 
         // Initialize Layer Control
@@ -353,7 +354,6 @@ var Editor = Class({
             var editor = $('canvas')[0].editor;
             editor.updateLayer($('#' + layerCtrlID)[0].layerCtrl.activeLayer);
             editor.render();
-            $(window.list.selectedElem).parent().trigger('mousedown'); // Update vertex edit button pos
         });
 
 
@@ -461,22 +461,22 @@ var Editor = Class({
         });
         quad.on('mousemove', function (evtData) {
             if (this.isMoving) {
-                this.layerData.layer;
                 this.x = this.origX + roundPosition(evtData.data.originalEvent.offsetX - this.origClickX);
                 this.y = this.origY + roundPosition(evtData.data.originalEvent.offsetY - this.origClickY);
                 this.editor.render();
                 this.layerData.layer.update(this);
-                $(this.editor.list.selectedElem).parent().trigger('mousedown'); // Update editor box
+                this.editor.refreshLayerEditBox();
+                this.editor.layerCtrl.update(this.layerData.layer);
             }
         }).on('touchmove', function (evtData) {
             if (!panZoomActive && this.isMoving) {
-                this.layerData.layer;
                 var newPosition = evtData.data.getLocalPosition(this.parent);
                 this.x = this.origX + roundPosition(newPosition.x - this.origClickX);
                 this.y = this.origY + roundPosition(newPosition.y - this.origClickY);
                 this.editor.render();
                 this.layerData.layer.update(this);
-                $(this.editor.list.selectedElem).parent().trigger('mousedown'); // Update editor box
+                this.editor.refreshLayerEditBox();
+                this.editor.layerCtrl.update(this.layerData.layer);
             }
         });
         quad.on('mouseup', function (evtData) {
@@ -691,6 +691,7 @@ var Editor = Class({
         this.editorBoxIcons.rotation.show();
     },
     refreshLayerEditBox: function () {
+        if (this.editorBoxIcons.tl.is(':hidden')) return; // Ignore if UI is hidden
         var offset = $('canvas').offset();
         var basePosX = offset.left + this.zoom * this.selectedLayer.x;
         var basePosY = offset.top + this.zoom * this.selectedLayer.y;
@@ -748,6 +749,26 @@ var Editor = Class({
             - 22.8;
         sel.obj.css('left', posX + 'px')
             .css('top', posY + 'px');
+    },
+    refreshDisplay: function () {
+        this.stage.removeChildren();
+        this.layers = [];
+
+        refreshGroupDisplay(this.mainGroup, this);
+        this.stage.addChild(this.SABox);
+
+        function refreshGroupDisplay(currGroup, editor) {
+            for (var i = currGroup.elems.length - 1; i >= 0; i--) {
+                let elem = currGroup.elems[i];
+                if (elem.type == 'l') {
+                    let layerData = editor.addLayer(elem);
+                    layerData.quad.interactive = false;
+                }
+                else if (elem.type == 'g') {
+                    refreshGroupDisplay(elem, editor);
+                }
+            }
+        }
     }
 });
 

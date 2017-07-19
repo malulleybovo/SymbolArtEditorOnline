@@ -202,7 +202,7 @@ var LayerCtrl = Class({
                 var editor = layerCtrl.editor;
                 editor.updateLayer(layerCtrl.activeLayer);
                 editor.render();
-                $(window.list.selectedElem).parent().trigger('mousedown'); // Update vertex edit button pos
+                editor.refreshLayerEditBox();
             }
         }
 

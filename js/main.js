@@ -104,6 +104,8 @@ function initUI() {
         reader.onload = function (evt) {
             var text = evt.target.result;
             samlLoader.load(text);
+            console.clear();
+            historyManager.clear();
         }
         reader.readAsText(e.target.files[0]);
         reader.onerror = function (evt) {
@@ -187,18 +189,41 @@ function initUI() {
     historyManager
         .registerUndoAction('rename',
         function (ctx) { // UNDO rename
-            ctx.elem.name = ctx.prevName;
-            ctx.domElem.textContent = ctx.prevName;
+            var $domLayer = $('#' + ctx.domElemID);
+            let mainElem = $domLayer[0];
+            if (!ctx.isLayer) {
+                mainElem = $domLayer[0].firstChild;
+            }
+            mainElem.elem.name = ctx.prevName;
+            let layerTextLink = mainElem.firstChild;
+            layerTextLink.textContent = ctx.prevName;
         },
         function (ctx) { // REDO rename
-            ctx.elem.name = ctx.newName;
-            ctx.domElem.textContent = ctx.newName;
-        });
+            var $domLayer = $('#' + ctx.domElemID);
+            let mainElem = $domLayer[0];
+            if (!ctx.isLayer) {
+                mainElem = $domLayer[0].firstChild;
+            }
+            mainElem.elem.name = ctx.newName;
+            let layerTextLink = mainElem.firstChild;
+            layerTextLink.textContent = ctx.newName;
+        },
+        ['domElemID', 'isLayer', 'prevName', 'newName']);
     historyManager
         .registerUndoAction('move',
         function (ctx) { // UNDO move
+            var srcLayer = $('#' + ctx.srcLayerID),
+                currLayerInSrc = $('#' + ctx.currLayerInSrcID);
             if (ctx.async.hasSynced) {
-                ctx.move(ctx.srcLayer, ctx.currLayerInSrc);
+                if (ctx.emptyGroupException) {
+                    var ulInDOMFolder = $(currLayerInSrc[0].lastChild.firstChild);
+                    ulInDOMFolder.append('<li id="temporaryLI">');
+                    currLayerInSrc = ulInDOMFolder;
+                }
+                // If destination is a folder (group), select header in destLayer (div)
+                if (srcLayer[0].tagName == 'DIV') srcLayer = $(srcLayer[0].firstChild);
+                if (currLayerInSrc[0].tagName == 'DIV') currLayerInSrc = $(currLayerInSrc[0].firstChild);
+                list.move(srcLayer[0], currLayerInSrc[0]);
             }
             else {
                 setTimeout(function () {
@@ -210,7 +235,12 @@ function initUI() {
         },
         function (ctx) { // REDO move
             if (ctx.async.hasSynced) {
-                ctx.move(ctx.srcLayer, ctx.destLayer);
+                var srcLayer = $('#' + ctx.srcLayerID),
+                    destLayer = $('#' + ctx.destLayerID);
+                // If destination is a folder (group), select header in destLayer (div)
+                if (srcLayer[0].tagName == 'DIV') srcLayer = $(srcLayer[0].firstChild);
+                if (destLayer[0].tagName == 'DIV') destLayer = $(destLayer[0].firstChild);
+                list.move(srcLayer[0], destLayer[0]);
             }
             else {
                 setTimeout(function () {
@@ -219,7 +249,21 @@ function initUI() {
                 console.log('Cannot redo "move" until synchronized.');
                 throw new Error();
             }
-        });
+        },
+        ['async', 'srcLayerID', 'currLayerInSrcID', 'destLayerID', 'emptyGroupException']);
+    historyManager
+        .registerUndoAction('add',
+        function (ctx) { // UNDO add
+            ctx.subtree = list.extractSubtree(ctx.elemID);
+            let parentDOM = ctx.subtree.parentDOM;
+            $(parentDOM.firstChild).click().click();
+        },
+        function (ctx) { // REDO add
+            list.insertSubtree(ctx.subtree);
+            let parentDOM = ctx.subtree.parentDOM;
+            $(parentDOM.firstChild).click().click();
+        },
+        ['elemID']);
 
     samlLoader = new SAMLLoader(list);
 
