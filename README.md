@@ -1,11 +1,16 @@
+<div align="center">
+
 # Symbol Art Editor Online
+
+## [*Play with it Now*](https://malulleybovo.github.io/SymbolArtEditorOnline/)
+
+</div>
+
 Inspired by the in-game feature from Phantasy Star Online 2 (SEGA), 
 this Symbol Art Editor is a browser image editor used to produce digital art made of symbols.
 This is purely a fan-made application developed to let other fans and  have fun crafting symbol artwork outside of the game in a dedicated user-friendly editor engineered to be quick to use and that minimizes effort and repetition required to create quality symbol art. The only profit I expect from this application is people's happiness.
 ##### Currently under development, but available for testing and usage at your own risk and by your own curiosity.
 ##### Tell me your ideas if you think about an extra feature I have not thought about already. Also, if you have knowledge about how *.sar* files are formatted, please enlighten me so I can add support for it.
-
-## Play with it at [Symbol Art Editor Online](https://malulleybovo.github.io/SymbolArtEditorOnline/)
 
 ### Usage: (Version 1.0 Coming Soon ! ! !)
 - *Click* (*Tap*) Plus Icon on Landing Screen to Create a Symbol Art from Scratch, or the Upload Icon to Select a Valid *.saml* File and Continue Working on an Existing Symbol Art (Works on Both Desktop and Mobile Devices)
@@ -29,7 +34,7 @@ This is purely a fan-made application developed to let other fans and  have fun 
 - (In Progress) Saving Your Creation to *.saml* Format (Currently, you can click *Q* to log the contents of the file and then save it to a *.saml* file by yourself)
 - Loading *.saml* Saved from this Application or from the lacking [Symbol Art Editor](http://www.pso-world.com/forums/showthread.php?215777-Symbol-Art-Editor-EN-Version) available in www.pso-world.com
     - *note:* I have not managed to understand how *.sar* files are formatted, so no *.sar* support until then unfortunately
-- (In Progress) Undo / Redo Changes Made (Only renaming has this support so far and it will be buggy until the feature is completed!)
+- (In Progress) Undo / Redo Changes Made (Only renaming, moving, and adding have this support so far and it will be buggy until the feature is completed!)
 - Layer Manager to Organize and Facilitate Your Workflow
     - Add Layer (New Symbol)
     - Add Group of Symbols
@@ -65,5 +70,3 @@ This is purely a fan-made application developed to let other fans and  have fun 
     
 # *Have Fun~*
 ## And Happy Art Crafting !
-#### With regards, the developer,
-### Arthur.
