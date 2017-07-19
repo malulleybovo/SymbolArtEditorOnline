@@ -175,14 +175,15 @@ function initUI() {
         disableOneFingerPan: true
     }).on("panzoomzoom", function (e, panzoom, scale, opts) {
         e.stopImmediatePropagation();
-        $('canvas')[0].editor.zoom = scale;
-        $(list.selectedElem).parent().trigger('mousedown'); // Update editor box
+        let editor = $('canvas')[0].editor;
+        editor.zoom = scale;
+        editor.refreshLayerEditBox();
     }).on("panzoomstart", function (e, panzoom, event, touches) {
         panZoomActive = true;
     }).on("panzoomend", function () {
         panZoomActive = false;
     }).on("panzoompan", function () {
-        $(list.selectedElem).parent().trigger('mousedown'); // Update editor box
+        $('canvas')[0].editor.refreshLayerEditBox();
     });
 
     historyManager = new HistoryManager();

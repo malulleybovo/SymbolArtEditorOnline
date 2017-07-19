@@ -392,7 +392,7 @@ var Editor = Class({
                 + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
             $('canvas').parent().css('transform', scale);
 
-            $(this.list.selectedElem).parent().click(); // Update editor box
+            this.refreshLayerEditBox();
         }
     },
     decrSize: function () {
@@ -403,7 +403,7 @@ var Editor = Class({
                 + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
             $('canvas').parent().css('transform', scale);
 
-            $(this.list.selectedElem).parent().click(); // Update editor box
+            this.refreshLayerEditBox();
         }
     },
     createLayer: function (layer) {
