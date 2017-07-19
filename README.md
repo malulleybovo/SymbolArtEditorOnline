@@ -4,13 +4,20 @@
 
 ## [*Play with it Now*](https://malulleybovo.github.io/SymbolArtEditorOnline/)
 
+<img height="25%" width="25%" src="https://raw.githubusercontent.com/malulleybovo/SymbolArtEditorOnline/master/css/images/arks_logo.png">
+
 </div>
 
 Inspired by the in-game feature from Phantasy Star Online 2 (SEGA), 
 this Symbol Art Editor is a browser image editor used to produce digital art made of symbols.
 This is purely a fan-made application developed to let other fans and  have fun crafting symbol artwork outside of the game in a dedicated user-friendly editor engineered to be quick to use and that minimizes effort and repetition required to create quality symbol art. The only profit I expect from this application is people's happiness.
+
+<div align="center">
+
 ##### Currently under development, but available for testing and usage at your own risk and by your own curiosity.
 ##### Tell me your ideas if you think about an extra feature I have not thought about already. Also, if you have knowledge about how *.sar* files are formatted, please enlighten me so I can add support for it.
+
+</div>
 
 ### Usage: (Version 1.0 Coming Soon ! ! !)
 - *Click* (*Tap*) Plus Icon on Landing Screen to Create a Symbol Art from Scratch, or the Upload Icon to Select a Valid *.saml* File and Continue Working on an Existing Symbol Art (Works on Both Desktop and Mobile Devices)
@@ -68,5 +75,9 @@ This is purely a fan-made application developed to let other fans and  have fun 
 ### Acknowledgement:
     TODO
     
+<div align="center">
+
 # *Have Fun~*
 ## And Happy Art Crafting !
+
+</div>
