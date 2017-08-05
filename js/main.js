@@ -224,7 +224,7 @@ function initUI() {
                 // If destination is a folder (group), select header in destLayer (div)
                 if (srcLayer[0].tagName == 'DIV') srcLayer = $(srcLayer[0].firstChild);
                 if (currLayerInSrc[0].tagName == 'DIV') currLayerInSrc = $(currLayerInSrc[0].firstChild);
-                list.move(srcLayer[0], currLayerInSrc[0]);
+                list.move(srcLayer[0], currLayerInSrc[0], true);
             }
             else {
                 setTimeout(function () {
@@ -241,7 +241,7 @@ function initUI() {
                 // If destination is a folder (group), select header in destLayer (div)
                 if (srcLayer[0].tagName == 'DIV') srcLayer = $(srcLayer[0].firstChild);
                 if (destLayer[0].tagName == 'DIV') destLayer = $(destLayer[0].firstChild);
-                list.move(srcLayer[0], destLayer[0]);
+                list.move(srcLayer[0], destLayer[0], true);
             }
             else {
                 setTimeout(function () {
@@ -265,6 +265,19 @@ function initUI() {
             $(parentDOM.firstChild).click().click();
         },
         ['elemID']);
+    historyManager
+        .registerUndoAction('remove',
+        function (ctx) { // UNDO remove
+            list.insertSubtree(ctx.subtree);
+            let parentDOM = ctx.subtree.parentDOM;
+            $(parentDOM.firstChild).click().click();
+        },
+        function (ctx) { // REDO remove
+            ctx.subtree = list.extractSubtree(ctx.elemID);
+            let parentDOM = ctx.subtree.parentDOM;
+            $(parentDOM.firstChild).click().click();
+        },
+        ['elemID', 'subtree']);
 
     samlLoader = new SAMLLoader(list);
 

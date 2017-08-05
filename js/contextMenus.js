@@ -38,7 +38,9 @@ var contextMenuCallback = function (key, options, evt, selector) {
             list.addFolderAtEnd("Group " + groupNum, selector[0].parentFolder); groupNum++;
             break;
         case 'remove':
-            list.removeElem(selector[0].parentFolder);
+            let id = selector[0].id;
+            if (selector[0].tagName == 'H2') id = selector[0].parentNode.id;
+            list.removeElem(id);
             break;
         default:
             break;

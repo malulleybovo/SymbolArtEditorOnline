@@ -454,7 +454,7 @@ var List = Class({
             input.focus().select();
         }
     },
-    move: function (srcElem, destElem) {
+    move: function (srcElem, destElem, noLog) {
         if (!this.async.hasSynced
             || srcElem == destElem) return;
         var src;
@@ -551,13 +551,15 @@ var List = Class({
             editor.render();
 
             /* Logging */
-            let msg = '%cMoved%c layer/group "%s" from index %i of group "%s" to index %i of group "%s"';
-            if (isForwardMove) console.log(msg + ' after layer/group "%s".', 
-                    'color: #2fa1d6', 'color: #f3f3f3', srcElem.elem.name, srcIndex, 
-                    srcOrigGroup.name, destIndex, destElem.group.name, destElem.elem.name);
-            else console.log(msg + ' before layer/group "%s".',
-                    'color: #2fa1d6', 'color: #f3f3f3', srcElem.elem.name, srcIndex,
-                    srcOrigGroup.name, destIndex, destElem.group.name, destElem.elem.name);
+            if (noLog === undefined) {
+                let msg = '%cMoved%c layer/group "%s" from index %i of group "%s" to index %i of group "%s"';
+                if (isForwardMove) console.log(msg + ' after layer/group "%s".',
+                        'color: #2fa1d6', 'color: #f3f3f3', srcElem.elem.name, srcIndex,
+                        srcOrigGroup.name, destIndex, destElem.group.name, destElem.elem.name);
+                else console.log(msg + ' before layer/group "%s".',
+                        'color: #2fa1d6', 'color: #f3f3f3', srcElem.elem.name, srcIndex,
+                        srcOrigGroup.name, destIndex, destElem.group.name, destElem.elem.name);
+            }
         };
 
         this.async.hasSynced = false;
@@ -599,7 +601,7 @@ var List = Class({
         groupFolder.children(":eq(0)").focusin().click();
 
         if (forcedID === undefined) {
-            // Save undoable action for move
+            // Save undoable action for add
             historyManager.pushUndoAction('add', {
                 'elemID': groupFolder[0].id
             });
@@ -628,7 +630,7 @@ var List = Class({
         groupFolder.children(":eq(0)").focusin().click();
 
         if (forcedID === undefined) {
-            // Save undoable action for move
+            // Save undoable action for add
             historyManager.pushUndoAction('add', {
                 'elemID': groupFolder[0].id
             });
@@ -674,7 +676,7 @@ var List = Class({
         li.click();
 
         if (forcedID === undefined) {
-            // Save undoable action for move
+            // Save undoable action for add
             historyManager.pushUndoAction('add', {
                 'elemID': li[0].id
             });
@@ -710,7 +712,7 @@ var List = Class({
         li.click();
 
         if (forcedID === undefined) {
-            // Save undoable action for move
+            // Save undoable action for add
             historyManager.pushUndoAction('add', {
                 'elemID': li[0].id
             });
@@ -722,28 +724,27 @@ var List = Class({
 
         return li;
     },
-    removeElem: function (folder) {
-        if (folder === undefined) folder = this.container[0].firstChild;
-        var parentNode = folder.children[1]; // Get list of node elems from folder
-
-        var group = folder.group;
-        if (group === undefined) group = this.mainGroup;
-        var subGroup = folder.subGroup;
-        if (subGroup === undefined) subGroup = this.mainGroup;
-
-        $(parentNode.firstChild.children[subGroup.activeElem]).remove();
-
-        var elem = subGroup.remLayer();
-
-        $(folder).trigger('create');
-
-        if (elem.type == 'l') {
-            this.editor.removeLayer(elem);
+    removeElem: function (id) {
+        let removedSubtree = null;
+        if (typeof id === 'string') removedSubtree = this.extractSubtree(id);
+        if (removedSubtree == null) {
+            console.err('List (%O): Could not remove branch with id %i.', this, id);
         }
-        else if (elem.type == 'g') {
-            this.removeGroupFromEditor(elem, this.editor);
+        else {
+            // Save undoable action for remove
+            historyManager.pushUndoAction('remove', {
+                'elemID': id,
+                'subtree': removedSubtree
+            });
+
+            // Change editor focus to the folder of the removed branch
+            let parentDOM = removedSubtree.parentDOM;
+            $(parentDOM.firstChild).click().click();
+
+            console.log('%cRemoved%c layer "%s" in group "%s" at position "%i".',
+                'color: #2fa1d6', 'color: #f3f3f3', removedSubtree.dataElem.name,
+                removedSubtree.dataGroup.name, removedSubtree.indexInGroup);
         }
-        this.editor.render();
     },
     displayGroup: function (group, parentFolder, parentGroup, index) {
         var contextMenuType = "group";
