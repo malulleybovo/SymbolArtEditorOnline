@@ -247,24 +247,40 @@ var List = Class({
                 let movingElem = this.list.movingElem;
                 if (movingElem.tagName == 'H2') movingElem = movingElem.parentNode;
 
-                var dest = $(movingElem).prev()[0];
-                dest = dest || $(movingElem).next()[0];
-                var emptyGroupException = false;
-                if (dest === undefined) {
-                    dest = $(movingElem).parent().parent().parent()[0];
+                /* Check if moving upward or downward */
+                let src = $(movingElem), dest = $(this.parentNode);
+                src.addClass('layerCurrentlyMoving');
+                dest.addClass('layerCurrentlyMoving');
+                let $movingLayers = $('.layerCurrentlyMoving');
+                var isForwardMove = true;
+                if ($movingLayers[0] == dest[0]) isForwardMove = false;
+                src.removeClass('layerCurrentlyMoving');
+                dest.removeClass('layerCurrentlyMoving');
+
+                /* Get layer that will now occupy the position of the moved layer */
+                let currLayerInSrc;
+                if (movingElem.group == this.parentNode.group
+                    && !isForwardMove) currLayerInSrc = src.prev()[0];
+                else currLayerInSrc = src.next()[0];
+                // Check for exception where layer moved is the only layer in its group
+                let emptyGroupException = false;
+                if (currLayerInSrc === undefined) {
+                    // Get the parent folder and indicate that this is an exception
+                    currLayerInSrc = src.parent().parent().parent()[0];
                     emptyGroupException = true;
                 }
 
+                let isForward = this.list.move(this.list.movingElem, this);
+                
                 // Save undoable action for move
                 historyManager.pushUndoAction('move', {
                     'srcLayerID': movingElem.id,
-                    'currLayerInSrcID': dest.id,
+                    'currLayerInSrcID': currLayerInSrc.id,
                     'destLayerID': this.parentNode.id,
+                    'isForward': isForward,
                     'async': this.list.async,
                     'emptyGroupException': emptyGroupException
                 });
-
-                this.list.move(this.list.movingElem, this);
             });
 
             // Function to recursively delete all quads in editor pertaining to the removed group
@@ -341,8 +357,9 @@ var List = Class({
 
                 /* Get layer that will now occupy the position of the moved layer */
                 let currLayerInSrc;
-                if (isForwardMove) currLayerInSrc = src.next()[0];
-                else currLayerInSrc = src.prev()[0];
+                if (movingElem.group == this.group
+                    && !isForwardMove) currLayerInSrc = src.prev()[0];
+                else currLayerInSrc = src.next()[0];
                 // Check for exception where layer moved is the only layer in its group
                 let emptyGroupException = false;
                 if (currLayerInSrc === undefined) {
@@ -351,16 +368,17 @@ var List = Class({
                     emptyGroupException = true;
                 }
 
+                let isForward = this.list.move(this.list.movingElem, this);
+
                 // Save undoable action for move
                 historyManager.pushUndoAction('move', {
                     'srcLayerID': movingElem.id,
                     'currLayerInSrcID': currLayerInSrc.id,
                     'destLayerID': this.id,
+                    'isForward': isForward,
                     'async': this.list.async,
                     'emptyGroupException': emptyGroupException
                 });
-
-                this.list.move(this.list.movingElem, this);
             });
 
             return li;
@@ -454,7 +472,7 @@ var List = Class({
             input.focus().select();
         }
     },
-    move: function (srcElem, destElem, noLog) {
+    move: function (srcElem, destElem, noLog, isForwardMove) {
         if (!this.async.hasSynced
             || srcElem == destElem) return;
         var src;
@@ -487,13 +505,15 @@ var List = Class({
         }
 
         /* Check if moving upward or downward */
-        src.addClass('layerCurrentlyMoving');
-        dest.addClass('layerCurrentlyMoving');
-        let $movingLayers = $('.layerCurrentlyMoving');
-        var isForwardMove = true;
-        if ($movingLayers[0] == dest[0]) isForwardMove = false;
-        src.removeClass('layerCurrentlyMoving');
-        dest.removeClass('layerCurrentlyMoving');
+        if (isForwardMove === undefined) {
+            src.addClass('layerCurrentlyMoving');
+            dest.addClass('layerCurrentlyMoving');
+            let $movingLayers = $('.layerCurrentlyMoving');
+            isForwardMove = true;
+            if ($movingLayers[0] == dest[0]) isForwardMove = false;
+            src.removeClass('layerCurrentlyMoving');
+            dest.removeClass('layerCurrentlyMoving');
+        }
 
         var srcIndex = src.index(), destIndex = dest.index();
         // Preventive error checking
@@ -519,16 +539,17 @@ var List = Class({
             }
             else {
                 $('#temporaryLI').remove();
-                if (isForwardMove) src.insertAfter(dest);
+                if (srcElem.group == destElem.group 
+                    && isForwardMove) src.insertAfter(dest);
                 else src.insertBefore(dest);
             }
-
-            // Get up-to-date index of target layer after changing the source
-            destIndex = dest.index();
 
             /* Data movement */
             let srcOrigGroup = srcElem.group;
             srcElem.group.elems.splice(srcIndex, 1);
+
+            // Get up-to-date index of target layer after changing the source
+            let newSrcIndex = src.index();
 
             if (destElem.tagName == 'UL') {
                 let headerNode = dest[0];
@@ -539,9 +560,7 @@ var List = Class({
                 destElem = headerNode; // For logging purposes
             }
             else {
-                if (isForwardMove) destIndex++;
-                else destIndex--;
-                destElem.group.elems.splice(destIndex, 0, srcElem.elem);
+                destElem.group.elems.splice(newSrcIndex, 0, srcElem.elem);
                 srcElem.group = destElem.group;
                 srcElem.elem.parent = destElem.group;
                 srcElem.parentFolder = destElem.parentFolder;
@@ -555,10 +574,10 @@ var List = Class({
                 let msg = '%cMoved%c layer/group "%s" from index %i of group "%s" to index %i of group "%s"';
                 if (isForwardMove) console.log(msg + ' after layer/group "%s".',
                         'color: #2fa1d6', 'color: #f3f3f3', srcElem.elem.name, srcIndex,
-                        srcOrigGroup.name, destIndex, destElem.group.name, destElem.elem.name);
+                        srcOrigGroup.name, newSrcIndex, destElem.group.name, destElem.elem.name);
                 else console.log(msg + ' before layer/group "%s".',
                         'color: #2fa1d6', 'color: #f3f3f3', srcElem.elem.name, srcIndex,
-                        srcOrigGroup.name, destIndex, destElem.group.name, destElem.elem.name);
+                        srcOrigGroup.name, newSrcIndex, destElem.group.name, destElem.elem.name);
             }
         };
 
@@ -570,6 +589,7 @@ var List = Class({
             console.log('%cApplication synced again after moving layers.', 'color: #aaa');
         });
 
+        return isForwardMove;
     },
     addFolder: function (name, folder, forcedID) {
         if (!this.async.hasSynced) return;

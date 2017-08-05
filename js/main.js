@@ -224,7 +224,7 @@ function initUI() {
                 // If destination is a folder (group), select header in destLayer (div)
                 if (srcLayer[0].tagName == 'DIV') srcLayer = $(srcLayer[0].firstChild);
                 if (currLayerInSrc[0].tagName == 'DIV') currLayerInSrc = $(currLayerInSrc[0].firstChild);
-                list.move(srcLayer[0], currLayerInSrc[0], true);
+                list.move(srcLayer[0], currLayerInSrc[0], true, !ctx.isForward);
             }
             else {
                 setTimeout(function () {
@@ -241,7 +241,7 @@ function initUI() {
                 // If destination is a folder (group), select header in destLayer (div)
                 if (srcLayer[0].tagName == 'DIV') srcLayer = $(srcLayer[0].firstChild);
                 if (destLayer[0].tagName == 'DIV') destLayer = $(destLayer[0].firstChild);
-                list.move(srcLayer[0], destLayer[0], true);
+                list.move(srcLayer[0], destLayer[0], true, ctx.isForward);
             }
             else {
                 setTimeout(function () {
@@ -251,7 +251,7 @@ function initUI() {
                 throw new Error();
             }
         },
-        ['async', 'srcLayerID', 'currLayerInSrcID', 'destLayerID', 'emptyGroupException']);
+        ['async', 'srcLayerID', 'currLayerInSrcID', 'destLayerID', 'isForward', 'emptyGroupException']);
     historyManager
         .registerUndoAction('add',
         function (ctx) { // UNDO add
