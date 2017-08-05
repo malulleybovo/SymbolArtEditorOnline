@@ -53,11 +53,11 @@ $(function () {
         selector: '.context-menu-symbol-art',
         callback: contextMenuCallback,
         items: {
-            "rename": { name: "Rename", icon: CONTEXT_MENU_ICON_LABELS[0], accesskey: "r" },
+            "rename": { name: "1 Rename", icon: CONTEXT_MENU_ICON_LABELS[0], accesskey: "1" },
             "sep1": "---------",
-            "insert layer": { name: "Insert Layer", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "l" },
+            "insert layer": { name: "2 Add Layer Inside", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "2" },
             "sep2": "---------",
-            "insert group": { name: "Insert Group", icon: CONTEXT_MENU_ICON_LABELS[2], accesskey: "g" }
+            "insert group": { name: "3 Add Group Inside", icon: CONTEXT_MENU_ICON_LABELS[2], accesskey: "3" }
         }
     });
 
@@ -72,18 +72,18 @@ $(function () {
         selector: '.context-menu-layer',
         callback: contextMenuCallback,
         items: {
-            "rename": { name: "Rename", icon: CONTEXT_MENU_ICON_LABELS[0], accesskey: "r" },
+            "rename": { name: "1 Rename", icon: CONTEXT_MENU_ICON_LABELS[0], accesskey: "1" },
             "sep1": "---------",
-            "new layer": { name: "New Layer", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "n l" },
-            "append layer": { name: "Append Layer", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "a l" },
+            "new layer": { name: "2 Add Layer Here", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "2" },
+            "append layer": { name: "3 Add Layer At End", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "3" },
             "sep2": "---------",
-            "new group": { name: "New Group", icon: CONTEXT_MENU_ICON_LABELS[2] },
-            "append group": { name: "Append Group", icon: CONTEXT_MENU_ICON_LABELS[2] },
+            "new group": { name: "4 Add Group Here", icon: CONTEXT_MENU_ICON_LABELS[2], accesskey: "4" },
+            "append group": { name: "5 Add Group At End", icon: CONTEXT_MENU_ICON_LABELS[2], accesskey: "5" },
             "sep3": "---------",
             "removal folder": {
-                "name": "Remove",
+                "name": "6 Remove", accesskey: "6",
                 "items": {
-                    "remove": { name: "Confirm" }
+                    "remove": { name: "0 Confirm", accesskey: "0" }
                 }, icon: CONTEXT_MENU_ICON_LABELS[3]
             }
         }
@@ -100,20 +100,20 @@ $(function () {
         selector: '.context-menu-group',
         callback: contextMenuCallback,
         items: {
-            "rename": { name: "Rename", icon: CONTEXT_MENU_ICON_LABELS[0], accesskey: "r" },
+            "rename": { name: "1 Rename", icon: CONTEXT_MENU_ICON_LABELS[0], accesskey: "1" },
             "sep1": "---------",
-            "new layer": { name: "New Layer", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "n l" },
-            "insert layer": { name: "Insert Layer", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "n l" },
-            "append layer": { name: "Append Layer", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "a l" },
+            "new layer": { name: "2 Add Layer Here", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "2" },
+            "insert layer": { name: "3 Add Layer Inside", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "3" },
+            "append layer": { name: "4 Add Layer At End", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "4" },
             "sep2": "---------",
-            "new group": { name: "New Group", icon: CONTEXT_MENU_ICON_LABELS[2] },
-            "insert group": { name: "Insert Group", icon: CONTEXT_MENU_ICON_LABELS[2] },
-            "append group": { name: "Append Group", icon: CONTEXT_MENU_ICON_LABELS[2] },
+            "new group": { name: "5 Add Group Here", icon: CONTEXT_MENU_ICON_LABELS[2], accesskey: "5" },
+            "insert group": { name: "6 Add Group Inside", icon: CONTEXT_MENU_ICON_LABELS[2], accesskey: "6" },
+            "append group": { name: "7 Add Group At End", icon: CONTEXT_MENU_ICON_LABELS[2], accesskey: "7" },
             "sep3": "---------",
             "removal folder": {
-                "name": "Remove",
+                "name": "8 Remove", accesskey: "8",
                 "items": {
-                    "remove": { name: "Confirm" }
+                    "remove": { name: "0 Confirm", accesskey: "0" }
                 }, icon: CONTEXT_MENU_ICON_LABELS[3]
             }
 
