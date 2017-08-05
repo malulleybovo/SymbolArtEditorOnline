@@ -27,6 +27,11 @@ img {
   user-select: none;
 }
 
+.has-slider input{
+    visibility: hidden;
+    width: 0 !important;
+}
+
 .highlight {background-color: #CCC;}
 
 .titleScreen {
