@@ -338,8 +338,22 @@ var Editor = Class({
             var buttons = $(this).find('.edit-button');
             if (!buttons.is(":visible")) return;
             buttons.css('opacity', 1).css('cursor', 'default');
+
+            let editor = $('canvas')[0].editor;
+            if (editor.currBtnDown == 8) {
+                let layer = list.selectedElem.parentNode.elem;
+                historyManager.pushUndoAction('symbol_rotate', {
+                    'layer': layer,
+                    'origVtces': editor.origEditbtn.vtces.slice(0),
+                    'vtcesAfterRot': layer.vertices.slice(0)
+                });
+                console.log('%cRotated Symbol%c of layer "%s" in group "%s" at position "%i".',
+                    'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                    layer.parent.elems.indexOf(layer));
+            }
+
             // Deactivate any edit box button that may have been used
-            $('canvas')[0].editor.currBtnDown = -1;
+            editor.currBtnDown = -1;
         })
         $(window).resize(function () {
             $('canvas')[0].editor.refreshLayerEditBox();
@@ -480,17 +494,19 @@ var Editor = Class({
             }
         });
         quad.on('mouseup', function (evtData) {
-            let layer = this.layerData.layer;
-            historyManager.pushUndoAction('symbol_move', {
-                'layer': layer,
-                'startX': this.origX,
-                'startY': this.origY,
-                'endX': layer.x,
-                'endY': layer.y
-            });
-            console.log('%cMoved Symbol%c of layer "%s" in group "%s" at position "%i".',
-                'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
-                layer.parent.elems.indexOf(layer));
+            if (this.isMoving) { // Save undoable action if moved symbol
+                let layer = this.layerData.layer;
+                historyManager.pushUndoAction('symbol_move', {
+                    'layer': layer,
+                    'startX': this.origX,
+                    'startY': this.origY,
+                    'endX': layer.x,
+                    'endY': layer.y
+                });
+                console.log('%cMoved Symbol%c of layer "%s" in group "%s" at position "%i".',
+                    'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                    layer.parent.elems.indexOf(layer));
+            }
 
             this.isMoving = false;
             delete this.origClickX;
@@ -498,17 +514,19 @@ var Editor = Class({
             delete this.origX;
             delete this.origY;
         }).on('touchend', function (evtData) {
-            let layer = this.layerData.layer;
-            historyManager.pushUndoAction('symbol_move', {
-                'layer': layer,
-                'startX': this.origX,
-                'startY': this.origY,
-                'endX': layer.x,
-                'endY': layer.y
-            });
-            console.log('%cMoved Symbol%c of layer "%s" in group "%s" at position "%i".',
-                'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
-                layer.parent.elems.indexOf(layer));
+            if (this.isMoving) { // Save undoable action if moved symbol
+                let layer = this.layerData.layer;
+                historyManager.pushUndoAction('symbol_move', {
+                    'layer': layer,
+                    'startX': this.origX,
+                    'startY': this.origY,
+                    'endX': layer.x,
+                    'endY': layer.y
+                });
+                console.log('%cMoved Symbol%c of layer "%s" in group "%s" at position "%i".',
+                    'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                    layer.parent.elems.indexOf(layer));
+            }
 
             this.isMoving = false;
             delete this.origClickX;
@@ -516,17 +534,20 @@ var Editor = Class({
             delete this.origX;
             delete this.origY;
         }).on('touchendoutside', function (evtData) {
-            let layer = this.layerData.layer;
-            historyManager.pushUndoAction('symbol_move', {
-                'layer': layer,
-                'startX': this.origX,
-                'startY': this.origY,
-                'endX': layer.x,
-                'endY': layer.y
-            });
-            console.log('%cMoved Symbol%c of layer "%s" in group "%s" at position "%i".',
-                'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
-                layer.parent.elems.indexOf(layer));
+            if (this.isMoving) { // Save undoable action if moved symbol
+                let layer = this.layerData.layer;
+                historyManager.pushUndoAction('symbol_move', {
+                    'layer': layer,
+                    'startX': this.origX,
+                    'startY': this.origY,
+                    'endX': layer.x,
+                    'endY': layer.y
+                });
+                console.log('%cMoved Symbol%c of layer "%s" in group "%s" at position "%i".',
+                    'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                    layer.parent.elems.indexOf(layer));
+            }
+
             this.isMoving = false;
             delete this.origClickX;
             delete this.origClickY;

@@ -314,6 +314,25 @@ function initUI() {
             editor.layerCtrl.update(ctx.layer);
         },
         ['layer', 'startX', 'startY', 'endX', 'endY']);
+    historyManager
+        .registerUndoAction('symbol_rotate',
+        function (ctx) { // UNDO symbol_rotate
+            ctx.layer.vertices = ctx.origVtces;
+            let editor = $('canvas')[0].editor;
+            editor.updateLayer(ctx.layer);
+            editor.render();
+            editor.refreshLayerEditBox();
+            editor.layerCtrl.update(ctx.layer);
+        },
+        function (ctx) { // REDO symbol_rotate
+            ctx.layer.vertices = ctx.vtcesAfterRot;
+            let editor = $('canvas')[0].editor;
+            editor.updateLayer(ctx.layer);
+            editor.render();
+            editor.refreshLayerEditBox();
+            editor.layerCtrl.update(ctx.layer);
+        },
+        ['layer', 'origVtces', 'vtcesAfterRot']);
 
     samlLoader = new SAMLLoader(list);
 
