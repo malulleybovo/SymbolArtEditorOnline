@@ -261,16 +261,22 @@ function initUI() {
         },
         function (ctx) { // REDO add
             list.insertSubtree(ctx.subtree);
-            let parentDOM = ctx.subtree.parentDOM;
-            $(parentDOM.firstChild).click().click();
+            let elemDOM = ctx.subtree.subtreeDOM;
+            if (elemDOM.tagName == 'DIV') // If Group, click header
+                $(elemDOM.firstChild).click().click();
+            else // If Layer, click it
+                $(elemDOM).click();
         },
         ['elemID']);
     historyManager
         .registerUndoAction('remove',
         function (ctx) { // UNDO remove
             list.insertSubtree(ctx.subtree);
-            let parentDOM = ctx.subtree.parentDOM;
-            $(parentDOM.firstChild).click().click();
+            let elemDOM = ctx.subtree.subtreeDOM;
+            if (elemDOM.tagName == 'DIV') // If Group, click header
+                $(elemDOM.firstChild).click().click();
+            else // If Layer, click it
+                $(elemDOM).click();
         },
         function (ctx) { // REDO remove
             ctx.subtree = list.extractSubtree(ctx.elemID);
