@@ -12,9 +12,19 @@
             this.selectmenu.addIconOption(partsInfo.path + partsInfo.dataArray[i] + partsInfo.imgType, function () {
                 // TODO - assign selected part to the layer being editted
                 var layer = this.layerCtrl.activeLayer;
+
+                historyManager.pushUndoAction('symbol_change', {
+                    'layer': layer,
+                    'prevPartNum': layer.part,
+                    'newPartNum': this.index
+                });
+                console.log('%cChanged Symbol%c of layer "%s" in group "%s" at position "%i".',
+                    'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                    layer.parent.elems.indexOf(layer));
+
                 layer.part = this.index;
 
-                var editor = this.layerCtrl.editor;
+                let editor = $('canvas')[0].editor;
                 editor.updateLayer(layer);
                 editor.render();
                 //console.log('Not Implemented: PartSelectMenu list item onclick');

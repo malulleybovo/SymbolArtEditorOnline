@@ -278,6 +278,42 @@ function initUI() {
             $(parentDOM.firstChild).click().click();
         },
         ['elemID', 'subtree']);
+    historyManager
+        .registerUndoAction('symbol_change',
+        function (ctx) { // UNDO symbol_partchange
+            ctx.layer.part = ctx.prevPartNum;
+            let editor = $('canvas')[0].editor;
+            editor.updateLayer(ctx.layer);
+            editor.render();
+        },
+        function (ctx) { // REDO symbol_partchange
+            ctx.layer.part = ctx.newPartNum;
+            let editor = $('canvas')[0].editor;
+            editor.updateLayer(ctx.layer);
+            editor.render();
+        },
+        ['layer', 'prevPartNum', 'newPartNum']);
+    historyManager
+        .registerUndoAction('symbol_move',
+        function (ctx) { // UNDO symbol_move
+            ctx.layer.x = ctx.startX;
+            ctx.layer.y = ctx.startY;
+            let editor = $('canvas')[0].editor;
+            editor.updateLayer(ctx.layer);
+            editor.render();
+            editor.refreshLayerEditBox();
+            editor.layerCtrl.update(ctx.layer);
+        },
+        function (ctx) { // REDO symbol_move
+            ctx.layer.x = ctx.endX;
+            ctx.layer.y = ctx.endY;
+            let editor = $('canvas')[0].editor;
+            editor.updateLayer(ctx.layer);
+            editor.render();
+            editor.refreshLayerEditBox();
+            editor.layerCtrl.update(ctx.layer);
+        },
+        ['layer', 'startX', 'startY', 'endX', 'endY']);
 
     samlLoader = new SAMLLoader(list);
 

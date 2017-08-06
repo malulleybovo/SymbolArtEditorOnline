@@ -480,18 +480,53 @@ var Editor = Class({
             }
         });
         quad.on('mouseup', function (evtData) {
+            let layer = this.layerData.layer;
+            historyManager.pushUndoAction('symbol_move', {
+                'layer': layer,
+                'startX': this.origX,
+                'startY': this.origY,
+                'endX': layer.x,
+                'endY': layer.y
+            });
+            console.log('%cMoved Symbol%c of layer "%s" in group "%s" at position "%i".',
+                'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                layer.parent.elems.indexOf(layer));
+
             this.isMoving = false;
             delete this.origClickX;
             delete this.origClickY;
             delete this.origX;
             delete this.origY;
         }).on('touchend', function (evtData) {
+            let layer = this.layerData.layer;
+            historyManager.pushUndoAction('symbol_move', {
+                'layer': layer,
+                'startX': this.origX,
+                'startY': this.origY,
+                'endX': layer.x,
+                'endY': layer.y
+            });
+            console.log('%cMoved Symbol%c of layer "%s" in group "%s" at position "%i".',
+                'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                layer.parent.elems.indexOf(layer));
+
             this.isMoving = false;
             delete this.origClickX;
             delete this.origClickY;
             delete this.origX;
             delete this.origY;
         }).on('touchendoutside', function (evtData) {
+            let layer = this.layerData.layer;
+            historyManager.pushUndoAction('symbol_move', {
+                'layer': layer,
+                'startX': this.origX,
+                'startY': this.origY,
+                'endX': layer.x,
+                'endY': layer.y
+            });
+            console.log('%cMoved Symbol%c of layer "%s" in group "%s" at position "%i".',
+                'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                layer.parent.elems.indexOf(layer));
             this.isMoving = false;
             delete this.origClickX;
             delete this.origClickY;
