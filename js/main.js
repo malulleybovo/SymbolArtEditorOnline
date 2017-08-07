@@ -321,24 +321,28 @@ function initUI() {
         },
         ['layer', 'startX', 'startY', 'endX', 'endY']);
     historyManager
-        .registerUndoAction('symbol_rotate',
-        function (ctx) { // UNDO symbol_rotate
-            ctx.layer.vertices = ctx.origVtces;
+        .registerUndoAction('symbol_reshape',
+        function (ctx) { // UNDO symbol_reshape
+            ctx.layer.vertices = ctx.origVals.vtces;
+            ctx.layer.x = ctx.origVals.x;
+            ctx.layer.y = ctx.origVals.y;
             let editor = $('canvas')[0].editor;
             editor.updateLayer(ctx.layer);
             editor.render();
             editor.refreshLayerEditBox();
             editor.layerCtrl.update(ctx.layer);
         },
-        function (ctx) { // REDO symbol_rotate
-            ctx.layer.vertices = ctx.vtcesAfterRot;
+        function (ctx) { // REDO symbol_reshape
+            ctx.layer.vertices = ctx.newVals.vtces;
+            ctx.layer.x = ctx.newVals.x;
+            ctx.layer.y = ctx.newVals.y;
             let editor = $('canvas')[0].editor;
             editor.updateLayer(ctx.layer);
             editor.render();
             editor.refreshLayerEditBox();
             editor.layerCtrl.update(ctx.layer);
         },
-        ['layer', 'origVtces', 'vtcesAfterRot']);
+        ['layer', 'origVals', 'newVals']);
 
     samlLoader = new SAMLLoader(list);
 
