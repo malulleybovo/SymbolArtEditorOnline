@@ -220,21 +220,38 @@ var LayerCtrl = Class({
             containerClassName: 'sa-color-picker-container',
             preferredFormat: "hex",
             clickoutFiresChange: true,
+            beforeShow: function (color) {
+                this.layer = $('canvas')[0].editor.selectedLayer;
+                this.colorBeforeChange = this.layer.color;
+            },
             change: function (color) { updateColor(color); },
             move: function (color) { updateColor(color); },
-            hide: function (color) { updateColor(color); }
+            hide: function (color) {
+                let newColor = updateColor(color);
+                if (newColor != this.colorBeforeChange) {
+                    historyManager.pushUndoAction('symbol_recolor', {
+                        'layer': this.layer,
+                        'oldColor': this.colorBeforeChange,
+                        'newColor': newColor
+                    });
+                    console.log('%cRecolored Symbol%c of layer "%s" in group "%s" at position "%i".',
+                        'color: #2fa1d6', 'color: #f3f3f3', this.layer.name, this.layer.parent.name,
+                        this.layer.parent.elems.indexOf(this.layer));
+                }
+            }
         });
         $('.sp-replacer').css('transition', '0.1s ease-in-out').addClass('no-panning');
         $('.sp-container').addClass('no-panning');
         function updateColor(color) {
-            var canvas = $('canvas')[0];
+            let canvas = $('canvas')[0];
+            let newColor = null;
             if (canvas.editor === undefined) console.error(
                 "Editor canvas could not be found and thus, color picker could not interact with the editor.");
             else {
-                var editor = canvas.editor;
+                let editor = canvas.editor;
                 if (editor.selectedLayer !== undefined) {
                     if (editor.selectedLayer != null) {
-                        var newColor = Math.round(parseInt('0x' + color.toHex()));
+                        newColor = Math.round(parseInt('0x' + color.toHex()));
                         editor.selectedLayer.color = newColor;
                         editor.updateLayer(editor.selectedLayer);
                         editor.render();
@@ -243,6 +260,7 @@ var LayerCtrl = Class({
                 else console.warn(
                     "No currently selected layer is defined. Could not update color picker.");
             }
+            return newColor;
         }
 
         this.partselectmenu = new PartSelectMenu(this);

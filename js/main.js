@@ -343,6 +343,21 @@ function initUI() {
             editor.layerCtrl.update(ctx.layer);
         },
         ['layer', 'origVals', 'newVals']);
+    historyManager
+        .registerUndoAction('symbol_recolor',
+        function (ctx) { // UNDO symbol_recolor
+            ctx.layer.color = ctx.oldColor;
+            let editor = $('canvas')[0].editor;
+            editor.updateLayer(ctx.layer);
+            editor.render();
+        },
+        function (ctx) { // REDO symbol_recolor
+            ctx.layer.color = ctx.newColor;
+            let editor = $('canvas')[0].editor;
+            editor.updateLayer(ctx.layer);
+            editor.render();
+        },
+        ['layer', 'oldColor', 'newColor']);
 
     samlLoader = new SAMLLoader(list);
 
