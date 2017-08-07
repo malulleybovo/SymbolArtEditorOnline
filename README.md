@@ -36,12 +36,18 @@ This is purely a fan-made application developed to let other fans and  have fun 
     - Volume Icon Plays the Currently Selected Sound
 - Use *Mouse Wheel* and *Middle Click and Hold* (*Pinch and Zoom*) for Zooming In/Out and Panning Through the Editor
 
+### Importing Symbol Art in *.sar* Format:
+- Download the Third-Party Application [Symbol Art Editor](http://www.pso-world.com/forums/showthread.php?215777-Symbol-Art-Editor-EN-Version) available in www.pso-world.com
+- Launch the Application, Click *File->Open*, and Select a Valid *.sar* File
+- Upon Loading the Symbol Art, Click *File->Save As*, and Save the Symbol Art in *.saml* Format this Time
+- Launch [Symbol Art Editor Online](https://malulleybovo.github.io/SymbolArtEditorOnline/) and Load the *.saml* File by Clicking the Upload Button at the Landing Screen and Choosing the File in your Device
+
 ### Features:
 - Touch Screen Support ! ! ! (70-80% functionality is supported so far)
 - (In Progress) Saving Your Creation to *.saml* Format (Currently, you can click *Q* to log the contents of the file and then save it to a *.saml* file by yourself)
 - Loading *.saml* Saved from this Application or from the lacking [Symbol Art Editor](http://www.pso-world.com/forums/showthread.php?215777-Symbol-Art-Editor-EN-Version) available in www.pso-world.com
     - *note:* I have not managed to understand how *.sar* files are formatted, so no *.sar* support until then unfortunately
-- (In Progress) Undo / Redo Changes Made (Only renaming, moving, and adding have this support so far and it will be buggy until the feature is completed!)
+- (In Progress) Undo / Redo Changes Made (Most features support this but it may be buggy until fully completed!)
 - Layer Manager to Organize and Facilitate Your Workflow
     - Add Layer (New Symbol)
     - Add Group of Symbols
