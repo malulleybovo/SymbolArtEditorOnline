@@ -221,7 +221,8 @@ var LayerCtrl = Class({
             preferredFormat: "hex",
             clickoutFiresChange: true,
             change: function (color) { updateColor(color); },
-            move: function (color) { updateColor(color); }
+            move: function (color) { updateColor(color); },
+            hide: function (color) { updateColor(color); }
         });
         $('.sp-replacer').css('transition', '0.1s ease-in-out').addClass('no-panning');
         $('.sp-container').addClass('no-panning');
