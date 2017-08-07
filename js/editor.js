@@ -360,7 +360,7 @@ var Editor = Class({
                 case 8:
                     reshapeType = reshapeType || 'Rotated';
                     let layer = list.selectedElem.parentNode.elem;
-                    historyManager.pushUndoAction('symbol_reshape', {
+                    let vals = {
                         'layer': layer,
                         'origVals': {
                             vtces: editor.origEditbtn.vtces.slice(0),
@@ -372,10 +372,13 @@ var Editor = Class({
                             x: layer.x,
                             y: layer.y
                         }
-                    });
-                    console.log('%c' + reshapeType + ' Symbol%c of layer "%s" in group "%s" at position "%i".',
+                    };
+                    historyManager.pushUndoAction('symbol_reshape', vals);
+                    console.log('%c' + reshapeType + ' Symbol%c of layer "%s" in group "%s" at position "%i". '
+                        + 'Vertices changed from %O to %O and position changed from (%i, %i) to (%i, %i).',
                         'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
-                        layer.parent.elems.indexOf(layer));
+                        layer.parent.elems.indexOf(layer), vals.origVals.vtces, vals.newVals.vtces,
+                        vals.origVals.x, vals.origVals.y, vals.newVals.x, vals.newVals.y);
                 default:
                     break;
             }
@@ -387,14 +390,6 @@ var Editor = Class({
         // Initialize Layer Control
         this.layerCtrl = new LayerCtrl(this);
         this.layerCtrl.hide();
-
-        this.layerCtrl.alpha.editor = this;
-        this.layerCtrl.alpha.onChange(function () {
-            var editor = $('canvas')[0].editor;
-            editor.updateLayer($('#' + layerCtrlID)[0].layerCtrl.activeLayer);
-            editor.render();
-        });
-
 
         $('body').append(this.editorBoxIcons.tl);
         $('body').append(this.editorBoxIcons.tr);
@@ -528,9 +523,11 @@ var Editor = Class({
                     'endX': layer.x,
                     'endY': layer.y
                 });
-                console.log('%cMoved Symbol%c of layer "%s" in group "%s" at position "%i".',
+                console.log('%cMoved Symbol%c of layer "%s" in group "%s" at position "%i" '
+                    + 'from position (%i, %i) to (%i, %i).',
                     'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
-                    layer.parent.elems.indexOf(layer));
+                    layer.parent.elems.indexOf(layer),
+                    this.origX, this.origY, layer.x, layer.y);
             }
 
             this.isMoving = false;

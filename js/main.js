@@ -358,6 +358,23 @@ function initUI() {
             editor.render();
         },
         ['layer', 'oldColor', 'newColor']);
+        historyManager
+            .registerUndoAction('symbol_changealpha',
+            function (ctx) { // UNDO symbol_changealpha
+                ctx.layer.alpha = ctx.oldAlpha;
+                let editor = $('canvas')[0].editor;
+                editor.updateLayer(ctx.layer);
+                editor.render();
+                editor.layerCtrl.update(ctx.layer);
+            },
+            function (ctx) { // REDO symbol_changealpha
+                ctx.layer.alpha = ctx.newAlpha;
+                let editor = $('canvas')[0].editor;
+                editor.updateLayer(ctx.layer);
+                editor.render();
+                editor.layerCtrl.update(ctx.layer);
+            },
+            ['layer', 'oldAlpha', 'newAlpha']);
 
     samlLoader = new SAMLLoader(list);
 

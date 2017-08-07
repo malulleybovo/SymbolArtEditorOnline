@@ -234,9 +234,11 @@ var LayerCtrl = Class({
                         'oldColor': this.colorBeforeChange,
                         'newColor': newColor
                     });
-                    console.log('%cRecolored Symbol%c of layer "%s" in group "%s" at position "%i".',
+                    console.log(
+                        '%cRecolored Symbol%c of layer "%s" in group "%s" at position "%i" from #%s to #%s.',
                         'color: #2fa1d6', 'color: #f3f3f3', this.layer.name, this.layer.parent.name,
-                        this.layer.parent.elems.indexOf(this.layer));
+                        this.layer.parent.elems.indexOf(this.layer),
+                        this.colorBeforeChange.toString(16), newColor.toString(16));
                 }
             }
         });
@@ -387,7 +389,36 @@ var LayerCtrl = Class({
         this.sideShearDMinus.layerCtrl = this; this.sideShearDMinus.sideNum = 7;
 
         this.rotation = this.gui.add(this.activeLayer, 'rotation').min(0).step(0.1).listen();
-        this.alpha = this.gui.add(this.activeLayer, 'alpha').min(0).step(1).max(7).listen();
+        var layerAlphaHolder = { alpha: 7, isFirstChange: true };
+        this.alpha = this.gui.add(layerAlphaHolder, 'alpha').min(0).step(1).max(7).listen()
+            .name('transparency')
+            .onChange(function (value) {
+                let editor = $('canvas')[0].editor;
+                this.layer = editor.layerCtrl.activeLayer;
+                if (this.object.isFirstChange) {
+                    this.initialAlpha = this.layer.alpha;
+                    this.object.isFirstChange = false;
+                }
+                this.layer.alpha = value;
+                editor.updateLayer(this.layer);
+                editor.render();
+            })
+            .onFinishChange(function (value) {
+                if (this.layer.alpha != this.initialAlpha) {
+                    historyManager.pushUndoAction('symbol_changealpha', {
+                        'layer': this.layer,
+                        'oldAlpha': this.initialAlpha,
+                        'newAlpha': this.layer.alpha
+                    });
+                    console.log(
+                        '%cChanged Symbol Transparency%c of layer "%s" in group "%s" at position "%i" from %i to %i.',
+                        'color: #2fa1d6', 'color: #f3f3f3', this.layer.name, this.layer.parent.name,
+                        this.layer.parent.elems.indexOf(this.layer), this.initialAlpha, this.layer.alpha);
+                }
+                this.object.isFirstChange = true;
+                this.initialAlpha = -1;
+                this.layer = null;
+            });
 
         $(this.gui.domElement).addClass('fade');
         $('.sp-replacer').addClass('fade fadeOut');
@@ -398,7 +429,7 @@ var LayerCtrl = Class({
         this.scaleX.object = this.activeLayer;
         this.scaleY.object = this.activeLayer;
         this.rotation.object = this.activeLayer;
-        this.alpha.object = this.activeLayer;
+        this.alpha.object.alpha = this.activeLayer.alpha;
 
         this.updateDisplay();
     },
