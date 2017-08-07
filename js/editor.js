@@ -373,12 +373,24 @@ var Editor = Class({
                             y: layer.y
                         }
                     };
-                    historyManager.pushUndoAction('symbol_reshape', vals);
-                    console.log('%c' + reshapeType + ' Symbol%c of layer "%s" in group "%s" at position "%i". '
-                        + 'Vertices changed from %O to %O and position changed from (%i, %i) to (%i, %i).',
-                        'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
-                        layer.parent.elems.indexOf(layer), vals.origVals.vtces, vals.newVals.vtces,
-                        vals.origVals.x, vals.origVals.y, vals.newVals.x, vals.newVals.y);
+                    let wasMeaningfulReshape = false;
+                    if (vals.origVals.x != vals.newVals.x
+                        || vals.origVals.y != vals.newVals.y)
+                        wasMeaningfulReshape = true;
+                    else {
+                        for (var i = 0; i < vals.origVals.vtces.length; i++) {
+                            if (vals.origVals.vtces[i] !== vals.newVals.vtces[i])
+                                wasMeaningfulReshape = true;
+                        }
+                    }
+                    if (wasMeaningfulReshape) {
+                        historyManager.pushUndoAction('symbol_reshape', vals);
+                        console.log('%c' + reshapeType + ' Symbol%c of layer "%s" in group "%s" at position "%i". '
+                            + 'Vertices changed from %O to %O and position changed from (%i, %i) to (%i, %i).',
+                            'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                            layer.parent.elems.indexOf(layer), vals.origVals.vtces, vals.newVals.vtces,
+                            vals.origVals.x, vals.origVals.y, vals.newVals.x, vals.newVals.y);
+                    }
                 default:
                     break;
             }
@@ -514,8 +526,9 @@ var Editor = Class({
             }
         });
         quad.on('mouseup', function (evtData) {
-            if (this.isMoving) { // Save undoable action if moved symbol
-                let layer = this.layerData.layer;
+            let layer = this.layerData.layer;
+            if (this.isMoving // Save undoable action if moved symbol
+                && (layer.x != this.origX || layer.y != this.origY)) {
                 historyManager.pushUndoAction('symbol_move', {
                     'layer': layer,
                     'startX': this.origX,
