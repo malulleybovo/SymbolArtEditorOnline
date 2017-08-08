@@ -30,12 +30,48 @@ var LayerCtrl = Class({
                 this.layerCtrl.functions.update(this.layerCtrl);
             },
             horizFlip: function () {
-                this.object.flip(0, this.layerCtrl.activeLayer.vertices);
+                let layer = this.layerCtrl.activeLayer;
+                let origVals = {
+                    vtces: layer.vertices.slice(0),
+                    x: layer.x,
+                    y: layer.y
+                };
+                this.object.flip(0, layer.vertices);
                 this.object.update(this.layerCtrl);
+                historyManager.pushUndoAction('symbol_reshape', {
+                    layer: layer,
+                    origVals: origVals,
+                    newVals: {
+                        vtces: layer.vertices.slice(0),
+                        x: layer.x,
+                        y: layer.y
+                    }
+                });
+                console.log('%cHorizontally Flipped Symbol%c of layer "%s" in group "%s" at position "%i".',
+                    'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                    layer.parent.elems.indexOf(layer));
             },
             vertFlip: function () {
-                this.object.flip(1, this.layerCtrl.activeLayer.vertices);
+                let layer = this.layerCtrl.activeLayer;
+                let origVals = {
+                    vtces: layer.vertices.slice(0),
+                    x: layer.x,
+                    y: layer.y
+                };
+                this.object.flip(1, layer.vertices);
                 this.object.update(this.layerCtrl);
+                historyManager.pushUndoAction('symbol_reshape', {
+                    layer: layer,
+                    origVals: origVals,
+                    newVals: {
+                        vtces: layer.vertices.slice(0),
+                        x: layer.x,
+                        y: layer.y
+                    }
+                });
+                console.log('%cVertically Flipped Symbol%c of layer "%s" in group "%s" at position "%i".',
+                    'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                    layer.parent.elems.indexOf(layer));
             },
             flip: function (typeNum, v) {
                 var scale;
@@ -199,7 +235,7 @@ var LayerCtrl = Class({
                 }
             },
             update: function (layerCtrl) {
-                var editor = layerCtrl.editor;
+                let editor = layerCtrl.editor;
                 editor.updateLayer(layerCtrl.activeLayer);
                 editor.render();
                 editor.refreshLayerEditBox();
