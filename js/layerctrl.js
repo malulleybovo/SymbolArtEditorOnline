@@ -16,7 +16,29 @@ var LayerCtrl = Class({
         this.functions = {
             trigger: function () { },
             move: function () {
-                var layer = this.layerCtrl.activeLayer;
+                let layer = this.layerCtrl.activeLayer;
+                var v = layer.vertices;
+
+                let lastAction = historyManager.undoList[historyManager.undoList.length - 1]
+                let thisTime = (new Date()).getTime();
+                let timeBetweenStretches;
+                if (this.timeOfLastStretch === undefined
+                    || lastAction.ID != this.stretchIDinHistory)
+                    timeBetweenStretches = thisTime;
+                else
+                    timeBetweenStretches = thisTime - this.timeOfLastStretch;
+                this.timeOfLastStretch = thisTime;
+                // If it has been more than 300 sec since last call
+                if (timeBetweenStretches >= 500
+                    || lastAction.ID != this.stretchIDinHistory) {
+                    // Save the original symbol values
+                    this.origVals = {
+                        vtces: v.slice(0),
+                        x: layer.x,
+                        y: layer.y
+                    };
+                }
+
                 switch (this.motionType) {
                     case 0:
                         layer.x += CANVAS_PIXEL_SCALE; break;
@@ -28,6 +50,29 @@ var LayerCtrl = Class({
                         layer.y -= CANVAS_PIXEL_SCALE; break;
                 }
                 this.layerCtrl.functions.update(this.layerCtrl);
+
+                let newVals = {
+                    vtces: layer.vertices.slice(0),
+                    x: layer.x,
+                    y: layer.y
+                };
+                if (timeBetweenStretches >= 500
+                    || lastAction.ID != this.stretchIDinHistory) {
+                    historyManager.pushUndoAction('symbol_reshape', {
+                        layer: layer,
+                        origVals: this.origVals,
+                        newVals: newVals
+                    });
+                    this.stretchIDinHistory = historyManager.pushID;
+                    console.log('%c' + reshapeType + ' Finely Diagonally Stretched Symbol%c of layer "%s" in group "%s" at position "%i". '
+                        + 'Vertices changed from %O to %O and position changed from (%i, %i) to (%i, %i).',
+                        'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                        layer.parent.elems.indexOf(layer), this.origVals.vtces, newVals.vtces,
+                        this.origVals.x, this.origVals.y, newVals.x, newVals.y);
+                }
+                else {
+                    lastAction.params.newVals = newVals;
+                }
             },
             horizFlip: function () {
                 let layer = this.layerCtrl.activeLayer;
