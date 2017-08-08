@@ -96,23 +96,68 @@ var LayerCtrl = Class({
                 this.object.update(this.layerCtrl);
             },
             diagStretch: function (that, amount) {
-                var v1, v2;
+                var v1, v2, reshapeType;
                 switch (that.diagNum) {
                     case 0:
-                        v1 = 0; v2 = 6;
+                        v1 = 0; v2 = 6; reshapeType = '\u2196 \u2198';
                         break;
                     case 1:
-                        v1 = 2; v2 = 4;
+                        v1 = 2; v2 = 4; reshapeType = '\u2199 \u2197';
                         break;
                     default:
                         return;
                 }
-                var v = that.layerCtrl.activeLayer.vertices;
+                let layer = that.layerCtrl.activeLayer;
+                var v = layer.vertices;
+
+                let lastAction = historyManager.undoList[historyManager.undoList.length - 1]
+                let thisTime = (new Date()).getTime();
+                let timeBetweenStretches;
+                if (that.timeOfLastStretch === undefined
+                    || lastAction.ID != that.stretchIDinHistory)
+                    timeBetweenStretches = thisTime;
+                else 
+                    timeBetweenStretches = thisTime - that.timeOfLastStretch;
+                that.timeOfLastStretch = thisTime;
+                // If it has been more than 300 sec since last call
+                if (timeBetweenStretches >= 500
+                    || lastAction.ID != that.stretchIDinHistory) {
+                    // Save the original symbol values
+                    that.origVals = {
+                        vtces: v.slice(0),
+                        x: layer.x,
+                        y: layer.y
+                    };
+                }
+
                 var vOffset = 0;
                 if (!that.isHoriz) vOffset++;
                 if (v[v1 + vOffset] <= v[v2 + vOffset]) amount = -amount;
                 v[v1 + vOffset] += amount;
                 v[v2 + vOffset] -= amount;
+
+                let newVals = {
+                    vtces: layer.vertices.slice(0),
+                    x: layer.x,
+                    y: layer.y
+                };
+                if (timeBetweenStretches >= 500
+                    || lastAction.ID != that.stretchIDinHistory) {
+                    historyManager.pushUndoAction('symbol_reshape', {
+                        layer: layer,
+                        origVals: that.origVals,
+                        newVals: newVals
+                    });
+                    that.stretchIDinHistory = historyManager.pushID;
+                    console.log('%c' + reshapeType + ' Finely Diagonally Stretched Symbol%c of layer "%s" in group "%s" at position "%i". '
+                        + 'Vertices changed from %O to %O and position changed from (%i, %i) to (%i, %i).',
+                        'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                        layer.parent.elems.indexOf(layer), that.origVals.vtces, newVals.vtces,
+                        that.origVals.x, that.origVals.y, newVals.x, newVals.y);
+                }
+                else {
+                    lastAction.params.newVals = newVals;
+                }
             },
             sideStretchMore: function () {
                 this.object.sideStretch(this, CANVAS_PIXEL_SCALE);
@@ -129,31 +174,41 @@ var LayerCtrl = Class({
                 // isLeftOrTop purely modifies boolean expressions in shearing to save code space
                 // idxOffset purely tweaks the indices used in shearing to save code space
                 var isLeftOrTop, idxOffset;
-                var v = that.layerCtrl.activeLayer.vertices;
+                let reshapeType;
+                let layer = that.layerCtrl.activeLayer;
+                var v = layer.vertices;
                 switch (that.sideNum) {
                     case 0:
                         vtx_i = [0, 4, 2, 6];
+                        reshapeType = 'Finely Stretched Left Side';
                     case 1:
                         vtx_i = vtx_i || [2, 6, 0, 4];
-                        testV = 2; 
+                        testV = 2;
+                        reshapeType = reshapeType || 'Finely Stretched Right Side';
                         break;
                     case 2:
                         vtx_i = [0, 2, 4, 6];
+                        reshapeType = reshapeType || 'Finely Stretched Top Side';
                     case 3:
                         vtx_i = vtx_i || [4, 6, 0, 2];
                         testV = 4;
+                        reshapeType = reshapeType || 'Finely Stretched Bottom Side';
                         break;
                     case 4: // Shear Top Side
                         isLeftOrTop = true; idxOffset = 1;
+                        reshapeType = reshapeType || 'Finely Sheared Top Side';
                     case 5: // Shear Right Side
                         if (isLeftOrTop === undefined) isLeftOrTop = false;
                         if (idxOffset === undefined) idxOffset = 0;
+                        reshapeType = reshapeType || 'Finely Sheared Right Side';
                     case 6: // Shear Left Side
                         if (isLeftOrTop === undefined) isLeftOrTop = true;
                         if (idxOffset === undefined) idxOffset = 0;
+                        reshapeType = reshapeType || 'Finely Sheared Left Side';
                     case 7: // Shear Bottom Side
                         if (isLeftOrTop === undefined) isLeftOrTop = false;
                         if (idxOffset === undefined) idxOffset = 1;
+                        reshapeType = reshapeType || 'Finely Sheared Bottom Side';
                         var posivites = [], negatives = [], testBool;
                         // Out of all 4 vertices, put the indices of the 2 with positive X in one 
                         // array and the indices of the other two in another array
@@ -208,6 +263,26 @@ var LayerCtrl = Class({
                     default:
                         return;
                 }
+                let lastAction = historyManager.undoList[historyManager.undoList.length - 1]
+                let thisTime = (new Date()).getTime();
+                let timeBetweenStretches;
+                if (that.timeOfLastStretch === undefined
+                    || lastAction.ID != that.stretchIDinHistory)
+                    timeBetweenStretches = thisTime;
+                else
+                    timeBetweenStretches = thisTime - that.timeOfLastStretch;
+                that.timeOfLastStretch = thisTime;
+                // If it has been more than 300 sec since last call
+                if (timeBetweenStretches >= 500
+                    || lastAction.ID != that.stretchIDinHistory) {
+                    // Save the original symbol values
+                    that.origVals = {
+                        vtces: v.slice(0),
+                        x: layer.x,
+                        y: layer.y
+                    };
+                }
+
                 var ang = Math.atan((v[arbiterV + 1] - v[testV + 1]) / (v[arbiterV] - v[testV]));
                 if (!isNaN(ang) && (ang < Math.PI / 3 && ang > -Math.PI / 3)) {
                     if (v[testV] <= v[arbiterV]) {
@@ -232,6 +307,29 @@ var LayerCtrl = Class({
                         v[vtx_i[0] + 1] += amount / 2; v[vtx_i[1] + 1] += amount / 2;
                         v[vtx_i[2] + 1] -= amount / 2; v[vtx_i[3] + 1] -= amount / 2;
                     }
+                }
+
+                let newVals = {
+                    vtces: layer.vertices.slice(0),
+                    x: layer.x,
+                    y: layer.y
+                };
+                if (timeBetweenStretches >= 500
+                    || lastAction.ID != that.stretchIDinHistory) {
+                    historyManager.pushUndoAction('symbol_reshape', {
+                        layer: layer,
+                        origVals: that.origVals,
+                        newVals: newVals
+                    });
+                    that.stretchIDinHistory = historyManager.pushID;
+                    console.log('%c' + reshapeType + ' of Symbol%c of layer "%s" in group "%s" at position "%i". '
+                        + 'Vertices changed from %O to %O and position changed from (%i, %i) to (%i, %i).',
+                        'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                        layer.parent.elems.indexOf(layer), that.origVals.vtces, newVals.vtces,
+                        that.origVals.x, that.origVals.y, newVals.x, newVals.y);
+                }
+                else {
+                    lastAction.params.newVals = newVals;
                 }
             },
             update: function (layerCtrl) {

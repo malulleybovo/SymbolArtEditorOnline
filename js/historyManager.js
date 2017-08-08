@@ -1,10 +1,11 @@
 
 var HistoryManager = Class({
     initialize: function () {
-        this.historyStackSize = 40;
+        this.historyStackSize = 100;
         this.undoActions = {};
         this.undoList = [];
         this.redoList = [];
+        this.pushID = 0;
     },
     registerUndoAction: function (actionName, undoCallback, redoCallback, reqParams, externalProperties) {
         if (actionName === undefined || typeof actionName !== 'string') console.warn(
@@ -76,7 +77,9 @@ var HistoryManager = Class({
                         'color: #a6cd94', 'color: #d5d5d5');
                     this.undoList.shift();
                 }
+                this.pushID++;
                 this.undoList.push({
+                    'ID': this.pushID,
                     'actionName': actionName,
                     'params': savedParams
                 });
