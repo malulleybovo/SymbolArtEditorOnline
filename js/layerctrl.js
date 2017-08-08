@@ -64,7 +64,7 @@ var LayerCtrl = Class({
                         newVals: newVals
                     });
                     this.stretchIDinHistory = historyManager.pushID;
-                    console.log('%c' + reshapeType + ' Finely Diagonally Stretched Symbol%c of layer "%s" in group "%s" at position "%i". '
+                    console.log('%cFinely Moved Symbol%c of layer "%s" in group "%s" at position "%i". '
                         + 'Vertices changed from %O to %O and position changed from (%i, %i) to (%i, %i).',
                         'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
                         layer.parent.elems.indexOf(layer), this.origVals.vtces, newVals.vtces,

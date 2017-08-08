@@ -42,7 +42,7 @@ var Toolbar = Class({
             $('body')[0].bgemanager.toggleBGEMenu();
         });
 
-        $('body').append(this.btn);
+        toolbarHolder.append(this.btn);
         $('body').append(this.options);
         this.options.append(this.options.bgeSelect);
         this.options.append(this.options.playbackBtn);

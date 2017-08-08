@@ -52,23 +52,13 @@ var List = Class({
             if (e.keyCode == 113) { // Q
                 console.log(list.toSAML());
             }
-            if (e.keyCode == 116) { // T
-                if (!list.async.hasSynced) return;
-                historyManager.undoAction();
-
-                list.async.hasSynced = false;
-                setTimeout(() => {
-                    list.async.hasSynced = true;
-                }, 500);
+            if (!e.ctrlKey) return;
+            /* Control + Key Commands */
+            if (e.keyCode == 26) { // Ctrl + Z = Undo
+                undoBtn.click();
             }
-            else if (e.keyCode == 114) { // R
-                if (!list.async.hasSynced) return;
-                historyManager.redoAction();
-
-                list.async.hasSynced = false;
-                setTimeout(() => {
-                    list.async.hasSynced = true;
-                }, 500);
+            else if (e.keyCode == 25) { // Ctrl + Y = Redo
+                redoBtn.click();
             }
         }
         document.onkeydown = function (e) {
