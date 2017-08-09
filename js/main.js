@@ -129,36 +129,6 @@ function initUI() {
     UINodeList['Canvas Container'].id = 'canvascontainer';
     addNode('Canvas Box', 'div', UINodeList['Canvas Container'], 'canvas-box');
 
-    // Initialize Toolbar Button
-    toolbarHolder = $('<div class="toolbar-holder no-panning">');
-    undoBtn = $('<div data-toolbar="content-option" class="btn-toolbar toolbarbtn no-panning">');
-    undoBtn.icon = $('<i class="fa fa-undo" style="text-shadow: none;margin-top: 2.5px;">');
-    undoBtn.append(undoBtn.icon);
-    undoBtn.click(function () {
-        if (!list.async.hasSynced) return;
-        historyManager.undoAction();
-
-        list.async.hasSynced = false;
-        setTimeout(() => {
-            list.async.hasSynced = true;
-        }, 500);
-    });
-    toolbarHolder.append(undoBtn);
-    redoBtn = $('<div data-toolbar="content-option" class="btn-toolbar toolbarbtn no-panning">');
-    redoBtn.icon = $('<i class="fa fa-repeat" style="text-shadow: none;margin-top: 2.5px;">');
-    redoBtn.append(redoBtn.icon);
-    redoBtn.click(function () {
-        if (!list.async.hasSynced) return;
-        historyManager.redoAction();
-
-        list.async.hasSynced = false;
-        setTimeout(() => {
-            list.async.hasSynced = true;
-        }, 500);
-    })
-    toolbarHolder.append(redoBtn);
-    $('body').append(toolbarHolder);
-
     // Initialize Interface
     list = new List("Layers", "Symbol Art", UINodeList['Canvas Box']);
     UINodeList['Canvas'] = list.editor.renderer.view;
@@ -215,6 +185,37 @@ function initUI() {
     }).on("panzoompan", function () {
         $('canvas')[0].editor.refreshLayerEditBox();
     });
+
+    bgeManager = new BGEManager();
+
+    // Initialize Toolbar Button
+    editorToolbar = new Toolbar($('body')[0]);
+    editorToolbar.addTool('undo', 'fa fa-undo', function () {
+        if (!list.async.hasSynced) return;
+        historyManager.undoAction();
+
+        list.async.hasSynced = false;
+        setTimeout(() => {
+            list.async.hasSynced = true;
+        }, 500);
+    })
+    editorToolbar.addTool('redo', 'fa fa-repeat', function () {
+        if (!list.async.hasSynced) return;
+        historyManager.redoAction();
+
+        list.async.hasSynced = false;
+        setTimeout(() => {
+            list.async.hasSynced = true;
+        }, 500);
+    });
+    editorToolbar.addTool('sound', 'fa fa-music');
+    editorToolbar.addMenuOptionToTool('sound', 'fa fa-volume-up', function () {
+        $('#player')[0].play();
+    });
+    editorToolbar.addMenuOptionToTool('sound', 'fa fa-th-large', function () {
+        bgeManager.toggleBGEMenu();
+    });
+    editorToolbar.setup(); // Ready the toolbar for use
 
     historyManager = new HistoryManager();
     historyManager

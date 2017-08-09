@@ -459,9 +459,6 @@ var Editor = Class({
         //Add the canvas to the HTML document
         parent.appendChild(this.renderer.view);
 
-        // Add Toolbar
-        this.toolbar = new Toolbar();
-
         $('canvas').addClass('editor-canvas-border');
         $('canvas')[0].editor = this;
 

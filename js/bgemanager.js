@@ -1,4 +1,4 @@
-var Toolbar = Class({
+var BGEManager = Class({
     initialize: function () {
         this.player = $('<audio id="player" src="sound/Help!.wav" preload="auto"></audio>');
         this.player[0].bges = [ // list of playable sounds
@@ -20,36 +20,6 @@ var Toolbar = Class({
 
         // Initialize BGE Select Menu
         this.bgeselect = new BGESelectMenu();
-
-        // Initialize Toolbar Button
-        this.btn = $('<div data-toolbar="content-option" class="btn-toolbar toolbarbtn no-panning">');
-        this.btn.icon = $('<i class="fa fa-music" style="text-shadow: none;margin-top: 2.5px;">');
-        this.btn.append(this.btn.icon);
-
-        // Initialize Toolbar Options
-        this.options = $('<div id="toolbar-options" class="hidden">');
-        this.options.playbackBtn = $('<a href="#" class="tool-item"></a>');
-        this.options.playbackBtn.icon = $('<i class="fa fa-volume-up toolbaritem" style="text-shadow: none;margin-top: 2.5px;"></i>');
-        this.options.playbackBtn.append(this.options.playbackBtn.icon);
-        this.options.playbackBtn.click(function () {
-            $('#player')[0].play();
-        });
-        this.options.bgeSelect = $('<a href="#" class="tool-item"></a>');
-        this.options.bgeSelect.icon = $('<i class="fa fa-th-large toolbaritem" style="text-shadow: none;margin-top: 2.5px;"></i>');
-        this.options.bgeSelect.append(this.options.bgeSelect.icon);
-        $('body')[0].bgemanager = this; // Attach refference to manager
-        this.options.bgeSelect.click(function () {
-            $('body')[0].bgemanager.toggleBGEMenu();
-        });
-
-        toolbarHolder.append(this.btn);
-        $('body').append(this.options);
-        this.options.append(this.options.bgeSelect);
-        this.options.append(this.options.playbackBtn);
-
-        this.btn.toolbar({
-            content: '#toolbar-options',
-        });
     },
     toggleBGEMenu: function () {
         this.bgeselect.toggle();
