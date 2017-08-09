@@ -209,11 +209,11 @@ function initUI() {
         }, 500);
     });
     editorToolbar.addTool('sound', 'fa fa-music');
-    editorToolbar.addMenuOptionToTool('sound', 'fa fa-volume-up', function () {
-        $('#player')[0].play();
-    });
     editorToolbar.addMenuOptionToTool('sound', 'fa fa-th-large', function () {
         bgeManager.toggleBGEMenu();
+    });
+    editorToolbar.addMenuOptionToTool('sound', 'fa fa-volume-up', function () {
+        $('#player')[0].play();
     });
     editorToolbar.setup(); // Ready the toolbar for use
 
