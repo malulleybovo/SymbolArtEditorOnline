@@ -2,6 +2,7 @@
     initialize: function (domElem) {
         this.domElem = $('<div class="toolbar-holder no-panning">');
         this.toolList = {};
+        this.toolListSize = 0;
         if (domElem instanceof Element) {
             $(domElem).append(this.domElem);
         }
@@ -17,7 +18,9 @@
         newTool.append(newTool.icon);
         if (onClickCallback !== undefined) newTool.click(onClickCallback);
         this.toolList[name] = newTool;
+        this.toolListSize++;
         this.domElem.append(newTool);
+        this.updateUI();
         return newTool;
     },
     addMenuOptionToTool: function (name, iconClassName, onClickCallback) {
@@ -43,5 +46,23 @@
                 });
             }
         }
+    },
+    updateUI: function () {
+        let tools = [];
+        for (var name in this.toolList) {
+            tools.push(name);
+        }
+        this.toolList[tools[0]]
+            .addClass('toolbar-first')
+            .removeClass('toolbar-last');
+        for (var i = 1; i < tools.length - 1; i++) {
+            this.toolList[tools[i]]
+                .removeClass('toolbar-first')
+                .removeClass('toolbar-last');
+        }
+        this.toolList[tools[tools.length - 1]]
+            .removeClass('toolbarfirst')
+            .addClass('toolbar-last');
+        this.domElem.css('width', 42 * this.toolListSize);
     }
 });

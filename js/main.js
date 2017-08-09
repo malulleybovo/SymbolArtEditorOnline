@@ -208,6 +208,11 @@ function initUI() {
             list.async.hasSynced = true;
         }, 500);
     });
+    editorToolbar.addTool('hideUI', 'fa fa-eye-slash', function () {
+        let editor = $('canvas')[0].editor;
+        editor.disableInteraction();
+        editor.hideInterface();
+    });
     editorToolbar.addTool('sound', 'fa fa-music');
     editorToolbar.addMenuOptionToTool('sound', 'fa fa-th-large', function () {
         bgeManager.toggleBGEMenu();

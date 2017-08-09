@@ -214,7 +214,7 @@ white { color: white; }
 }
 
 .toolbar-holder {
-    width: 126px;
+    width: 0;
     position: fixed;
     bottom: 0;
     left: 0;
@@ -224,7 +224,19 @@ white { color: white; }
 
 .toolbarbtn {
     float: left;
-    border: 1px solid #2fa1d6;
+    border-top: 1px solid#2fa1d6;
+    border-bottom: 1px solid#2fa1d6;
+    border-radius: 0px !important;
+}
+
+.toolbar-first {
+    border-radius: 6px 0px 0px 6px !important;
+    border-left: 1px solid#2fa1d6;
+}
+
+.toolbar-last {
+    border-radius: 0px 6px 6px 0px !important;
+    border-right: 1px solid#2fa1d6;
 }
 
 .ui-dialog .ui-dialog-buttonpane { 
