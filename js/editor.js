@@ -177,6 +177,22 @@ var Editor = Class({
         }).on('vmousemove', function () {
         }).on('vmouseup', function () {
         }).hide();
+        var btn_resize = $('<i class="fa fa-expand fa-border edit-button no-highlight no-panning" ondragstart="return false;">');
+        btn_resize[0].list = list;
+        btn_resize[0].editor = this;
+        btn_resize.on('vmousedown', function (e) {
+            if (!panZoomActive) {
+                this.editor.currBtnDown = 9;
+                if (!this.editor.disableSmallVtxChange)
+                    this.editor.origEditbtn = {
+                        vtces: this.editor.layerCtrl.activeLayer.vertices.slice(0),
+                        x: this.editor.layerCtrl.activeLayer.x,
+                        y: this.editor.layerCtrl.activeLayer.y
+                    };
+            }
+        }).on('vmousemove', function () {
+        }).on('vmouseup', function () {
+        }).hide();
         function diagStretch(index, clientPos, origValues) {
             var canvas = $('canvas');
             var canvasPos = canvas.offset();
@@ -290,6 +306,27 @@ var Editor = Class({
             editor.updateLayer(layer);
             editor.render();
         }
+        function resizeSymbol(clientPos, origValues) {
+            let canvas = $('canvas');
+            let canvasPos = canvas.offset();
+            let editor = canvas[0].editor;
+            let layer = list.selectedElem.parentNode.elem;
+            let origVtces = origValues.vtces;
+            let currVtces = layer.vertices;
+
+            let relPos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
+            let dPosX = ((relPos.left / editor.zoom) - layer.x);
+            let scalingFactor = (1 + dPosX / 100);
+            if (scalingFactor < 0.1) scalingFactor = 0.1;
+            for (var i = 0; i < 4; i++) {
+                currVtces[2 * i] = roundPosition(origVtces[2 * i]
+                    * scalingFactor);
+                currVtces[2 * i + 1] = roundPosition(origVtces[2 * i + 1]
+                    * scalingFactor);
+            }
+            editor.updateLayer(layer);
+            editor.render();
+        }
         this.editorBoxIcons = {
             tl: tl,
             tr: tr,
@@ -299,7 +336,8 @@ var Editor = Class({
             up: btn_u,
             right: btn_r,
             down: btn_d,
-            rotation: btn_rot
+            rotation: btn_rot,
+            resize: btn_resize
         };
 
         $('body').on('vmousemove', function (e) {
@@ -308,7 +346,7 @@ var Editor = Class({
             if (!buttons.is(":visible")) return;
 
             var editor = $('canvas')[0].editor;
-            var btnActive = editor.currBtnDown;
+            let btnActive = editor.currBtnDown;
             // Check if should proceed
             if (btnActive < 0) {
                 return; // Avoids useless computation
@@ -337,10 +375,13 @@ var Editor = Class({
                 case 8:
                     rotate(pos, editor.origEditbtn);
                     break;
+                case 9:
+                    resizeSymbol(pos, editor.origEditbtn);
+                    break;
                 default:
                     break;
             }
-            $('canvas')[0].editor.refreshLayerEditBox();
+            editor.refreshLayerEditBox();
         }).on('vmouseup', function (e) {
             var buttons = $(this).find('.edit-button');
             if (!buttons.is(":visible")) return;
@@ -359,6 +400,8 @@ var Editor = Class({
                     reshapeType = reshapeType || 'Side Stretched';
                 case 8:
                     reshapeType = reshapeType || 'Rotated';
+                case 9:
+                    reshapeType = reshapeType || 'Resized';
                     let layer = list.selectedElem.parentNode.elem;
                     let vals = {
                         'layer': layer,
@@ -412,6 +455,7 @@ var Editor = Class({
         $('body').append(this.editorBoxIcons.right);
         $('body').append(this.editorBoxIcons.down);
         $('body').append(this.editorBoxIcons.rotation);
+        $('body').append(this.editorBoxIcons.resize);
         //Add the canvas to the HTML document
         parent.appendChild(this.renderer.view);
 
@@ -768,6 +812,7 @@ var Editor = Class({
         this.editorBoxIcons.right.hide();
         this.editorBoxIcons.down.hide();
         this.editorBoxIcons.rotation.hide();
+        this.editorBoxIcons.resize.hide();
     },
     showInterface: function () {
         this.layerCtrl.show();
@@ -780,6 +825,7 @@ var Editor = Class({
         this.editorBoxIcons.right.show();
         this.editorBoxIcons.down.show();
         this.editorBoxIcons.rotation.show();
+        this.editorBoxIcons.resize.show();
     },
     refreshLayerEditBox: function () {
         if (this.editorBoxIcons.tl.is(':hidden')) return; // Ignore if UI is hidden
@@ -807,6 +853,8 @@ var Editor = Class({
 
         this.editorBoxIcons.rotation.css('left', (basePosX - 11.3) + 'px')
             .css('top', (basePosY - 42.5) + 'px');
+        this.editorBoxIcons.resize.css('left', (basePosX - 11.3) + 'px')
+            .css('top', (basePosY + 17.5) + 'px');
     },
     refreshLayerEditBoxButton: function (index) {
         var sel = {};
