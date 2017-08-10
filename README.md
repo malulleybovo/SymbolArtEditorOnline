@@ -37,7 +37,7 @@ This is purely a fan-made application developed to let other fans and  have fun 
 - *Click* (*Tap*) the Toolbar Option with the Musical Note to Show the Sound Manager Menu
     - List Icon in Menu Shows/Hides the List of Available Sounds
     - Volume Icon in Menu Plays the Currently Selected Sound
-- *Click* (*Tap*, or press Ctrl+S) the Toolbar Option eith the Download Icon to Save Your Work
+- *Click* (*Tap*, or press Ctrl+S) the Toolbar Option with the Download Icon to Save Your Work (Due to Restriction, in iOs, this Feature will Result in Opening a New Tab with the Contents of the *.saml* File Representing Your Work)
 
 ### Importing Symbol Art in *.sar* Format:
 - Download the Third-Party Application [Symbol Art Editor](http://www.pso-world.com/forums/showthread.php?215777-Symbol-Art-Editor-EN-Version) available in www.pso-world.com
