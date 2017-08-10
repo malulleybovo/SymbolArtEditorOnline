@@ -451,7 +451,8 @@ var LayerCtrl = Class({
             },
             menu: this.partselectmenu
         };
-        this.part = this.gui.add(this.partManager, 'part');
+        this.part = this.gui.add(this.partManager, 'part')
+            .name('symbol type');
 
         this.pos = this.gui.addFolder('move');
         this.posYMinus = this.pos.add(this.functions, 'trigger')
@@ -471,7 +472,7 @@ var LayerCtrl = Class({
         this.scaleX = this.scale.add(this.activeLayer, 'scaleX').min(1).step(0.1).listen();
         this.scaleY = this.scale.add(this.activeLayer, 'scaleY').min(1).step(0.1).listen();
 
-        this.flipsFolder = this.gui.addFolder('flip symbol');
+        this.flipsFolder = this.gui.addFolder('flip');
 
         this.horizFlip = this.flipsFolder.add(this.functions, 'trigger')
             .name('horizontal').onChange(this.functions.horizFlip);
