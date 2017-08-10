@@ -49,12 +49,12 @@ var List = Class({
             if (e.keyCode == 13) { // Enter
                 $('#canvasctrlbutton').click();
             }
-            if (e.keyCode == 113) { // Q
-                console.log(list.toSAML());
-            }
             if (!e.ctrlKey) return;
             /* Control + Key Commands */
-            if (e.keyCode == 26) { // Ctrl + Z = Undo
+            if (e.keyCode == 113) { // Ctrl + S = Save
+                editorToolbar.toolList.save.click();
+            }
+            else if (e.keyCode == 26) { // Ctrl + Z = Undo
                 editorToolbar.toolList.undo.click();
             }
             else if (e.keyCode == 25) { // Ctrl + Y = Redo
