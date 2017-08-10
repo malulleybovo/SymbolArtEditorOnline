@@ -602,6 +602,7 @@ var LayerCtrl = Class({
 
         $(this.gui.domElement).addClass('fade');
         $('.sp-replacer').addClass('fade fadeOut');
+        this.forceClose();
     },
     update: function (layer) {
         this.activeLayer = layer;
@@ -629,5 +630,10 @@ var LayerCtrl = Class({
         this.partselectmenu.show();
         $(this.gui.domElement).removeClass('fadeOut');
         $('.sp-replacer').removeClass('fadeOut');
+    },
+    forceClose: function () {
+        let layerCtrlBtn = $('div .close-button');
+        if (layerCtrlBtn[0].innerText == 'Close Controls')
+            layerCtrlBtn.click();
     }
 });
