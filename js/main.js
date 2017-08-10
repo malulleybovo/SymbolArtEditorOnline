@@ -220,6 +220,10 @@ function initUI() {
     editorToolbar.addMenuOptionToTool('sound', 'fa fa-volume-up', function () {
         $('#player')[0].play();
     });
+    editorToolbar.addTool('save', 'fa fa-download', function () {
+        var blob = new Blob([list.toSAML()], { type: "text/plain;charset=utf-8" });
+        saveAs(blob, list.mainGroup.name + ".saml");
+    });
     editorToolbar.setup(); // Ready the toolbar for use
 
     historyManager = new HistoryManager();
