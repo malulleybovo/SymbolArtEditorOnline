@@ -55,10 +55,10 @@ var List = Class({
             if (!e.ctrlKey) return;
             /* Control + Key Commands */
             if (e.keyCode == 26) { // Ctrl + Z = Undo
-                undoBtn.click();
+                editorToolbar.toolList.undo.click();
             }
             else if (e.keyCode == 25) { // Ctrl + Y = Redo
-                redoBtn.click();
+                editorToolbar.toolList.redo.click();
             }
         }
         document.onkeydown = function (e) {
