@@ -222,6 +222,12 @@ white { color: white; }
     margin: 0 auto;
 }
 
+.renamingBox {
+    position: fixed;
+    z-index: 99999999;
+    left: 50%;
+}
+
 .toolbarbtn {
     float: left;
     border-top: 1px solid#2fa1d6;

@@ -12,15 +12,11 @@ var List = Class({
         // Initialize Side Bar
         $(".sidebar.left").sidebar().trigger("sidebar:close");
 
-        this.mainFolder;
-        this.mainGroup = new Group(groupName);
         Ps.initialize(this.page[0], {
             wheelSpeed: 0.2,
             wheelPropagation: false,
             minScrollbarLength: 20
         });
-
-        this.editor = new Editor(editorContainer, this);
 
         this.header = $('<div data-role="header" class="ui-header ui-bar-inherit">');
         this.header.append('<h1 class="ui-title">' + headerName + '</h1>');
@@ -28,6 +24,10 @@ var List = Class({
         this.container = $('<div data-role="main" class="ui-content">');
         this.page.append(this.header);
         this.page.append(this.container);
+
+        this.mainGroup = new Group(groupName);
+
+        this.editor = new Editor(editorContainer, this);
 
         this.movingElem = null;
         this.selectedElem = null;
@@ -45,28 +45,18 @@ var List = Class({
             $(".sidebar.left").trigger("sidebar:toggle");
         });
         $(HTMLBody).append(this.toggleButton);
-        document.onkeypress = function (e) {
-            if (e.keyCode == 13) { // Enter
+        document.onkeydown = function (e) {
+            if (e.ctrlKey && (e.key === 'z' || e.key === 'y')) {
+                e.preventDefault();
+            }
+            if (list.isRenamingLayer) return;
+            if (e.key === 'Enter') { // Enter
                 $('#canvasctrlbutton').click();
             }
-            if (!e.ctrlKey) return;
-            /* Control + Key Commands */
-            if (e.keyCode == 113) { // Ctrl + S = Save
-                editorToolbar.toolList.save.click();
-            }
-            else if (e.keyCode == 26) { // Ctrl + Z = Undo
-                editorToolbar.toolList.undo.click();
-            }
-            else if (e.keyCode == 25) { // Ctrl + Y = Redo
-                editorToolbar.toolList.redo.click();
-            }
-        }
-        document.onkeydown = function (e) {
-            if (list.isRenamingLayer) return;
-            if (e.keyCode == 9) {
+            else if (e.key === 'Tab') {
                 e.preventDefault(); // Disable TAB
             }
-            if (e.keyCode == 32) { // Triggers active element highlight
+            else if (e.key == ' ') { // Triggers active element highlight
                 var canvas = $('canvas')[0];
                 if (canvas.isHighlightActive !== undefined) { // Have already triggered
                     return;
@@ -94,6 +84,17 @@ var List = Class({
                 }
                 canvas.isHighlightActive = true;
                 list.editor.render();
+            }
+            else if (!e.ctrlKey) return;
+            /* Control + Key Commands */
+            if (e.key === 's') { // Ctrl + S = Save
+                editorToolbar.toolList.save.click();
+            }
+            else if (e.key === 'z') { // Ctrl + Z = Undo
+                editorToolbar.toolList.undo.click();
+            }
+            else if (e.key === 'y') { // Ctrl + Y = Redo
+                editorToolbar.toolList.redo.click();
             }
         }
         document.onkeyup = function (e) {
@@ -171,9 +172,13 @@ var List = Class({
                 return; // Something bad happened
             }
             var index = elem.index();
-            elem[0].group.activeElem = index;
-            console.log("Selected elem. \"" + elem[0].group.elems[elem[0].group.activeElem].name + "\" from group \"" + elem[0].group.name + "\"");
-            
+            if (elem[0].group != undefined) {
+                elem[0].group.activeElem = index;
+                console.log("Selected elem. \"" + elem[0].group.elems[elem[0].group.activeElem].name + "\" from group \"" + elem[0].group.name + "\"");
+            }
+            else {
+                console.log('Selected symbol art.');
+            }
         };
         this.createGroupNode = function (name, subGroup, group, parentGroup, folder, forcedID) {
             var id = groupID;
@@ -375,8 +380,8 @@ var List = Class({
         };
 
         $('canvas')[0].list = this;
-
-        this.displayGroup(this.mainGroup, this.container);
+        this.mainFolder = this.setupGroupAsMain(this.mainGroup);
+        this.container.append(this.mainFolder);
         this.container.trigger('create');
     },
     rename: function () {
@@ -418,9 +423,15 @@ var List = Class({
                                 'isLayer': isLayer
                             });
 
-                            console.log('%cRenamed%c layer "%s" from group "%s" to "%s".',
-                                'color: #2fa1d6', 'color: #f3f3f3', parent[0].elem.name,
-                                parent[0].group.name, prevElem.text());
+                            if (parent[0].group != this.mainGroup) {
+                                console.log('%cRenamed%c layer "%s" from group "%s" to "%s".',
+                                    'color: #2fa1d6', 'color: #f3f3f3', parent[0].elem.name,
+                                    parent[0].group.name, prevElem.text());
+                            }
+                            else {
+                                console.log('%cRenamed%c symbol art from "%s" to "%s".',
+                                    'color: #2fa1d6', 'color: #f3f3f3', parent[0].elem.name, prevElem.text());
+                            }
                             parent[0].elem.name = prevElem.text();
                             parent[0].textbox = false;
                             elem.remove();
@@ -756,30 +767,22 @@ var List = Class({
                 removedSubtree.dataGroup.name, removedSubtree.indexInGroup);
         }
     },
-    displayGroup: function (group, parentFolder, parentGroup, index) {
-        var contextMenuType = "group";
-        if (group === undefined) group = this.mainGroup;
-        if (index === undefined) contextMenuType = "symbol-art";
+    setupGroupAsMain: function (group) {
         var groupFolder = $('<div data-role="collapsible" id="' + groupID + '">'); groupID++;
-        var header = $('<h2 class="context-menu-' + contextMenuType + '">' + group.name + '</h2>');
+        var header = $('<h2 onmousedown="return false" class="context-menu-symbol-art">' + group.name + '</h2>');
         groupFolder.append(header);
         var list = $('<ul data-role="listview" data-divider-theme="b">');
-        var menuType;
-        if (parentGroup !== undefined && index !== undefined) {
-            header[0].group = parentGroup;
-            header[0].elem = parentGroup.elems[index];
-            header[0].parentFolder = parentFolder[0].parentNode; // Get reference to collapsible
-            $(header).mousedown(this.elemMousedownEvtHandler);
-            header.click(this.elemMousedownEvtHandler);
-            menuType = 'SubGroupMenu';
-        }
-        else {
-            header[0].elem = group;
-            menuType = 'MainGroupMenu';
-        }
+        var menuType = 'MainGroupMenu';
+        header[0].elem = group;
+        header[0].list = this;
         header[0].focusinCallback = this.rename;
+        header.mousedown(this.elemMousedownEvtHandler);
+        header.click(this.elemMousedownEvtHandler);
         header.on("swiperight", function () {
             $(this).contextMenu();
+        });
+        header.on('click', function (e) {
+            this.list.changeSelectedElem(this.firstChild);
         });
         // Show menu when #myDiv is clicked
         groupFolder[0].isOpen = false;
@@ -791,30 +794,9 @@ var List = Class({
             e.stopPropagation();
             groupFolder[0].isOpen = false;
         });
-        parentFolder.append(groupFolder);
         groupFolder.append(list);
         groupFolder[0].list = list;
-        groupFolder[0].group = group;
-
-        for (var i = 0; i < group.elems.length; i++) {
-            if (group.elems[i].type == 'g') {
-                this.displayGroup(group.elems[i], groupFolder[0].list, group, i);
-            }
-            else if (group.elems[i].type = 'l') {
-                var li = $('<li data-mini="true" class="context-menu-layer" id="' + layerID + '">'); layerID++;
-                li.append('<a data-mini="true" href="#popupBasic" data-rel="popup" data-role="button" data-inline="true" data-transition="pop">' + group.elems[i].name + '</a>');
-                li[0].group = group;
-                li[0].parentFolder = groupFolder[0];
-                li[0].elem = group.elems[i];
-                $(li).mousedown(this.elemMousedownEvtHandler);
-                li.click(this.elemMousedownEvtHandler);
-                li.on("swiperight", function () {
-                    $(this).contextMenu();
-                });
-                // Show menu when #myDiv is clicked
-                list.append(li);
-            }
-        }
+        return groupFolder;
     },
     extractSubtree: function (id) {
         /* Validate parameter */
