@@ -192,6 +192,7 @@ function initUI() {
     editorToolbar = new Toolbar($('body')[0]);
     editorToolbar.addTool('undo', 'fa fa-undo', function () {
         if (!list.async.hasSynced) return;
+        if ($('div.sp-container').is(':visible')) return;
         historyManager.undoAction();
 
         list.async.hasSynced = false;
@@ -201,6 +202,7 @@ function initUI() {
     })
     editorToolbar.addTool('redo', 'fa fa-repeat', function () {
         if (!list.async.hasSynced) return;
+        if ($('div.sp-container').is(':visible')) return;
         historyManager.redoAction();
 
         list.async.hasSynced = false;
