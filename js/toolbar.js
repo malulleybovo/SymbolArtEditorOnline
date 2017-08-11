@@ -15,8 +15,10 @@
         newTool = $('<div data-toolbar="content-option" class="btn-toolbar toolbarbtn no-panning">');
         newTool.icon = $('<i class="' + iconClassName
             + '" style="text-shadow: none;margin-top: 2.5px;">');
+        newTool.onclickRef = onClickCallback;
+        newTool.isEnabled = true;
         newTool.append(newTool.icon);
-        if (onClickCallback !== undefined) newTool.click(onClickCallback);
+        if (onClickCallback !== undefined) newTool.on('click', onClickCallback);
         this.toolList[name] = newTool;
         this.toolListSize++;
         this.domElem.append(newTool);
@@ -64,5 +66,21 @@
             .removeClass('toolbarfirst')
             .addClass('toolbar-last');
         this.domElem.css('width', 42 * this.toolListSize);
+    },
+    enableTool: function (name) {
+        if (this.toolList[name] === undefined) return null;
+        let tool = this.toolList[name];
+        if (tool.isEnabled) return null;
+        tool.isEnabled = true;
+        tool.removeClass('toolbar-disabled-tool');
+        if (tool.onclickRef !== undefined) tool.on('click', tool.onclickRef);
+    },
+    disableTool: function (name) {
+        if (this.toolList[name] === undefined) return null;
+        let tool = this.toolList[name];
+        if (!tool.isEnabled) return null;
+        tool.isEnabled = false;
+        tool.addClass('toolbar-disabled-tool');
+        if (tool.onclickRef !== undefined) tool.off();
     }
 });

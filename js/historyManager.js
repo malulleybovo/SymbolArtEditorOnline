@@ -6,6 +6,10 @@ var HistoryManager = Class({
         this.undoList = [];
         this.redoList = [];
         this.pushID = 0;
+        this.onpushhandler = null;
+        this.onundohandler = null;
+        this.onredohandler = null;
+        this.onchangehandler = null;
     },
     registerUndoAction: function (actionName, undoCallback, redoCallback, reqParams, externalProperties) {
         if (actionName === undefined || typeof actionName !== 'string') console.warn(
@@ -84,6 +88,8 @@ var HistoryManager = Class({
                     'params': savedParams
                 });
                 this.redoList = [];
+                if (typeof this.onpushhandler === 'function')
+                    this.onpushhandler();
             }
         }
         else console.warn(
@@ -100,6 +106,10 @@ var HistoryManager = Class({
                 action.undoCallback(undo.params);
                 console.log('%cHistory Manager:%c Undid ' + undo.actionName + ' action.',
                     'color: #a6cd94', 'color: #d5d5d5');
+                if (typeof this.onundohandler === 'function')
+                    this.onundohandler();
+                if (typeof this.onchangehandler === 'function')
+                    this.onchangehandler();
             }
             catch (err) {
                 console.log('%cHistory Manager (%O):%c Could not undo ' + undo.actionName
@@ -119,6 +129,10 @@ var HistoryManager = Class({
                 action.redoCallback(redo.params);
                 console.log('%cHistory Manager:%c Redid ' + redo.actionName + ' action.',
                     'color: #a6cd94', 'color: #d5d5d5');
+                if (typeof this.onredohandler === 'function')
+                    this.onredohandler();
+                if (typeof this.onchangehandler === 'function')
+                    this.onchangehandler();
             }
             catch (err) {
                 console.log('%cHistory Manager (%O):%c Could not redo ' + redo.actionName
@@ -132,5 +146,25 @@ var HistoryManager = Class({
     clear: function () {
         this.undoList = [];
         this.redoList = [];
+    },
+    onpush: function (handler) {
+        if (typeof handler === 'function') {
+            this.onpushhandler = handler;
+        }
+    },
+    onundo: function (handler) {
+        if (typeof handler === 'function') {
+            this.onundohandler = handler;
+        }
+    },
+    onredo: function (handler) {
+        if (typeof handler === 'function') {
+            this.onredohandler = handler;
+        }
+    },
+    onchange: function (handler) {
+        if (typeof handler === 'function') {
+            this.onchangehandler = handler;
+        }
     }
 });

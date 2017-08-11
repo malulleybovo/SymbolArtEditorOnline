@@ -225,8 +225,24 @@ function initUI() {
         saveAs(blob, list.mainGroup.name + ".saml");
     });
     editorToolbar.setup(); // Ready the toolbar for use
+    editorToolbar.disableTool('undo');
+    editorToolbar.disableTool('redo');
 
     historyManager = new HistoryManager();
+    historyManager.onpush(function () {
+        editorToolbar.enableTool('undo');
+        editorToolbar.disableTool('redo');
+    });
+    historyManager.onchange(function () {
+        if (historyManager.undoList.length <= 0)
+            editorToolbar.disableTool('undo');
+        else
+            editorToolbar.enableTool('undo');
+        if (historyManager.redoList.length <= 0)
+            editorToolbar.disableTool('redo');
+        else
+            editorToolbar.enableTool('redo');
+    });
     historyManager
         .registerUndoAction('rename',
         function (ctx) { // UNDO rename
