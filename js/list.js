@@ -415,92 +415,96 @@ var List = Class({
     },
     rename: function (domElem) {
         if (!list.ready) return;
-        var parent = $(domElem);
-        var elem = parent.children(":first");
-        if (!parent[0].textbox) {
-            var input = $('<input />', {
-                'type': 'text',
-                'name': 'aname',
-                'value': parent[0].elem.name
-            });
-            input[0].prevValue = parent[0].elem.name;
-            input[0].prevNode = elem[0];
-            if (parent[0].elem.type == 'g') { parent.parent().collapsible("option", "collapsed", true); }
-            list.isRenamingLayer = true;
-            input.keypress(function (e) { // Update contents of layer/group
-                e.stopPropagation();
-                var elem = $(this);
-                var parent = elem.parent().parent();
-                if (parent[0].textbox) {
-                    if (e.keyCode == 13) { // Enter Key
-                        let newName = elem.val();
-                        if (/^[a-z|A-Z|0-9].*[a-z|A-Z|0-9]$|^[a-z|A-Z|0-9]$/.test(newName)
-                            && newName != parent[0].elem.name) { // Validade new name and check if it changed
-                            var prevElem = $(elem[0].prevNode); // Retrieve prev display DOM elem
-                            prevElem.children('span:first').text(newName); // Update name of elem in node
+        $(domElem).addClass('renamingDOMElem');
+        setTimeout(function () {
+            var parent = $('.renamingDOMElem');
+            parent.removeClass('renamingDOMElem');
+            var elem = parent.children(":first");
+            if (!parent[0].textbox) {
+                var input = $('<input />', {
+                    'type': 'text',
+                    'name': 'aname',
+                    'value': parent[0].elem.name
+                });
+                input[0].prevValue = parent[0].elem.name;
+                input[0].prevNode = elem[0];
+                if (parent[0].elem.type == 'g') { parent.parent().collapsible("option", "collapsed", true); }
+                list.isRenamingLayer = true;
+                input.keypress(function (e) { // Update contents of layer/group
+                    e.stopPropagation();
+                    var elem = $(this);
+                    var parent = elem.parent().parent();
+                    if (parent[0].textbox) {
+                        if (e.keyCode == 13) { // Enter Key
+                            let newName = elem.val();
+                            if (/^[a-z|A-Z|0-9].*[a-z|A-Z|0-9]$|^[a-z|A-Z|0-9]$/.test(newName)
+                                && newName != parent[0].elem.name) { // Validade new name and check if it changed
+                                var prevElem = $(elem[0].prevNode); // Retrieve prev display DOM elem
+                                prevElem.children('span:first').text(newName); // Update name of elem in node
 
-                            let savedDOMElem = parent;
-                            let isLayer = true;
-                            // If renaming a group, move from header to its parent that contains the ID
-                            if (savedDOMElem[0].tagName == 'H2') {
-                                savedDOMElem = savedDOMElem.parent();
-                                isLayer = false;
-                            }
-                            // Save undoable action for this rename
-                            historyManager.pushUndoAction('rename', {
-                                'prevName': parent[0].elem.name,
-                                'newName': newName,
-                                'domElemID': savedDOMElem[0].id,
-                                'isLayer': isLayer
-                            });
+                                let savedDOMElem = parent;
+                                let isLayer = true;
+                                // If renaming a group, move from header to its parent that contains the ID
+                                if (savedDOMElem[0].tagName == 'H2') {
+                                    savedDOMElem = savedDOMElem.parent();
+                                    isLayer = false;
+                                }
+                                // Save undoable action for this rename
+                                historyManager.pushUndoAction('rename', {
+                                    'prevName': parent[0].elem.name,
+                                    'newName': newName,
+                                    'domElemID': savedDOMElem[0].id,
+                                    'isLayer': isLayer
+                                });
 
-                            if (parent[0].group != this.mainGroup) {
-                                console.log('%cRenamed%c layer "%s" from group "%s" to "%s".',
-                                    'color: #2fa1d6', 'color: #f3f3f3', parent[0].elem.name,
-                                    parent[0].group.name, newName);
+                                if (parent[0].group != this.mainGroup) {
+                                    console.log('%cRenamed%c layer "%s" from group "%s" to "%s".',
+                                        'color: #2fa1d6', 'color: #f3f3f3', parent[0].elem.name,
+                                        parent[0].group.name, newName);
+                                }
+                                else {
+                                    console.log('%cRenamed%c symbol art from "%s" to "%s".',
+                                        'color: #2fa1d6', 'color: #f3f3f3', parent[0].elem.name, newName);
+                                }
+                                parent[0].elem.name = newName;
+                                this.blur();
+                                prevElem.focus();
                             }
                             else {
-                                console.log('%cRenamed%c symbol art from "%s" to "%s".',
-                                    'color: #2fa1d6', 'color: #f3f3f3', parent[0].elem.name, newName);
+                                this.blur();
                             }
-                            parent[0].elem.name = newName;
-                            this.blur();
-                            prevElem.focus();
                         }
-                        else {
+                        else if (e.keyCode == 27) { // Esc Key
                             this.blur();
                         }
                     }
-                    else if (e.keyCode == 27) { // Esc Key
-                        this.blur();
+                });
+                input.blur(function (e) { // Abort changes on layer/group
+                    e.stopPropagation();
+                    var elem = $(this);
+                    var parent = elem.parent().parent();
+                    if (parent[0].textbox) {
+                        var prevElem = $(elem[0].prevNode); // Retrieve prev display DOM elem
+                        parent.append(prevElem);
+                        parent[0].textbox = false;
+                        elem.remove();
+                        parent.trigger('create');
                     }
-                }
-            });
-            input.blur(function (e) { // Abort changes on layer/group
-                e.stopPropagation();
-                var elem = $(this);
-                var parent = elem.parent().parent();
-                if (parent[0].textbox) {
-                    var prevElem = $(elem[0].prevNode); // Retrieve prev display DOM elem
-                    parent.append(prevElem);
-                    parent[0].textbox = false;
-                    elem.remove();
-                    parent.trigger('create');
-                }
-                list.isRenamingLayer = undefined;
-            });
-            var disableClicks = function (e) {
-                e.stopPropagation();
-            };
-            input.click(disableClicks);
-            input.mousedown(disableClicks);
+                    list.isRenamingLayer = undefined;
+                });
+                var disableClicks = function (e) {
+                    e.stopPropagation();
+                };
+                input.click(disableClicks);
+                input.mousedown(disableClicks);
 
-            parent.append(input);
-            parent[0].textbox = true;
-            elem.remove();
-            parent.trigger('create');
-            input.focus().select();
-        }
+                parent.append(input);
+                parent[0].textbox = true;
+                elem.remove();
+                parent.trigger('create');
+                input.focus().select();
+            }
+        }, 100);
     },
     move: function (srcElem, destElem, noLog, isForwardMove) {
         if (!this.ready) return;
