@@ -185,7 +185,9 @@ var List = Class({
             if (forcedID !== undefined) { id = forcedID; }
             var groupFolder = $('<div data-role="collapsible" id="' + id + '">');
             if (forcedID === undefined) groupID++;
-            var header = $('<h2 class="context-menu-group">' + name + '</h2>');
+            var header = $('<h2 class="context-menu-group">');
+            let $headerName = $('<span>' + name + '</span>');
+            header.append($headerName);
             groupFolder.append(header);
             var list = $('<ul data-role="listview" data-divider-theme="b">');
             list.css('margin-left', '1px');
@@ -219,12 +221,19 @@ var List = Class({
             groupFolder[0].subGroup = subGroup;
 
             // For purposes of moving elements
+            header.draggable({
+                cursor: "move",
+                helper: function (e) {
+                    let name = e.currentTarget.elem.name;
+                    let c0nt = $(e.currentTarget).contents();
+                    return $("<div class='drag-ghost'>" + name + "</div>");
+                }
+            }).droppable();
             header.on("dragover", function (event) {
                 event.preventDefault();
                 event.stopPropagation();
                 $(this).addClass('dragging');
             });
-
             header.on("dragstart", function (event) {
                 event.stopPropagation();
                 $(this).addClass('dragging');
@@ -298,9 +307,12 @@ var List = Class({
         this.createLayerNode = function (name, group, folder, forcedID) {
             var id = groupID;
             if (forcedID !== undefined) { id = forcedID; }
-            var li = $('<li id="' + id + '" class="context-menu-layer" data-mini="true" class="ui-draggable ui-draggable-handle">');
+            var li = $('<li id="' + id + '" class="context-menu-layer" data-mini="true">');
             if (forcedID === undefined) groupID++;
-            li.append('<a data-mini="true" href="#" data-role="button" data-transition="pop" style="text-shadow:none;">' + name + '</a>');
+            let $liATag = $('<a data-mini="true" data-role="button" data-transition="pop" style="text-shadow:none;">');
+            let $liName = $('<span>' + name + '</span>');
+            li.append($liATag);
+            $liATag.append($liName);
             li[0].group = group;
             li[0].parentFolder = folder;
             li[0].elem = group.elems[group.activeElem];
@@ -319,6 +331,13 @@ var List = Class({
             li[0].focusinCallback = this.rename;
 
             // For purposes of moving elements
+            li.draggable({
+                cursor: "move",
+                helper: function (e) {
+                    let name = e.currentTarget.elem.name;
+                    return $("<div class='drag-ghost'>" + name + "</div>");
+                }
+            }).droppable();
             li.on("dragover", function (event) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -407,9 +426,10 @@ var List = Class({
                 var parent = elem.parent().parent();
                 if (parent[0].textbox) {
                     if (e.keyCode == 13) { // Enter Key
-                        if (/^[a-z|A-Z|0-9].*[a-z|A-Z|0-9]$|^[a-z|A-Z|0-9]$/.test(elem.val())) { // Validade new name
+                        let newName = elem.val();
+                        if (/^[a-z|A-Z|0-9].*[a-z|A-Z|0-9]$|^[a-z|A-Z|0-9]$/.test(newName)) { // Validade new name
                             var prevElem = $(elem[0].prevNode); // Retrieve prev display DOM elem
-                            prevElem.text(elem.val()); // Update name of elem in node
+                            prevElem.children('span:first').text(newName); // Update name of elem in node
                             parent.append(prevElem);
 
                             let savedDOMElem = prevElem.parent();
@@ -422,7 +442,7 @@ var List = Class({
                             // Save undoable action for this rename
                             historyManager.pushUndoAction('rename', {
                                 'prevName': parent[0].elem.name,
-                                'newName': prevElem.text(),
+                                'newName': newName,
                                 'domElemID': savedDOMElem[0].id,
                                 'isLayer': isLayer
                             });
@@ -430,13 +450,13 @@ var List = Class({
                             if (parent[0].group != this.mainGroup) {
                                 console.log('%cRenamed%c layer "%s" from group "%s" to "%s".',
                                     'color: #2fa1d6', 'color: #f3f3f3', parent[0].elem.name,
-                                    parent[0].group.name, prevElem.text());
+                                    parent[0].group.name, newName);
                             }
                             else {
                                 console.log('%cRenamed%c symbol art from "%s" to "%s".',
-                                    'color: #2fa1d6', 'color: #f3f3f3', parent[0].elem.name, prevElem.text());
+                                    'color: #2fa1d6', 'color: #f3f3f3', parent[0].elem.name, newName);
                             }
-                            parent[0].elem.name = prevElem.text();
+                            parent[0].elem.name = newName;
                             parent[0].textbox = false;
                             elem.remove();
                             parent.trigger('create');

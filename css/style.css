@@ -17,6 +17,15 @@ body {
     transform: translate(0,-50%);
 }
 
+.drag-ghost {
+    opacity: 0.5;
+    background-color: black;
+    border-radius: 10px;
+    padding: 5px 10px;
+    width: 50% !important;
+    height: 20px !important;
+}
+
 .sa-color-picker-replacer {
     position: fixed;
     bottom: 0;
