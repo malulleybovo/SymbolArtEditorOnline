@@ -90,6 +90,7 @@ var List = Class({
             else if (!e.ctrlKey) return;
             /* Control + Key Commands */
             if (e.key === 's') { // Ctrl + S = Save
+                e.preventDefault();
                 editorToolbar.toolList.save.click();
             }
             else if (e.key === 'z') { // Ctrl + Z = Undo
