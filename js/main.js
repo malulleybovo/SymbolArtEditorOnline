@@ -103,11 +103,12 @@ function initUI() {
         });
         var reader = new FileReader();
         reader.onload = function (evt) {
+            list.setReady(true); // Ready the Layer Manager
             var text = evt.target.result;
             samlLoader.load(text);
             console.clear();
             historyManager.clear();
-            list.setReady(true); // Ready the Layer Manager
+            editorToolbar.disableTool('undo');
         }
         reader.readAsText(e.target.files[0]);
         reader.onerror = function (evt) {
