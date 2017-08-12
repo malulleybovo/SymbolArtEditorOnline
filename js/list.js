@@ -8,6 +8,8 @@ var List = Class({
         this.async = {
             hasSynced: true
         };
+        // Set to true for initialization. It is set to false at end of initialization
+        this.ready = true;
 
         // Initialize Side Bar
         $(".sidebar.left").sidebar().trigger("sidebar:close");
@@ -49,9 +51,9 @@ var List = Class({
             if (e.ctrlKey && (e.key === 'z' || e.key === 'y')) {
                 e.preventDefault();
             }
-            if (list.isRenamingLayer) return;
+            if (list.isRenamingLayer || !list.ready) return;
             if (e.key === 'Enter') { // Enter
-                $('#canvasctrlbutton').click();
+               $('#canvasctrlbutton').click();
             }
             else if (e.key === 'Tab') {
                 e.preventDefault(); // Disable TAB
@@ -98,10 +100,10 @@ var List = Class({
             }
         }
         document.onkeyup = function (e) {
+            if (list.isRenamingLayer || !list.ready) return;
             if (e.keyCode == 32) { // Wraps up active element highlight
                 var canvas = $('canvas')[0];
                 if (canvas.isHighlightActive) {
-                    var list = canvas.list;
                     var elem = list.selectedElem.parentNode.elem;
 
                     list.editor.stage.alpha = 1.0;
@@ -406,8 +408,14 @@ var List = Class({
         this.mainFolder = this.setupGroupAsMain(this.mainGroup);
         this.container.append(this.mainFolder);
         this.container.trigger('create');
+
+        this.ready = false;
+    },
+    setReady: function (val) {
+        if (val === true || val === false) this.ready = val;
     },
     rename: function () {
+        if (!this.ready) return;
         var parent = $(this);
         var elem = parent.children(":first");
         if (!parent[0].textbox) {
@@ -498,6 +506,7 @@ var List = Class({
         }
     },
     move: function (srcElem, destElem, noLog, isForwardMove) {
+        if (!this.ready) return;
         if (!this.async.hasSynced
             || srcElem == destElem) return;
         var src;
@@ -617,11 +626,13 @@ var List = Class({
         return isForwardMove;
     },
     changeMovingElem: function (elem) {
+        if (!this.ready) return;
         $(this.movingElem).children(':first').children().remove('i');
         this.movingElem = elem;
         $(elem).children(':first').append('<i class="fa fa-check-square-o moving-checkbox">');
     },
     addFolder: function (name, folder, forcedID) {
+        if (!this.ready) return;
         if (!this.async.hasSynced) return;
         if (folder === undefined) folder = this.container[0].firstChild;
         var parentNode = folder.children[1]; // Get list of node elems from folder
@@ -663,6 +674,7 @@ var List = Class({
             headerNode.group.elems.indexOf(headerNode.elem));
     },
     addFolderAtEnd: function (name, folder, forcedID) {
+        if (!this.ready) return;
         if (folder === undefined) folder = this.container[0].firstChild;
         var parentNode = folder.children[1]; // Get list of node elems from folder
 
@@ -692,6 +704,7 @@ var List = Class({
             headerNode.group.elems.indexOf(headerNode.elem));
     },
     addElem: function (name, folder, forcedID) {
+        if (!this.ready) return;
         if (folder === undefined) folder = this.container[0].firstChild;
         var parentNode = folder.children[1]; // Get list of node elems from folder
 
@@ -739,6 +752,7 @@ var List = Class({
         return li;
     },
     addElemAtEnd: function (name, folder, forcedID) {
+        if (!this.ready) return;
         if (folder === undefined) folder = this.container[0].firstChild;
         var parentNode = folder.children[1]; // Get list of node elems from folder
 
@@ -775,6 +789,7 @@ var List = Class({
         return li;
     },
     removeElem: function (id) {
+        if (!this.ready) return;
         let removedSubtree = null;
         if (typeof id === 'string') removedSubtree = this.extractSubtree(id);
         if (removedSubtree == null) {
@@ -797,6 +812,7 @@ var List = Class({
         }
     },
     setupGroupAsMain: function (group) {
+        if (!this.ready) return;
         var groupFolder = $('<div data-role="collapsible" id="' + groupID + '">'); groupID++;
         var header = $('<h2 onmousedown="return false" class="context-menu-symbol-art">' + group.name + '</h2>');
         groupFolder.append(header);
@@ -828,6 +844,7 @@ var List = Class({
         return groupFolder;
     },
     extractSubtree: function (id) {
+        if (!this.ready) return;
         /* Validate parameter */
         if (id === undefined || id < 0 || id > groupID) return null;
 
@@ -869,6 +886,7 @@ var List = Class({
         }
     },
     insertSubtree: function (extr) {
+        if (!this.ready) return;
         /* Validate parameter */
         if (extr.subtreeDOMid === undefined || extr.parentDOMid === undefined
             || extr.subtreeDOM === undefined || extr.parentDOM === undefined
@@ -897,6 +915,7 @@ var List = Class({
         return 0;
     },
     toSAML: function () {
+        if (!this.ready) return;
         var saml = '<?xml version="1.0" encoding="utf-8"?>\n<sa name="' + this.mainGroup.name + '" visible="true" version="4" author="0" width="192" height="96" sound="0">';
         for (var i = 0; i < this.mainGroup.elems.length; i++) {
             var elem = this.mainGroup.elems[i];

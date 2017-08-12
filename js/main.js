@@ -78,6 +78,7 @@ function initUI() {
     UI.landing.menu.newAppButton = $('<div>');
     UI.landing.menu.newAppButton.append($('<i class="fa fa-plus">'));
     UI.landing.menu.newAppButton.click(function (e) {
+        list.setReady(true); // Ready the Layer Manager
         UI.landing.animate({
             opacity: 0
         }, "slow", "linear", function () {
@@ -106,6 +107,7 @@ function initUI() {
             samlLoader.load(text);
             console.clear();
             historyManager.clear();
+            list.setReady(true); // Ready the Layer Manager
         }
         reader.readAsText(e.target.files[0]);
         reader.onerror = function (evt) {
