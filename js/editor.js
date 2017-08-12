@@ -7,6 +7,7 @@ var Editor = Class({
         this.ZOOM_MAX = this.ZOOM_MIN + 12 * this.ZOOM_STEP; // = 4.5
         this.zoom = this.ZOOM_MIN + 2 * this.ZOOM_STEP; // = 1
         this.MIN_VTX_VARIATION = 2 * CANVAS_PIXEL_SCALE;
+        // Setting option for enabling assistance in doing purely vertical/horizontal changes in symbol
         this.disableSmallVtxChange = false;
 
         this.list = list;

@@ -228,7 +228,7 @@ var List = Class({
             header.on("dragstart", function (event) {
                 event.stopPropagation();
                 $(this).addClass('dragging');
-                this.list.movingElem = this;
+                this.list.changeMovingElem(this);
             });
             header.on("dragleave", function (event) {
                 event.preventDefault();
@@ -236,8 +236,10 @@ var List = Class({
                 $(this).removeClass('dragging');
             });
             header.on("drop", function (event) {
-                event.preventDefault();
-                event.stopPropagation();
+                if (event !== undefined) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
 
                 let movingElem = this.list.movingElem;
                 if (movingElem.tagName == 'H2') movingElem = movingElem.parentNode;
@@ -326,16 +328,18 @@ var List = Class({
             li.on("dragstart", function (event) {
                 event.stopPropagation();
                 $(this).addClass('dragging');
-                this.list.movingElem = this;
+                this.list.changeMovingElem(this);
             });
             li.on("dragleave", function (event) {
                 event.preventDefault();
                 event.stopPropagation();
                 $(this).removeClass('dragging');
             });
-            li.on("drop", function(event) {
-                event.preventDefault();  
-                event.stopPropagation();
+            li.on("drop", function (event) {
+                if (event !== undefined) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
 
                 let movingElem = this.list.movingElem;
                 if (movingElem.tagName == 'H2') movingElem = movingElem.parentNode;
@@ -591,6 +595,11 @@ var List = Class({
         });
 
         return isForwardMove;
+    },
+    changeMovingElem: function (elem) {
+        $(this.movingElem).children(':first').children().remove('i');
+        this.movingElem = elem;
+        $(elem).children(':first').append('<i class="fa fa-check-square-o moving-checkbox">');
     },
     addFolder: function (name, folder, forcedID) {
         if (!this.async.hasSynced) return;

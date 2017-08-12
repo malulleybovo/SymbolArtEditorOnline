@@ -10,6 +10,13 @@ body {
 
 }
 
+.moving-checkbox {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translate(0,-50%);
+}
+
 .sa-color-picker-replacer {
     position: fixed;
     bottom: 0;

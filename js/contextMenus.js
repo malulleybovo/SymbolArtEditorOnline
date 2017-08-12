@@ -1,9 +1,10 @@
-var CONTEXT_MENU_ICON_LABELS = [
-    "fa-edit",
-    "fa-picture-o",
-    "fa-folder-o",
-    "fa-trash-o"
-]
+var CONTEXT_MENU_ICONS = {
+    'rename': 'fa-edit',
+    'addlayer': 'fa-picture-o',
+    'addgroup': 'fa-folder-o',
+    'move': 'fa-unsorted',
+    'remove': 'fa-trash-o'
+};
 
 var contextMenuCallback = function (key, options, evt, selector) {
     selector = selector || this;
@@ -37,6 +38,12 @@ var contextMenuCallback = function (key, options, evt, selector) {
         case 'append group':
             list.addFolderAtEnd("Group " + groupNum, selector[0].parentFolder); groupNum++;
             break;
+        case 'picktomove':
+            list.changeMovingElem(selector[0]);
+            break;
+        case 'moveselectedhere':
+            selector.trigger('drop');
+            break;
         case 'remove':
             let id = selector[0].id;
             if (selector[0].tagName == 'H2') id = selector[0].parentNode.id;
@@ -53,11 +60,11 @@ $(function () {
         selector: '.context-menu-symbol-art',
         callback: contextMenuCallback,
         items: {
-            "rename": { name: "1 Rename", icon: CONTEXT_MENU_ICON_LABELS[0], accesskey: "1" },
+            "rename": { name: "1 Rename", icon: CONTEXT_MENU_ICONS.rename, accesskey: "1" },
             "sep1": "---------",
-            "insert layer": { name: "2 Add Layer Inside", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "2" },
+            "insert layer": { name: "2 Add Layer Inside", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "2" },
             "sep2": "---------",
-            "insert group": { name: "3 Add Group Inside", icon: CONTEXT_MENU_ICON_LABELS[2], accesskey: "3" }
+            "insert group": { name: "3 Add Group Inside", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "3" }
         }
     });
 
@@ -72,19 +79,22 @@ $(function () {
         selector: '.context-menu-layer',
         callback: contextMenuCallback,
         items: {
-            "rename": { name: "1 Rename", icon: CONTEXT_MENU_ICON_LABELS[0], accesskey: "1" },
+            "rename": { name: "1 Rename", icon: CONTEXT_MENU_ICONS.rename, accesskey: "1" },
             "sep1": "---------",
-            "new layer": { name: "2 Add Layer Here", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "2" },
-            "append layer": { name: "3 Add Layer At End", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "3" },
+            "new layer": { name: "2 Add Layer Here", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "2" },
+            "append layer": { name: "3 Add Layer At End", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "3" },
             "sep2": "---------",
-            "new group": { name: "4 Add Group Here", icon: CONTEXT_MENU_ICON_LABELS[2], accesskey: "4" },
-            "append group": { name: "5 Add Group At End", icon: CONTEXT_MENU_ICON_LABELS[2], accesskey: "5" },
+            "new group": { name: "4 Add Group Here", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "4" },
+            "append group": { name: "5 Add Group At End", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "5" },
             "sep3": "---------",
+            "picktomove": { name: "6 Pick to Move", icon: CONTEXT_MENU_ICONS.move, accesskey: "6" },
+            "moveselectedhere": { name: "7 Move Selected Here", icon: CONTEXT_MENU_ICONS.move, accesskey: "7" },
+            "sep4": "---------",
             "removal folder": {
-                "name": "6 Remove", accesskey: "6",
+                "name": "8 Remove", accesskey: "8",
                 "items": {
-                    "remove": { name: "0 Confirm", accesskey: "0" }
-                }, icon: CONTEXT_MENU_ICON_LABELS[3]
+                    "remove": { name: "Confirm" }
+                }, icon: CONTEXT_MENU_ICONS.remove
             }
         }
     });
@@ -100,21 +110,24 @@ $(function () {
         selector: '.context-menu-group',
         callback: contextMenuCallback,
         items: {
-            "rename": { name: "1 Rename", icon: CONTEXT_MENU_ICON_LABELS[0], accesskey: "1" },
+            "rename": { name: "1 Rename", icon: CONTEXT_MENU_ICONS.rename, accesskey: "1" },
             "sep1": "---------",
-            "new layer": { name: "2 Add Layer Here", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "2" },
-            "insert layer": { name: "3 Add Layer Inside", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "3" },
-            "append layer": { name: "4 Add Layer At End", icon: CONTEXT_MENU_ICON_LABELS[1], accesskey: "4" },
+            "new layer": { name: "2 Add Layer Here", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "2" },
+            "insert layer": { name: "3 Add Layer Inside", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "3" },
+            "append layer": { name: "4 Add Layer At End", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "4" },
             "sep2": "---------",
-            "new group": { name: "5 Add Group Here", icon: CONTEXT_MENU_ICON_LABELS[2], accesskey: "5" },
-            "insert group": { name: "6 Add Group Inside", icon: CONTEXT_MENU_ICON_LABELS[2], accesskey: "6" },
-            "append group": { name: "7 Add Group At End", icon: CONTEXT_MENU_ICON_LABELS[2], accesskey: "7" },
+            "new group": { name: "5 Add Group Here", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "5" },
+            "insert group": { name: "6 Add Group Inside", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "6" },
+            "append group": { name: "7 Add Group At End", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "7" },
             "sep3": "---------",
+            "picktomove": { name: "8 Pick to Move", icon: CONTEXT_MENU_ICONS.move, accesskey: "8" },
+            "moveselectedhere": { name: "9 Move Selected Here", icon: CONTEXT_MENU_ICONS.move, accesskey: "9" },
+            "sep4": "---------",
             "removal folder": {
-                "name": "8 Remove", accesskey: "8",
+                "name": "0 Remove", accesskey: "0",
                 "items": {
-                    "remove": { name: "0 Confirm", accesskey: "0" }
-                }, icon: CONTEXT_MENU_ICON_LABELS[3]
+                    "remove": { name: "Confirm" }
+                }, icon: CONTEXT_MENU_ICONS.remove
             }
 
         }
