@@ -204,7 +204,6 @@ var List = Class({
             });
             // Show menu when #myDiv is clicked
             header[0].list = this;
-            header[0].focusinCallback = this.rename;
             header.on('click', function (e) {
                 this.list.changeSelectedElem(this.firstChild);
             });
@@ -330,7 +329,6 @@ var List = Class({
             });
 
             li[0].textbox = false;
-            li[0].focusinCallback = this.rename;
 
             // For purposes of moving elements
             li.draggable({
@@ -414,9 +412,9 @@ var List = Class({
     setReady: function (val) {
         if (val === true || val === false) this.ready = val;
     },
-    rename: function () {
-        if (!this.ready) return;
-        var parent = $(this);
+    rename: function (domElem) {
+        if (!list.ready) return;
+        var parent = $(domElem);
         var elem = parent.children(":first");
         if (!parent[0].textbox) {
             var input = $('<input />', {
@@ -814,13 +812,14 @@ var List = Class({
     setupGroupAsMain: function (group) {
         if (!this.ready) return;
         var groupFolder = $('<div data-role="collapsible" id="' + groupID + '">'); groupID++;
-        var header = $('<h2 onmousedown="return false" class="context-menu-symbol-art">' + group.name + '</h2>');
+        var header = $('<h2 onmousedown="return false" class="context-menu-symbol-art">');
+        let $headerName = $('<span>' + group.name + '</span>');
+        header.append($headerName);
         groupFolder.append(header);
         var list = $('<ul data-role="listview" data-divider-theme="b">');
         var menuType = 'MainGroupMenu';
         header[0].elem = group;
         header[0].list = this;
-        header[0].focusinCallback = this.rename;
         header.mousedown(this.elemMousedownEvtHandler);
         header.click(this.elemMousedownEvtHandler);
         header.on("swiperight", function () {

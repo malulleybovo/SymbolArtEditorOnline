@@ -10,7 +10,7 @@ var contextMenuCallback = function (key, options, evt, selector) {
     selector = selector || this;
     switch (key) {
         case 'rename':
-            selector[0].focusinCallback();
+            list.rename(selector[0]);
             break;
         case 'new layer':
             list.addElem("Layer " + layerNum, selector[0].parentFolder); layerNum++;
