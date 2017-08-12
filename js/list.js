@@ -433,12 +433,12 @@ var List = Class({
                 if (parent[0].textbox) {
                     if (e.keyCode == 13) { // Enter Key
                         let newName = elem.val();
-                        if (/^[a-z|A-Z|0-9].*[a-z|A-Z|0-9]$|^[a-z|A-Z|0-9]$/.test(newName)) { // Validade new name
+                        if (/^[a-z|A-Z|0-9].*[a-z|A-Z|0-9]$|^[a-z|A-Z|0-9]$/.test(newName)
+                            && newName != parent[0].elem.name) { // Validade new name and check if it changed
                             var prevElem = $(elem[0].prevNode); // Retrieve prev display DOM elem
                             prevElem.children('span:first').text(newName); // Update name of elem in node
-                            parent.append(prevElem);
 
-                            let savedDOMElem = prevElem.parent();
+                            let savedDOMElem = parent;
                             let isLayer = true;
                             // If renaming a group, move from header to its parent that contains the ID
                             if (savedDOMElem[0].tagName == 'H2') {
@@ -463,11 +463,8 @@ var List = Class({
                                     'color: #2fa1d6', 'color: #f3f3f3', parent[0].elem.name, newName);
                             }
                             parent[0].elem.name = newName;
-                            parent[0].textbox = false;
-                            elem.remove();
-                            parent.trigger('create');
+                            this.blur();
                             prevElem.focus();
-                            list.isRenamingLayer = undefined;
                         }
                         else {
                             this.blur();
@@ -489,6 +486,7 @@ var List = Class({
                     elem.remove();
                     parent.trigger('create');
                 }
+                list.isRenamingLayer = undefined;
             });
             var disableClicks = function (e) {
                 e.stopPropagation();

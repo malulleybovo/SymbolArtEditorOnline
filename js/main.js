@@ -257,7 +257,7 @@ function initUI() {
             }
             mainElem.elem.name = ctx.prevName;
             let layerTextLink = mainElem.firstChild;
-            layerTextLink.textContent = ctx.prevName;
+            $(layerTextLink).children('span:first').text(ctx.prevName);
         },
         function (ctx) { // REDO rename
             var $domLayer = $('#' + ctx.domElemID);
@@ -267,7 +267,7 @@ function initUI() {
             }
             mainElem.elem.name = ctx.newName;
             let layerTextLink = mainElem.firstChild;
-            layerTextLink.textContent = ctx.newName;
+            $(layerTextLink).children('span:first').text(ctx.newName);
         },
         ['domElemID', 'isLayer', 'prevName', 'newName']);
     historyManager
