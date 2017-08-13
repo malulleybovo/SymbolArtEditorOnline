@@ -126,7 +126,6 @@ var List = Class({
         }
 
         this.elemMousedownEvtHandler = function () {
-            var elem;
             var canvas = $('canvas')[0];
             var editor;
             try {
@@ -141,9 +140,10 @@ var List = Class({
             catch (err) {
                 console.error('No editor attached to canvas. It may not have been correctly initialized./n/t' + err.message);
             }
+            let elem = $(this);
             editor.selectedLayer = null;
+            let group = elem[0].group;
             if (this.elem.type == 'l') {
-                elem = $(this);
                 var myLayer = elem[0].elem;
                 try {
                     var testMyLayer = myLayer.x;
@@ -165,7 +165,7 @@ var List = Class({
                 editor.enableInteraction(myLayer);
             }
             else if (this.elem.type == 'g') {
-                elem = $(this.parentNode);
+                elem = elem.parent();
                 editor.hideInterface();
                 editor.disableInteraction();
                 editor.enableGroupInteraction(this.elem);
@@ -175,9 +175,10 @@ var List = Class({
                 return; // Something bad happened
             }
             var index = elem.index();
-            if (elem[0].group != undefined) {
-                elem[0].group.activeElem = index;
-                console.log("Selected elem. \"" + elem[0].group.elems[elem[0].group.activeElem].name + "\" from group \"" + elem[0].group.name + "\"");
+            if (group != undefined) {
+                group.activeElem = index;
+                console.log("Selected elem. \"" + group.elems[group.activeElem].name 
+                    + "\" from group \"" + group.name + "\"");
             }
             else {
                 console.log('Selected symbol art.');
@@ -192,8 +193,8 @@ var List = Class({
             let $headerName = $('<span>' + name + '</span>');
             header.append($headerName);
             groupFolder.append(header);
-            var list = $('<ul data-role="listview" data-divider-theme="b">');
-            list.css('margin-left', '1px');
+            let listview = $('<ul data-role="listview" data-divider-theme="b">');
+            listview.css('margin-left', '1px');
             var menuType = 'SubGroupMenu';
             header[0].group = group;
             header[0].elem = group.elems[group.activeElem];
@@ -204,9 +205,8 @@ var List = Class({
                 $(this).contextMenu();
             });
             // Show menu when #myDiv is clicked
-            header[0].list = this;
             header.on('click', function (e) {
-                this.list.changeSelectedElem(this.firstChild);
+                list.changeSelectedElem(this.firstChild);
             });
             groupFolder[0].isOpen = false;
             $(groupFolder).on('collapsibleexpand', function (e) {
@@ -217,8 +217,8 @@ var List = Class({
                 e.stopPropagation();
                 groupFolder[0].isOpen = false;
             });
-            groupFolder.append(list);
-            groupFolder[0].list = list;
+            groupFolder.append(listview);
+            groupFolder[0].list = listview;
             groupFolder[0].group = group;
             groupFolder[0].subGroup = subGroup;
 
@@ -227,7 +227,6 @@ var List = Class({
                 cursor: "move",
                 helper: function (e) {
                     let name = e.currentTarget.elem.name;
-                    let c0nt = $(e.currentTarget).contents();
                     return $("<div class='drag-ghost'>" + name + "</div>");
                 }
             }).droppable();
@@ -239,7 +238,7 @@ var List = Class({
             header.on("dragstart", function (event) {
                 event.stopPropagation();
                 $(this).addClass('dragging');
-                this.list.changeMovingElem(this);
+                list.changeMovingElem(this);
             });
             header.on("dragleave", function (event) {
                 event.preventDefault();
@@ -251,44 +250,7 @@ var List = Class({
                     event.preventDefault();
                     event.stopPropagation();
                 }
-
-                let movingElem = this.list.movingElem;
-                if (movingElem.tagName == 'H2') movingElem = movingElem.parentNode;
-
-                /* Check if moving upward or downward */
-                let src = $(movingElem), dest = $(this.parentNode);
-                src.addClass('layerCurrentlyMoving');
-                dest.addClass('layerCurrentlyMoving');
-                let $movingLayers = $('.layerCurrentlyMoving');
-                var isForwardMove = true;
-                if ($movingLayers[0] == dest[0]) isForwardMove = false;
-                src.removeClass('layerCurrentlyMoving');
-                dest.removeClass('layerCurrentlyMoving');
-
-                /* Get layer that will now occupy the position of the moved layer */
-                let currLayerInSrc;
-                if (movingElem.group == this.parentNode.group
-                    && !isForwardMove) currLayerInSrc = src.prev()[0];
-                else currLayerInSrc = src.next()[0];
-                // Check for exception where layer moved is the only layer in its group
-                let emptyGroupException = false;
-                if (currLayerInSrc === undefined) {
-                    // Get the parent folder and indicate that this is an exception
-                    currLayerInSrc = src.parent().parent().parent()[0];
-                    emptyGroupException = true;
-                }
-
-                let isForward = this.list.move(this.list.movingElem, this);
-                
-                // Save undoable action for move
-                historyManager.pushUndoAction('move', {
-                    'srcLayerID': movingElem.id,
-                    'currLayerInSrcID': currLayerInSrc.id,
-                    'destLayerID': this.parentNode.id,
-                    'isForward': isForward,
-                    'async': this.list.async,
-                    'emptyGroupException': emptyGroupException
-                });
+                list.moveSelectedElemTo(this);
             });
 
             // Function to recursively delete all quads in editor pertaining to the removed group
@@ -318,12 +280,11 @@ var List = Class({
             li[0].group = group;
             li[0].parentFolder = folder;
             li[0].elem = group.elems[group.activeElem];
-            li[0].list = this;
             $(li).mousedown(this.elemMousedownEvtHandler);
             li.click(this.elemMousedownEvtHandler);
             // Show menu when right clicked
             li.on('click', function (e) {
-                this.list.changeSelectedElem(this.firstChild);
+                list.changeSelectedElem(this.firstChild);
             });
             li.on("swiperight", function () {
                 $(this).contextMenu();
@@ -348,7 +309,7 @@ var List = Class({
             li.on("dragstart", function (event) {
                 event.stopPropagation();
                 $(this).addClass('dragging');
-                this.list.changeMovingElem(this);
+                list.changeMovingElem(this);
             });
             li.on("dragleave", function (event) {
                 event.preventDefault();
@@ -360,44 +321,7 @@ var List = Class({
                     event.preventDefault();
                     event.stopPropagation();
                 }
-
-                let movingElem = this.list.movingElem;
-                if (movingElem.tagName == 'H2') movingElem = movingElem.parentNode;
-
-                /* Check if moving upward or downward */
-                let src = $(movingElem), dest = $(this);
-                src.addClass('layerCurrentlyMoving');
-                dest.addClass('layerCurrentlyMoving');
-                let $movingLayers = $('.layerCurrentlyMoving');
-                var isForwardMove = true;
-                if ($movingLayers[0] == dest[0]) isForwardMove = false;
-                src.removeClass('layerCurrentlyMoving');
-                dest.removeClass('layerCurrentlyMoving');
-
-                /* Get layer that will now occupy the position of the moved layer */
-                let currLayerInSrc;
-                if (movingElem.group == this.group
-                    && !isForwardMove) currLayerInSrc = src.prev()[0];
-                else currLayerInSrc = src.next()[0];
-                // Check for exception where layer moved is the only layer in its group
-                let emptyGroupException = false;
-                if (currLayerInSrc === undefined) {
-                    // Get the parent folder and indicate that this is an exception
-                    currLayerInSrc = src.parent().parent().parent()[0];
-                    emptyGroupException = true;
-                }
-
-                let isForward = this.list.move(this.list.movingElem, this);
-
-                // Save undoable action for move
-                historyManager.pushUndoAction('move', {
-                    'srcLayerID': movingElem.id,
-                    'currLayerInSrcID': currLayerInSrc.id,
-                    'destLayerID': this.id,
-                    'isForward': isForward,
-                    'async': this.list.async,
-                    'emptyGroupException': emptyGroupException
-                });
+                list.moveSelectedElemTo(this);
             });
 
             return li;
@@ -506,10 +430,58 @@ var List = Class({
             }
         }, 100);
     },
+    moveSelectedElemTo: function (destElem) {
+        let movingSrcElem = list.movingElem;
+        if (movingSrcElem.tagName == 'H2') movingSrcElem = movingSrcElem.parentNode;
+        let movingDestElem = destElem;
+        if (movingDestElem.tagName == 'H2') movingDestElem = movingDestElem.parentNode;
+
+        /* Check if moving upward or downward */
+        let src = $(movingSrcElem), dest = $(movingDestElem);
+        src.addClass('layerCurrentlyMoving');
+        dest.addClass('layerCurrentlyMoving');
+        let $movingLayers = $('.layerCurrentlyMoving');
+        var isForwardMove = true;
+        if ($movingLayers[0] == dest[0]) isForwardMove = false;
+        src.removeClass('layerCurrentlyMoving');
+        dest.removeClass('layerCurrentlyMoving');
+
+        /* Get layer that will now occupy the position of the moved layer */
+        let currLayerInSrc;
+        if (list.movingElem.group == destElem.group
+            && !isForwardMove) currLayerInSrc = src.prev()[0];
+        else {
+            let nxtLayer = src.next();
+            if (nxtLayer.hasClass('drag-ghost'))
+                nxtLayer = nxtLayer.next();
+            currLayerInSrc = nxtLayer[0];
+        }
+        // Check for exception where layer moved is the only layer in its group
+        let emptyGroupException = false;
+        if (currLayerInSrc === undefined) {
+            // Get the parent folder and indicate that this is an exception
+            currLayerInSrc = src.parent().parent().parent()[0];
+            emptyGroupException = true;
+        }
+
+        let isForward = list.move(list.movingElem, destElem);
+
+        // Save undoable action for move
+        historyManager.pushUndoAction('move', {
+            'srcLayerID': movingSrcElem.id,
+            'currLayerInSrcID': currLayerInSrc.id,
+            'destLayerID': movingDestElem.id,
+            'isForward': isForward,
+            'async': list.async,
+            'emptyGroupException': emptyGroupException
+        });
+    },
     move: function (srcElem, destElem, noLog, isForwardMove) {
         if (!this.ready) return;
         if (!this.async.hasSynced
             || srcElem == destElem) return;
+        // Check if trying to nest a group somewhere inside itself
+        if (srcElem.elem.type == 'g' && $.contains(srcElem.parentNode, destElem)) return;
         var src;
 
         /* Select layers in editor to move */
