@@ -208,6 +208,7 @@ img {
 #layerctrl {
     position: relative;
     float: right;
+    z-index: 1;
 }
 
 white { color: white; }

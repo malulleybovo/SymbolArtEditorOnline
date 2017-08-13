@@ -196,6 +196,7 @@ function initUI() {
         editor.zoom = scale;
         editor.refreshLayerEditBox();
     }).on("panzoomstart", function (e, panzoom, event, touches) {
+        editorToolbar.enableTool('resetPan');
         panZoomActive = true;
     }).on("panzoomend", function () {
         panZoomActive = false;
@@ -227,6 +228,10 @@ function initUI() {
             list.async.hasSynced = true;
         }, 500);
     });
+    editorToolbar.addTool('resetPan', 'fa fa-crosshairs', function () {
+        $('#canvascontainer').panzoom('reset');
+        editorToolbar.disableTool('resetPan');
+    });
     editorToolbar.addTool('hideUI', 'fa fa-eye-slash', function () {
         let editor = $('canvas')[0].editor;
         editor.disableInteraction();
@@ -236,7 +241,7 @@ function initUI() {
     editorToolbar.addMenuOptionToTool('sound', 'fa fa-th-large', function () {
         bgeManager.toggleBGEMenu();
     });
-    editorToolbar.addMenuOptionToTool('sound', 'fa fa-volume-up', function () {
+    editorToolbar.addMenuOptionToTool('sound', 'fa fa-play-circle-o', function () {
         $('#player')[0].play();
     });
     editorToolbar.addTool('save', 'fa fa-download', function () {
@@ -244,6 +249,7 @@ function initUI() {
         saveAs(blob, list.mainGroup.name + ".saml");
     });
     editorToolbar.setup(); // Ready the toolbar for use
+    editorToolbar.disableTool('resetPan');
     editorToolbar.disableTool('undo');
     editorToolbar.disableTool('redo');
 

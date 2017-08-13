@@ -21,7 +21,7 @@ var List = Class({
         });
 
         this.header = $('<div data-role="header" class="ui-header ui-bar-inherit">');
-        this.header.append('<h1 class="ui-title">' + headerName + '</h1>');
+        this.header.append('<h1 class="ui-title no-panning no-highlight cursor-default">' + headerName + '</h1>');
 
         this.container = $('<div data-role="main" class="ui-content">');
         this.page.append(this.header);
