@@ -191,9 +191,10 @@ img {
 #canvasctrl {
     float: left;
     min-width: 135px;
-    width: 20%;
+    width: 25%;
     height: 100%;
     border-right: 1px solid #2fa1d6;
+    opacity: 0.85;
 }
 #canvascontainer {
     background-color: black;
@@ -375,4 +376,15 @@ white { color: white; }
 .ui-button-icon-only .ui-icon[class*=" icon-"] {
     /* Bump it - jQuery UI is -8px */
     margin-left: -7px;
+}
+
+.elem-selected {
+    background-color: #f3f3f3 !important;
+    color: #2fa1d6 !important;
+}
+
+@media screen and (max-width: 720px) {
+    div.sidebar {
+        width: 100% !important;
+    }
 }

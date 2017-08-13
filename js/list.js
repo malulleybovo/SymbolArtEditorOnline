@@ -35,15 +35,29 @@ var List = Class({
         this.selectedElem = null;
         this.changeSelectedElem = function (elem) {
             if (elem.tagName == "A" || elem.tagName == "H2") {
-                if (this.selectedElem != null) $(this.selectedElem).css("filter", "invert(0%)");
-                $(elem).css("filter", "invert(100%)");
+                if (this.selectedElem != null) $(this.selectedElem).removeClass('elem-selected');
+                $(elem).addClass('elem-selected');
                 this.selectedElem = elem;
             }
         };
 
         // Create Toggle Button
         this.toggleButton = $('<i id="canvasctrlbutton" class="material-icons button layer1 no-highlight cursor-pointer no-panning">&#xE8EF;</i>');
+        this.toggleButton[0].hasScrolled = false;
+        this.toggleButton[0].prevScrollPos = 0;
         this.toggleButton.click(function () {
+            let $layerMan = $("#canvasctrl");
+            if (list.selectedElem && list.selectedElem != null
+                && $('#canvasctrl').css('left') != '0px') {
+                $layerMan.scrollTop(0);
+                list.selectedElem.scrollIntoView();
+                let newHeight = list.selectedElem.getBoundingClientRect().top;
+                let newScroll = $layerMan.scrollTop();
+                if (newHeight < window.innerHeight / 2)
+                    $layerMan.scrollTop(newScroll - window.innerHeight / 2);
+                else
+                    $layerMan.scrollTop(newScroll + window.innerHeight / 2);
+            }
             $(".sidebar.left").trigger("sidebar:toggle");
         });
         $(HTMLBody).append(this.toggleButton);
