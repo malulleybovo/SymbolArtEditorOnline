@@ -75,16 +75,29 @@ function initUI() {
     
     UI.landing.menu = $('<div class="landing-menu">');
 
+    let landingOnKeyPressCallback = function (e) {
+        if (e.keyCode == 10 || e.keyCode == 13) {
+            if (e.ctrlKey) // Ctrl + Enter = Open Symbol Art
+                $(UI.landing.menu.loadAppButton).click();
+            else // Enter = New Symbol Art
+                $(UI.landing.menu.newAppButton).click();
+        }
+    }
+    $(document).bind('keypress', landingOnKeyPressCallback);
     UI.landing.menu.newAppButton = $('<div>');
     UI.landing.menu.newAppButton.append($('<i class="fa fa-plus">'));
-    UI.landing.menu.newAppButton.click(function (e) {
-        list.setReady(true); // Ready the Layer Manager
-        UI.landing.animate({
-            opacity: 0
-        }, "slow", "linear", function () {
-            UI.landing.remove();
+    UI.landing.menu.newAppButton.click(
+        {
+            landingOnKeyPressCallback: landingOnKeyPressCallback
+        }, function (e) {
+            list.setReady(true); // Ready the Layer Manager
+            $(document).unbind('keypress', landingOnKeyPressCallback);
+            UI.landing.animate({
+                opacity: 0
+            }, "slow", "linear", function () {
+                UI.landing.remove();
+            });
         });
-    });
     UI.landing.menu.append(UI.landing.menu.newAppButton);
 
     UI.landing.menu.loadAppButton = $('<div>');
@@ -104,6 +117,7 @@ function initUI() {
         var reader = new FileReader();
         reader.onload = function (evt) {
             list.setReady(true); // Ready the Layer Manager
+            $(document).unbind('keypress', landingOnKeyPressCallback);
             var text = evt.target.result;
             samlLoader.load(text);
             console.clear();
