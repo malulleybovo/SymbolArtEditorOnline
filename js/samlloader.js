@@ -172,9 +172,9 @@ var SAMLLoader = Class({
                         value = value.match(/([0-9|a-f|A-F]{3,6})/)[0];
                         var color = hexToRgb(value);
                         color = {
-                            r: (color.r - 35 >= 0) ? color.r - 35 : 0,
-                            g: (color.g - 35 >= 0) ? color.g - 35 : 0,
-                            b: (color.b - 35 >= 0) ? color.b - 35 : 0,
+                            r: pseudoCubicSplineColor(color.r),
+                            g: pseudoCubicSplineColor(color.g),
+                            b: pseudoCubicSplineColor(color.b),
                         }
                         value = parseInt('0x' + rgbToHex(color));
                         if (value === undefined) {

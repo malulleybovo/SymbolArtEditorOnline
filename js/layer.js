@@ -52,9 +52,9 @@ var Layer = Class({
         var absVtx = this.getAbsVertices();
         var color = hexToRgb(Math.round(this.color).toString(16));
         color = {
-            r: (color.r + 35 < 255) ? color.r + 35 : 255,
-            g: (color.g + 35 < 255) ? color.g + 35 : 255,
-            b: (color.b + 35 < 255) ? color.b + 35 : 255,
+            r: revertPseudoCubicSplineColor(color.r),
+            g: revertPseudoCubicSplineColor(color.g),
+            b: revertPseudoCubicSplineColor(color.b),
         }
         var alphaVal = 0.121569;
         switch (this.alpha) {
