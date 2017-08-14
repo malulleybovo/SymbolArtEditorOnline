@@ -14,9 +14,10 @@ var LayerCtrl = Class({
         $('body').append(this.gui.domElement);
 
         this.functions = {
+            layerCtrl: this,
             trigger: function () { },
             move: function () {
-                let layer = this.layerCtrl.activeLayer;
+                let layer = this.object.layerCtrl.activeLayer;
                 var v = layer.vertices;
 
                 let lastAction = historyManager.undoList[historyManager.undoList.length - 1]
@@ -49,7 +50,7 @@ var LayerCtrl = Class({
                     case 3:
                         layer.y -= CANVAS_PIXEL_SCALE; break;
                 }
-                this.layerCtrl.functions.update(this.layerCtrl);
+                this.object.update(this.object.layerCtrl);
 
                 let newVals = {
                     vtces: layer.vertices.slice(0),
@@ -75,14 +76,14 @@ var LayerCtrl = Class({
                 }
             },
             horizFlip: function () {
-                let layer = this.layerCtrl.activeLayer;
+                let layer = this.object.layerCtrl.activeLayer;
                 let origVals = {
                     vtces: layer.vertices.slice(0),
                     x: layer.x,
                     y: layer.y
                 };
                 this.object.flip(0, layer.vertices);
-                this.object.update(this.layerCtrl);
+                this.object.update(this.object.layerCtrl);
                 historyManager.pushUndoAction('symbol_reshape', {
                     layer: layer,
                     origVals: origVals,
@@ -97,14 +98,14 @@ var LayerCtrl = Class({
                     layer.parent.elems.indexOf(layer));
             },
             vertFlip: function () {
-                let layer = this.layerCtrl.activeLayer;
+                let layer = this.object.layerCtrl.activeLayer;
                 let origVals = {
                     vtces: layer.vertices.slice(0),
                     x: layer.x,
                     y: layer.y
                 };
                 this.object.flip(1, layer.vertices);
-                this.object.update(this.layerCtrl);
+                this.object.update(this.object.layerCtrl);
                 historyManager.pushUndoAction('symbol_reshape', {
                     layer: layer,
                     origVals: origVals,
@@ -134,11 +135,11 @@ var LayerCtrl = Class({
             },
             diagStretchMore: function () {
                 this.object.diagStretch(this, CANVAS_PIXEL_SCALE);
-                this.object.update(this.layerCtrl);
+                this.object.update(this.object.layerCtrl);
             },
             diagStretchLess: function () {
                 this.object.diagStretch(this, -CANVAS_PIXEL_SCALE);
-                this.object.update(this.layerCtrl);
+                this.object.update(this.object.layerCtrl);
             },
             diagStretch: function (that, amount) {
                 var v1, v2, reshapeType;
@@ -206,11 +207,11 @@ var LayerCtrl = Class({
             },
             sideStretchMore: function () {
                 this.object.sideStretch(this, CANVAS_PIXEL_SCALE);
-                this.object.update(this.layerCtrl);
+                this.object.update(this.object.layerCtrl);
             },
             sideStretchLess: function () {
                 this.object.sideStretch(this, -CANVAS_PIXEL_SCALE);
-                this.object.update(this.layerCtrl);
+                this.object.update(this.object.layerCtrl);
             },
             sideStretch: function (that, amount) {
                 var arbiterV = 0;
@@ -509,10 +510,6 @@ var LayerCtrl = Class({
             .name('downward').onChange(this.functions.move);
         this.posYPlus.layerCtrl = this; this.posYPlus.motionType = 2;
 
-        this.scale = this.fineActions.addFolder('scale');
-        this.scaleX = this.scale.add(this.activeLayer, 'scaleX').min(1).step(0.1).listen();
-        this.scaleY = this.scale.add(this.activeLayer, 'scaleY').min(1).step(0.1).listen();
-
         this.vStretchFolder = this.fineActions.addFolder('diagonal stretch');
 
         this.vStretch1plus = this.vStretchFolder.add(this.functions, 'trigger')
@@ -599,8 +596,6 @@ var LayerCtrl = Class({
         this.sideShearDMinus = this.sideShearFolder.add(this.functions, 'trigger')
             .name('bottom leftward').onChange(this.functions.sideStretchMore);
         this.sideShearDMinus.layerCtrl = this; this.sideShearDMinus.sideNum = 7;
-
-        this.rotation = this.fineActions.add(this.activeLayer, 'rotation').min(0).step(0.1).listen();
         
         $(this.gui.domElement).addClass('fade');
         $('.sp-replacer').addClass('fade fadeOut');
@@ -608,18 +603,11 @@ var LayerCtrl = Class({
     update: function (layer) {
         this.activeLayer = layer;
         this.partselectmenu.update(this.activeLayer.part);
-        this.scaleX.object = this.activeLayer;
-        this.scaleY.object = this.activeLayer;
-        this.rotation.object = this.activeLayer;
         this.alpha.object.alpha = this.activeLayer.alpha;
 
         this.updateDisplay();
     },
     updateDisplay: function () {
-        this.part.updateDisplay();
-        this.scaleX.updateDisplay();
-        this.scaleY.updateDisplay();
-        this.rotation.updateDisplay();
         this.alpha.updateDisplay();
     },
     hide: function () {
