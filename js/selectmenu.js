@@ -59,15 +59,15 @@
         var menu = SelectMenu.menus[menuIndex] || SelectMenu.activeMenu;
         if (menu.options.length <= num) return -1;
         if (menu.selectedOption != null) {
-            menu.selectedOption.removeClass('img-highlight').addClass('img-no-highlight');
+            menu.selectedOption.removeClass('img-highlight');
         }
         menu.selectedOption = menu.options[num];
-        menu.selectedOption.removeClass('img-no-highlight').addClass('img-highlight');
+        menu.selectedOption.addClass('img-highlight');
         return 0;
     },
     addIconOption: function (url, handler, addonProperties) {
         url = url || "https://image.flaticon.com/teams/1-freepik.jpg";
-        var newOption = $('<img src="' + url + '" style="width: 24px; height: 24px;" class="img-no-highlight ui-li-thumb">');
+        var newOption = $('<img src="' + url + '" style="width: 24px; height: 24px;" class="img-base ui-li-thumb">');
         newOption[0].handler = handler || function () { }; // specific function/action for a given option
         newOption[0].index = SelectMenu.activeMenu.options.length;
 
@@ -84,10 +84,10 @@
             var menu = SelectMenu.activeMenu;
             var prevSelected = menu.selectedOption;
             if (prevSelected) {
-                prevSelected.removeClass('img-highlight').addClass('img-no-highlight');
+                prevSelected.removeClass('img-highlight');
             }
             var option = $(this);
-            option.removeClass('img-no-highlight').addClass('img-highlight');
+            option.addClass('img-highlight');
             menu.selectedOption = option;
             option[0].handler(); // Trigger option-specific function
         });

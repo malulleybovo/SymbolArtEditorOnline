@@ -369,17 +369,35 @@ function initUI() {
         .registerUndoAction('symbol_change',
         function (ctx) { // UNDO symbol_partchange
             ctx.layer.part = ctx.prevPartNum;
+            ctx.previewImg.src = partsInfo.path
+                + partsInfo.dataArray[ctx.prevPartNum]
+                + partsInfo.imgType;
+            if (ctx.layer == list.selectedElem.parentNode.elem) {
+                let selectmenu = $('#sidenav')[0].selectmenu;
+                if (selectmenu.isMenuActive(0)) {
+                    selectmenu.setSelectedOption(ctx.prevPartNum, 0);
+                }
+            }
             let editor = $('canvas')[0].editor;
             editor.updateLayer(ctx.layer);
             editor.render();
         },
         function (ctx) { // REDO symbol_partchange
             ctx.layer.part = ctx.newPartNum;
+            ctx.previewImg.src = partsInfo.path
+                + partsInfo.dataArray[ctx.newPartNum]
+                + partsInfo.imgType;
+            if (ctx.layer == list.selectedElem.parentNode.elem) {
+                let selectmenu = $('#sidenav')[0].selectmenu;
+                if (selectmenu.isMenuActive(0)) {
+                    selectmenu.setSelectedOption(ctx.newPartNum, 0);
+                }
+            }
             let editor = $('canvas')[0].editor;
             editor.updateLayer(ctx.layer);
             editor.render();
         },
-        ['layer', 'prevPartNum', 'newPartNum']);
+        ['layer', 'previewImg', 'prevPartNum', 'newPartNum']);
     historyManager
         .registerUndoAction('symbol_move',
         function (ctx) { // UNDO symbol_move

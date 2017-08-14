@@ -289,8 +289,10 @@ var List = Class({
             if (forcedID === undefined) groupID++;
             let $liATag = $('<a data-mini="true" data-role="button" data-transition="pop" style="text-shadow:none;">');
             let $liName = $('<span>' + name + '</span>');
+            let $liImg = $('<img class="elem-symbol-preview">');
             li.append($liATag);
             $liATag.append($liName);
+            $liATag.append($liImg);
             li[0].group = group;
             li[0].parentFolder = folder;
             li[0].elem = group.elems[group.activeElem];
@@ -702,6 +704,7 @@ var List = Class({
 
         var layer = subGroup.addLayer(name);
         var li = this.createLayerNode(name, subGroup, folder, forcedID);
+        li.children().find('img')[0].src = partsInfo.path + partsInfo.dataArray[layer.part] + partsInfo.imgType;
         if (parentNode.firstChild.children.length == 0) {
             $(parentNode.firstChild).append(li);
         }
@@ -750,6 +753,7 @@ var List = Class({
 
         var layer = subGroup.addLayerAtEnd(name);
         var li = this.createLayerNode(name, subGroup, folder, forcedID);
+        li.children().find('img')[0].src = partsInfo.path + partsInfo.dataArray[layer.part] + partsInfo.imgType;
         $(parentNode.firstChild).append(li);
 
         $(folder).trigger('create');

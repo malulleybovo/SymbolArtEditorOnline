@@ -69,6 +69,8 @@ var SAMLLoader = Class({
         this.editor.render();
         this.editor.hideInterface();
 
+        $(mainFolder).children(':first').click().click();
+
         return isValid;
     },
     setupElem: function (node, tag, type) {
@@ -86,11 +88,11 @@ var SAMLLoader = Class({
                         // Valid Info
                         if (type == 'layer') {
                             node.elem.name = value;
-                            node.firstChild.innerText = value;
+                            $(node).find('span:first').text(value); // Update name of elem in node
                         }
                         else if (type == 'g' || type == 'sa') {
                             node.firstChild.elem.name = value;
-                            node.firstChild.firstChild.innerText = value;
+                            $(node).find('span:first').text(value); // Update name of elem in node
                         }
                     }
                     break;
@@ -141,6 +143,8 @@ var SAMLLoader = Class({
                             break;
                         }
                         node.elem.part = partIdx;
+                        $(node).find('img')[0].src = partsInfo.path
+                            + partsInfo.dataArray[partIdx] + partsInfo.imgType;
                     }
                     break;
                 case 'color':

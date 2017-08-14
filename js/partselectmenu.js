@@ -12,9 +12,11 @@
             this.selectmenu.addIconOption(partsInfo.path + partsInfo.dataArray[i] + partsInfo.imgType, function () {
                 // TODO - assign selected part to the layer being editted
                 var layer = this.layerCtrl.activeLayer;
+                let $liImgTag = $(list.selectedElem).find('img');
 
                 historyManager.pushUndoAction('symbol_change', {
                     'layer': layer,
+                    'previewImg': $liImgTag[0],
                     'prevPartNum': layer.part,
                     'newPartNum': this.index
                 });
@@ -23,6 +25,8 @@
                     layer.parent.elems.indexOf(layer));
 
                 layer.part = this.index;
+
+                $liImgTag[0].src = partsInfo.path + partsInfo.dataArray[layer.part] + partsInfo.imgType;
 
                 let editor = $('canvas')[0].editor;
                 editor.updateLayer(layer);

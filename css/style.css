@@ -316,9 +316,10 @@ white { color: white; }
 }
 
 .img-highlight {
+    margin: 0px !important;
     border: 2px solid #02baf2;
 }
-.img-no-highlight {
+.img-base {
     margin: 2px;
 }
 
@@ -381,6 +382,15 @@ white { color: white; }
 .elem-selected {
     background-color: #f3f3f3 !important;
     color: #2fa1d6 !important;
+}
+
+.elem-symbol-preview {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    top: 50%;
+    right: 20px;
+    transform: translate(0%, -50%);
 }
 
 @media screen and (max-width: 720px) {
