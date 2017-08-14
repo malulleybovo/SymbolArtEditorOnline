@@ -160,7 +160,8 @@ var SAMLLoader = Class({
                                 '%cSAML Loader (%O):%c Layer/group element %O uses an invalid symbol number "%i".'
                                 + ' Using default symbol (symbol number 0).',
                                 'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value);
-                            break; // Keep default
+                            // Set default blank image
+                            partIdx = partsInfo.dataArray.indexOf((1000).toString());
                         }
                         node.elem.part = partIdx;
                         $(node).find('img')[0].src = partsInfo.path
