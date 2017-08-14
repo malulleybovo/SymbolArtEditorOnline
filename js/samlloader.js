@@ -17,6 +17,10 @@ var SAMLLoader = Class({
      * @returns {void}
      */
     load: function (SAMLText) {
+        // Temporarily disable normal logging for loading purposes
+        let savedConsoleLogCallback = console.log;
+        console.log = function () { }
+
         // TODO
         var xmlTags = SAMLText.match(/<\?xml([ ]+[A-Z|a-z][A-Z|a-z|0-9|_]*[A-Z|a-z|0-9]*="[^"|\n]+")*[ ]*\?>/g);
         if (xmlTags == null || xmlTags.length <= 0) {
@@ -71,6 +75,8 @@ var SAMLLoader = Class({
 
         $(mainFolder).children(':first').click().click();
 
+        // Restore normal logging functionality
+        console.log = savedConsoleLogCallback;
         return isValid;
     },
     setupElem: function (node, tag, type) {
@@ -84,16 +90,20 @@ var SAMLLoader = Class({
 
             switch (key) {
                 case 'name':
-                    if (true) {
-                        // Valid Info
-                        if (type == 'layer') {
-                            node.elem.name = value;
-                            $(node).find('span:first').text(value); // Update name of elem in node
-                        }
-                        else if (type == 'g' || type == 'sa') {
-                            node.firstChild.elem.name = value;
-                            $(node).find('span:first').text(value); // Update name of elem in node
-                        }
+                    if (!LAYER_NAME_REGEX.test(value)) {
+                        console.warn(
+                            '%cSAML Loader (%O):%c Layer/group element %O contains an invalid name.'
+                            + ' Please rename it soon.',
+                            'color: #a6cd94', this, 'color: #d5d5d5', node.elem);
+                    }
+                    // Use Valid or Invalid Info (wont affect much)
+                    if (type == 'layer') {
+                        node.elem.name = value;
+                        $(node).find('span:first').text(value); // Update name of elem in node
+                    }
+                    else if (type == 'g' || type == 'sa') {
+                        node.firstChild.elem.name = value;
+                        $(node).find('span:first').text(value); // Update name of elem in node
                     }
                     break;
                 case 'visible':
@@ -128,9 +138,15 @@ var SAMLLoader = Class({
                     if (type == 'sa') {
                         value = parseInt(value);
                         if (value === undefined || value < 0 || value >= $('#player')[0].bges.length) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Symbol Art uses an invalid sound effect (BGE "%i").'
+                                + ' Setting to default BGE.',
+                                'color: #a6cd94', this, 'color: #d5d5d5', value);
                             value = 0;
                         }
-                        // TODO - implement setting bge of application after deciding where this info is stored
+                        let bgeMan = $('#player')[0].manager.bgeselect;
+                        bgeMan.setActiveBGE(value);
+                        bgeMan.selectmenu.setSelectedOption(value, 1);
                     }
                     break;
                 case 'type':
@@ -140,7 +156,11 @@ var SAMLLoader = Class({
                         var partIdx = partsInfo.dataArray.indexOf((value + 1).toString());
                         if (value === undefined || !this.editor.parts[partIdx]) {
                             // Invalid Input
-                            break;
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O uses an invalid symbol number "%i".'
+                                + ' Using default symbol (symbol number 0).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value);
+                            break; // Keep default
                         }
                         node.elem.part = partIdx;
                         $(node).find('img')[0].src = partsInfo.path
@@ -169,6 +189,10 @@ var SAMLLoader = Class({
                         value = parseFloat(value);
                         if (value === undefined) {
                             // Invalid Input
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid transparency value "%i".'
+                                + ' Using default value (1).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value);
                             break;
                         }
 
@@ -189,6 +213,10 @@ var SAMLLoader = Class({
                         value = parseInt(value);
                         if (value === undefined) {
                             // Invalid Input
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid top-left vertex X value "%i".'
+                                + ' Using default value (%i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[0]);
                             break;
                         }
                         rawVtces[0] = (value) * CANVAS_PIXEL_SCALE;
@@ -199,6 +227,10 @@ var SAMLLoader = Class({
                         value = parseInt(value);
                         if (value === undefined) {
                             // Invalid Input
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid top-left vertex Y value "%i".'
+                                + ' Using default value (%i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[1]);
                             break;
                         }
                         rawVtces[1] = (value) * CANVAS_PIXEL_SCALE;
@@ -209,6 +241,10 @@ var SAMLLoader = Class({
                         value = parseInt(value);
                         if (value === undefined) {
                             // Invalid Input
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid bottom-left vertex X value "%i".'
+                                + ' Using default value (%i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[4]);
                             break;
                         }
                         rawVtces[4] = (value) * CANVAS_PIXEL_SCALE;
@@ -219,6 +255,10 @@ var SAMLLoader = Class({
                         value = parseInt(value);
                         if (value === undefined) {
                             // Invalid Input
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid bottom-left vertex Y value "%i".'
+                                + ' Using default value (%i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[5]);
                             break;
                         }
                         rawVtces[5] = (value) * CANVAS_PIXEL_SCALE;
@@ -229,6 +269,10 @@ var SAMLLoader = Class({
                         value = parseInt(value);
                         if (value === undefined) {
                             // Invalid Input
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid top-right vertex X value "%i".'
+                                + ' Using default value (%i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[2]);
                             break;
                         }
                         rawVtces[2] = (value) * CANVAS_PIXEL_SCALE;
@@ -239,6 +283,10 @@ var SAMLLoader = Class({
                         value = parseInt(value);
                         if (value === undefined) {
                             // Invalid Input
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid top-right vertex Y value "%i".'
+                                + ' Using default value (%i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[3]);
                             break;
                         }
                         rawVtces[3] = (value) * CANVAS_PIXEL_SCALE;
@@ -249,6 +297,10 @@ var SAMLLoader = Class({
                         value = parseInt(value);
                         if (value === undefined) {
                             // Invalid Input
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid bottom-right vertex X value "%i".'
+                                + ' Using default value (%i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[6]);
                             break;
                         }
                         rawVtces[6] = (value) * CANVAS_PIXEL_SCALE;
@@ -259,6 +311,10 @@ var SAMLLoader = Class({
                         value = parseInt(value);
                         if (value === undefined) {
                             // Invalid Input
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid bottom-right vertex Y value "%i".'
+                                + ' Using default value (%i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[7]);
                             break;
                         }
                         rawVtces[7] = (value) * CANVAS_PIXEL_SCALE;
@@ -275,12 +331,26 @@ var SAMLLoader = Class({
                 node.elem.vertices[i] = rawVtces[i] - x;
                 node.elem.vertices[i + 1] = rawVtces[i + 1] - y;
             }
+            if (!isValidQuad(node.elem.vertices)) {
+                console.warn(
+                    '%cSAML Loader (%O):%c Layer/group element %O has an invalid shape "%O"'
+                    + ' because it is not a parallelogram. '
+                    + 'Top/bottom sides OR left/right sides are not equal in length.',
+                    'color: #a6cd94', this, 'color: #d5d5d5', node.elem, rawVtces);
+            }
         }
         if (type == 'layer') {
             this.editor.updateLayer(node.elem);
             this.editor.disableInteraction(node.elem);
         }
 
+        function isValidQuad (v) {
+            // Valid only if top/botom AND left/right sides are equal in length
+            return (
+                v[0] == -v[6] && v[1] == -v[7]
+                && v[2] == -v[4] && v[3] == -v[5]
+                );
+        }
         function hexToRgb(hex) {
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? {

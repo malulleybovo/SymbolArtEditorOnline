@@ -1,5 +1,6 @@
 var groupID = 0;
 var layerID = 0;
+var LAYER_NAME_REGEX = /([\w'" -]|[^\x00-\x7F])+/;
 
 var List = Class({
     initialize: function (headerName, groupName, editorContainer) {
@@ -370,14 +371,14 @@ var List = Class({
                 input[0].prevNode = elem[0];
                 if (parent[0].elem.type == 'g') { parent.parent().collapsible("option", "collapsed", true); }
                 list.isRenamingLayer = true;
-                input.keypress(function (e) { // Update contents of layer/group
+                input.keydown(function (e) { // Update contents of layer/group
                     e.stopPropagation();
                     var elem = $(this);
                     var parent = elem.parent().parent();
                     if (parent[0].textbox) {
                         if (e.keyCode == 13) { // Enter Key
-                            let newName = elem.val();
-                            if (/^[a-z|A-Z|0-9].*[a-z|A-Z|0-9]$|^[a-z|A-Z|0-9]$/.test(newName)
+                            let newName = elem.val().trim();
+                            if (LAYER_NAME_REGEX.test(newName)
                                 && newName != parent[0].elem.name) { // Validade new name and check if it changed
                                 var prevElem = $(elem[0].prevNode); // Retrieve prev display DOM elem
                                 prevElem.children('span:first').text(newName); // Update name of elem in node
@@ -908,7 +909,8 @@ var List = Class({
     },
     toSAML: function () {
         if (!this.ready) return;
-        var saml = '<?xml version="1.0" encoding="utf-8"?>\n<sa name="' + this.mainGroup.name + '" visible="true" version="4" author="0" width="192" height="96" sound="0">';
+        var saml = '<?xml version="1.0" encoding="utf-8"?>\n<sa name="' + this.mainGroup.name
+            + '" visible="true" version="4" author="0" width="192" height="96" sound="' + $('#player')[0].manager.currBGE + '">';
         for (var i = 0; i < this.mainGroup.elems.length; i++) {
             var elem = this.mainGroup.elems[i];
             saml += '\n\r\t' + elem.toSAML(1); // for elem = group/layer
@@ -917,3 +919,7 @@ var List = Class({
         return saml;
     }
 });
+
+function alertError(msg) {
+
+}

@@ -120,7 +120,6 @@ function initUI() {
             $(document).unbind('keypress', landingOnKeyPressCallback);
             var text = evt.target.result;
             samlLoader.load(text);
-            console.clear();
             historyManager.clear();
             editorToolbar.disableTool('undo');
         }

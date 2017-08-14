@@ -1,6 +1,6 @@
 ﻿var BGESelectMenu = Class({
-    initialize: function () {
-        var defaultOpt = 3;
+    initialize: function (defaultNum) {
+        this.defaultOpt = defaultNum;
 
         // Initialize selectmenu
         this.selectmenu = new SelectMenu();
@@ -11,18 +11,20 @@
 
         // Setup options
         for (var i = 0; i < bges.length; i++) {
-            this.selectmenu.addIconOption('./images/sound_icon.png', function () {
-                // Audio source (BGE) changes to selected option
-                var p = $('#player')[0];
-                p.src = p.bges[this.index];
-                p.play(); // Play sample
-            });
+            this.selectmenu.addIconOption('./images/sound_icon.png', this.setActiveBGE);
         }
 
         // Set default audio source (BGE)
-        defaultOpt = (defaultOpt >= 0 && defaultOpt < bges.length) ? defaultOpt : 0;
-        this.selectmenu.setSelectedOption(defaultOpt);
-        player.src = player.bges[defaultOpt];
+        this.defaultOpt = (this.defaultOpt >= 0 && this.defaultOpt < bges.length) ? this.defaultOpt : 0;
+        this.selectmenu.setSelectedOption(this.defaultOpt);
+        player.src = player.bges[this.defaultOpt];
+    },
+    setActiveBGE: function (index) {
+        // Audio source (BGE) changes to selected option
+        let p = $('#player')[0];
+        p.src = p.bges[index];
+        p.manager.currBGE = index;
+        p.play(); // Play sample
     },
     toggle: function () {
         this.selectmenu.setActiveMenu(1);

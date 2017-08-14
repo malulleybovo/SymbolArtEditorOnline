@@ -89,7 +89,7 @@
             var option = $(this);
             option.addClass('img-highlight');
             menu.selectedOption = option;
-            option[0].handler(); // Trigger option-specific function
+            option[0].handler(option[0].index); // Trigger option-specific function
         });
         SelectMenu.activeMenu.options.push(newOption);
         SelectMenu.activeMenu.container.list.append(newOption);

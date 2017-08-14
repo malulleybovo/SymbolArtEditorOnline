@@ -16,10 +16,12 @@ var BGEManager = Class({
             'sound/Shyness.wav', // sound 11
             'sound/Decivise.wav' // sound 12
         ];
+        this.player[0].manager = this;
         $(HTMLBody).prepend(this.player);
+        this.currBGE = 3;
 
         // Initialize BGE Select Menu
-        this.bgeselect = new BGESelectMenu();
+        this.bgeselect = new BGESelectMenu(this.currBGE);
     },
     toggleBGEMenu: function () {
         this.bgeselect.toggle();
