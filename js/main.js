@@ -228,8 +228,11 @@ function initUI() {
         }, 500);
     });
     editorToolbar.addTool('resetPan', 'fa fa-crosshairs', function () {
-        $('#canvascontainer').panzoom('reset');
+        $('#canvascontainer').panzoom('reset', {
+            animate: false
+        });
         editorToolbar.disableTool('resetPan');
+        $('canvas')[0].editor.refreshLayerEditBox();
     });
     editorToolbar.addTool('hideUI', 'fa fa-eye-slash', function () {
         let editor = $('canvas')[0].editor;
