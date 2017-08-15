@@ -422,6 +422,33 @@ function initUI() {
         },
         ['layer', 'startX', 'startY', 'endX', 'endY']);
     historyManager
+        .registerUndoAction('symbol_groupmove',
+        function (ctx) { // UNDO symbol_groupmove
+            let editor = $('canvas')[0].editor;
+            for (var i = ctx.startIdx; i < ctx.endIdx; i++) {
+                if (!ctx.layers[i]) continue;
+                let layer = ctx.layers[i].layer;
+                layer.x = ctx.startX[i];
+                layer.y = ctx.startY[i];
+                editor.updateLayer(layer);
+            }
+            editor.render();
+            editor.refreshLayerEditBox();
+        },
+        function (ctx) { // REDO symbol_groupmove
+            let editor = $('canvas')[0].editor;
+            for (var i = ctx.startIdx; i < ctx.endIdx; i++) {
+                if (!ctx.layers[i]) continue;
+                let layer = ctx.layers[i].layer;
+                layer.x = ctx.endX[i];
+                layer.y = ctx.endY[i];
+                editor.updateLayer(layer);
+            }
+            editor.render();
+            editor.refreshLayerEditBox();
+        },
+        ['layers', 'startIdx', 'endIdx', 'startX', 'startY', 'endX', 'endY']);
+    historyManager
         .registerUndoAction('symbol_reshape',
         function (ctx) { // UNDO symbol_reshape
             ctx.layer.vertices = ctx.origVals.vtces.slice(0);

@@ -777,12 +777,20 @@ var Editor = Class({
                         var clickY = e.originalEvent.offsetY;
                         layer.x = this.origX[i] + roundPosition(clickX - this.origClickX);
                         layer.y = this.origY[i] + roundPosition(clickY - this.origClickY);
+                        if (!this.hasChangedGroupPos // Check to see if should push to history after done
+                            && (layer.x != this.origX[i] || layer.y != this.origY[i])) {
+                            this.hasChangedGroupPos = true;
+                        }
                     }
                     else if (ev instanceof TouchEvent) { // Mobile device touch event
                         var clickX = (ev.touches[0].pageX - ev.touches[0].target.offsetLeft);
                         var clickY = (ev.touches[0].pageY - ev.touches[0].target.offsetTop);
                         layer.x = this.origX[i] + roundPosition(clickX - this.origClickX);
                         layer.y = this.origY[i] + roundPosition(clickY - this.origClickY);
+                        if (!this.hasChangedGroupPos // Check to see if should push to history after done
+                            && (layer.x != this.origX[i] || layer.y != this.origY[i])) {
+                            this.hasChangedGroupPos = true;
+                        }
                     }
                     this.editor.updateLayer(layer);
                 }
@@ -790,6 +798,31 @@ var Editor = Class({
             }
         }).on('vmouseup', function (e) {
             this.mouseMoving = false;
+            if (this.hasChangedGroupPos) {
+                this.hasChangedGroupPos = undefined;
+                let endX = [];
+                let endY = [];
+                var layer;
+                for (var i = this.firstIndex; i < this.lastIndex; i++) {
+                    layer = this.editor.layers[i].layer;
+                    endX[i] = layer.x;
+                    endY[i] = layer.y;
+                }
+
+                historyManager.pushUndoAction('symbol_groupmove', {
+                    'layers': this.editor.layers,
+                    'startIdx': this.firstIndex,
+                    'endIdx': this.lastIndex,
+                    'startX': this.origX,
+                    'startY': this.origY,
+                    'endX': endX,
+                    'endY': endY
+                });
+                console.log('%cMoved Group of Symbols%c in group "%s".',
+                    'color: #2fa1d6', 'color: #f3f3f3', list.selectedElem.parentNode.elem.name);
+                this.endX = undefined;
+                this.endY = undefined;
+            }
         });
     },
     disableGroupInteraction: function () {
