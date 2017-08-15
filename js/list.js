@@ -66,7 +66,7 @@ var List = Class({
             if (e.ctrlKey && (e.key === 'z' || e.key === 'y')) {
                 e.preventDefault();
             }
-            if (list.isRenamingLayer || !list.ready) return;
+            if (list.renamingLayer || !list.ready) return;
             if (e.key === 'Enter') { // Enter
                $('#canvasctrlbutton').click();
             }
@@ -116,7 +116,7 @@ var List = Class({
             }
         }
         document.onkeyup = function (e) {
-            if (list.isRenamingLayer || !list.ready) return;
+            if (list.renamingLayer || !list.ready) return;
             if (e.keyCode == 32) { // Wraps up active element highlight
                 var canvas = $('canvas')[0];
                 if (canvas.isHighlightActive) {
@@ -214,7 +214,7 @@ var List = Class({
             header[0].group = group;
             header[0].elem = group.elems[group.activeElem];
             header[0].parentFolder = folder; // Get reference to collapsible
-            $(header).mousedown(this.elemMousedownEvtHandler);
+            //$(header).mousedown(this.elemMousedownEvtHandler);
             header.click(this.elemMousedownEvtHandler);
             header.on("swiperight", function () {
                 $(this).contextMenu();
@@ -297,7 +297,7 @@ var List = Class({
             li[0].group = group;
             li[0].parentFolder = folder;
             li[0].elem = group.elems[group.activeElem];
-            $(li).mousedown(this.elemMousedownEvtHandler);
+            //$(li).mousedown(this.elemMousedownEvtHandler);
             li.click(this.elemMousedownEvtHandler);
             // Show menu when right clicked
             li.on('click', function (e) {
@@ -370,7 +370,7 @@ var List = Class({
                 input[0].prevValue = parent[0].elem.name;
                 input[0].prevNode = elem[0];
                 if (parent[0].elem.type == 'g') { parent.parent().collapsible("option", "collapsed", true); }
-                list.isRenamingLayer = true;
+                list.renamingLayer = input;
                 input.keydown(function (e) { // Update contents of layer/group
                     e.stopPropagation();
                     var elem = $(this);
@@ -431,7 +431,7 @@ var List = Class({
                         elem.remove();
                         parent.trigger('create');
                     }
-                    list.isRenamingLayer = undefined;
+                    list.renamingLayer = undefined;
                 });
                 var disableClicks = function (e) {
                     e.stopPropagation();
@@ -814,7 +814,7 @@ var List = Class({
         var menuType = 'MainGroupMenu';
         header[0].elem = group;
         header[0].list = this;
-        header.mousedown(this.elemMousedownEvtHandler);
+        //header.mousedown(this.elemMousedownEvtHandler);
         header.click(this.elemMousedownEvtHandler);
         header.on("swiperight", function () {
             $(this).contextMenu();

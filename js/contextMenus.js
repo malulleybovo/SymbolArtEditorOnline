@@ -8,6 +8,7 @@ var CONTEXT_MENU_ICONS = {
 
 var contextMenuCallback = function (key, options, evt, selector) {
     selector = selector || this;
+    selector.click(); // Select the layer/group before editting
     switch (key) {
         case 'rename':
             list.rename(selector[0]);

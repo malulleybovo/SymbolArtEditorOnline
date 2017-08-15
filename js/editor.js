@@ -733,7 +733,7 @@ var Editor = Class({
 
         canvas[0].movingFolder = folder;
 
-        this.groupMoveMousedownHandler = function (e) {
+        let groupMoveMousedownHandler = function (e) {
             if (!panZoomActive
                 && $('canvas')[0].list.selectedElem.parentNode.elem.type == 'g') {
                 this.mouseMoving = true;
@@ -765,7 +765,7 @@ var Editor = Class({
                 }
             }
         }
-        this.groupMoveMousemoveHandler = function (e) {
+        let groupMoveMousemoveHandler = function (e) {
             if (!panZoomActive
                 && this.mouseMoving) {
                 if (this.firstIndex == -1) return;
@@ -798,7 +798,7 @@ var Editor = Class({
                 this.editor.render();
             }
         }
-        this.groupMoveMouseupHandler = function (e) {
+        let groupMoveMouseupHandler = function (e) {
             this.mouseMoving = false;
             if (this.hasChangedGroupPos) {
                 this.hasChangedGroupPos = undefined;
@@ -826,21 +826,18 @@ var Editor = Class({
                 this.endY = undefined;
             }
         }
-        canvas.bind('vmousedown', this.groupMoveMousedownHandler)
-            .bind('vmousemove', this.groupMoveMousemoveHandler)
-            .bind('vmouseup', this.groupMoveMouseupHandler);
+        canvas.bind('vmousedown.saGroupMousedown', groupMoveMousedownHandler)
+            .bind('vmousemove.saGroupMousemove', groupMoveMousemoveHandler)
+            .bind('vmouseup.saGroupMouseup', groupMoveMouseupHandler);
     },
     disableGroupInteraction: function () {
         let canvas = $('canvas');
 
         canvas[0].movingFolder = undefined;
 
-        canvas.unbind('vmousedown', this.groupMoveMousedownHandler)
-            .unbind('vmousemove', this.groupMoveMousemoveHandler)
-            .unbind('vmouseup', this.groupMoveMouseupHandler);
-        this.groupMoveMousedownHandler = undefined;
-        this.groupMoveMousemoveHandler = undefined;
-        this.groupMoveMouseupHandler = undefined;
+        canvas.unbind('vmousedown.saGroupMousedown')
+            .unbind('vmousemove.saGroupMousemove')
+            .unbind('vmouseup.saGroupMouseup');
     },
     hideInterface: function () {
         this.layerCtrl.hide();

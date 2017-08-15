@@ -168,6 +168,10 @@ function initUI() {
         /* Uncomment to hide side bar upon focusing on canvas */
         //$(".sidebar.left").trigger("sidebar:close");
         //$(UINodeList['Canvas Button']).removeClass('selected');
+        if (list.renamingLayer) {
+            // isRenamingLayer is either undefined or the <input> of the renaming element
+            $(list.renamingLayer).blur();
+        }
     });
     UINodeList['Canvas Container'].onwheel = function (e) {
         e.preventDefault();
