@@ -775,14 +775,14 @@ var Editor = Class({
                     if (ev instanceof MouseEvent) { // Desktop mouse event
                         var clickX = e.originalEvent.offsetX;
                         var clickY = e.originalEvent.offsetY;
-                        layer.x = roundPosition(this.origX[i] + (clickX - this.origClickX));
-                        layer.y = roundPosition(this.origY[i] + (clickY - this.origClickY));
+                        layer.x = this.origX[i] + roundPosition(clickX - this.origClickX);
+                        layer.y = this.origY[i] + roundPosition(clickY - this.origClickY);
                     }
                     else if (ev instanceof TouchEvent) { // Mobile device touch event
                         var clickX = (ev.touches[0].pageX - ev.touches[0].target.offsetLeft);
                         var clickY = (ev.touches[0].pageY - ev.touches[0].target.offsetTop);
-                        layer.x = roundPosition(this.origX[i] + ((clickX - this.origClickX) / this.editor.zoom));
-                        layer.y = roundPosition(this.origY[i] + ((clickY - this.origClickY) / this.editor.zoom));
+                        layer.x = this.origX[i] + roundPosition(clickX - this.origClickX);
+                        layer.y = this.origY[i] + roundPosition(clickY - this.origClickY);
                     }
                     this.editor.updateLayer(layer);
                 }
