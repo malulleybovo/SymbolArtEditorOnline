@@ -7,8 +7,10 @@ var Editor = Class({
         this.ZOOM_MAX = this.ZOOM_MIN + 12 * this.ZOOM_STEP; // = 4.5
         this.zoom = this.ZOOM_MIN + 2 * this.ZOOM_STEP; // = 1
         this.MIN_VTX_VARIATION = 2 * CANVAS_PIXEL_SCALE;
+        this.LAYER_HIGHLIGHT_FACTOR = 10.0;
         // Setting option for enabling assistance in doing purely vertical/horizontal changes in symbol
         this.disableSmallVtxChange = false;
+        this.highlightedLayers = null;
 
         this.list = list;
         this.mainGroup = list.mainGroup;
@@ -552,17 +554,26 @@ var Editor = Class({
                 this.x = this.origX + roundPosition(evtData.data.originalEvent.offsetX - this.origClickX);
                 this.y = this.origY + roundPosition(evtData.data.originalEvent.offsetY - this.origClickY);
                 this.editor.render();
+                if (this.editor.highlightedLayers != null)
+                    this.alpha /= this.editor.LAYER_HIGHLIGHT_FACTOR; // Void highlight just to update layer
                 this.layerData.layer.update(this);
+                if (this.editor.highlightedLayers != null)
+                    this.alpha *= this.editor.LAYER_HIGHLIGHT_FACTOR; // Restore highlight if necessary
                 this.editor.refreshLayerEditBox();
                 this.editor.layerCtrl.update(this.layerData.layer);
             }
         }).on('touchmove', function (evtData) {
+            // Check if moving the selected layer (only one layer active)
             if (!panZoomActive && this.isMoving) {
                 var newPosition = evtData.data.getLocalPosition(this.parent);
                 this.x = this.origX + roundPosition(newPosition.x - this.origClickX);
                 this.y = this.origY + roundPosition(newPosition.y - this.origClickY);
                 this.editor.render();
+                if (this.editor.highlightedLayers != null)
+                    this.alpha /= this.editor.LAYER_HIGHLIGHT_FACTOR; // Void highlight just to update layer
                 this.layerData.layer.update(this);
+                if (this.editor.highlightedLayers != null)
+                    this.alpha *= this.editor.LAYER_HIGHLIGHT_FACTOR; // Restore highlight if necessary
                 this.editor.refreshLayerEditBox();
                 this.editor.layerCtrl.update(this.layerData.layer);
             }
@@ -675,9 +686,9 @@ var Editor = Class({
         return -1;
     },
     updateLayer: function (layer) {
-        var i = findWithAttr(this.layers, 'layer', layer);
-        if (i == -1) return;
-        var quad = this.layers[i].quad;
+        var idx = findWithAttr(this.layers, 'layer', layer);
+        if (idx == -1) return;
+        var quad = this.layers[idx].quad;
         quad.texture = this.parts[layer.part];
         quad.tint = layer.color;
         quad.x = layer.x;
@@ -698,6 +709,10 @@ var Editor = Class({
             case 5: quad.alpha = 0.74902; break;
             case 6: quad.alpha = 0.87451; break;
             case 7: quad.alpha = 1; break;
+        }
+        if (this.highlightedLayers != null
+            && idx >= this.highlightedLayers[0] && idx < this.highlightedLayers[1]) {
+            quad.alpha *= this.LAYER_HIGHLIGHT_FACTOR;
         }
 
         function findWithAttr(array, attr, value) {
@@ -838,6 +853,33 @@ var Editor = Class({
         canvas.unbind('vmousedown.saGroupMousedown')
             .unbind('vmousemove.saGroupMousemove')
             .unbind('vmouseup.saGroupMouseup');
+    },
+    setHighlightedLayers: function (idx, optionalIdx) {
+        if (this.highlightedLayers != null) {
+            this.stopHighlightingLayers();
+        }
+        if (idx === undefined || typeof idx !== 'number'
+            || idx < 0 || idx >= this.layers.length) return;
+        let startIdx = idx;
+        let endIdx =
+            (optionalIdx !== undefined && typeof optionalIdx === 'number'
+            && optionalIdx > idx && optionalIdx <= this.layers.length) ?
+            optionalIdx : idx + 1; // Inclusive
+        this.highlightedLayers = [ startIdx, endIdx ];
+        this.stage.alpha = 1.0 / this.LAYER_HIGHLIGHT_FACTOR;
+        for (var i = startIdx; i < endIdx; i++) {
+            if (this.layers[i])
+                this.layers[i].quad.alpha *= this.LAYER_HIGHLIGHT_FACTOR;
+        }
+    },
+    stopHighlightingLayers: function () {
+        if (this.highlightedLayers == null) return;
+        this.stage.alpha = 1.0;
+        for (var i = this.highlightedLayers[0]; i < this.highlightedLayers[1]; i++) {
+            if (this.layers[i])
+                this.layers[i].quad.alpha /= this.LAYER_HIGHLIGHT_FACTOR;
+        }
+        this.highlightedLayers = null;
     },
     hideInterface: function () {
         this.layerCtrl.hide();

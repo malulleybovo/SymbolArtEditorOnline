@@ -36,6 +36,10 @@ var List = Class({
         this.selectedElem = null;
         this.changeSelectedElem = function (elem) {
             if (elem.tagName == "A" || elem.tagName == "H2") {
+                if (this.selectedElem != null && this.selectedElem != elem
+                    && this.selectedElem.parentNode.tagName == 'H2') {
+                    this.selectedElem.parentNode.parentNode.isFirstClick = true;
+                }
                 if (this.selectedElem != null) $(this.selectedElem).removeClass('elem-selected');
                 $(elem).addClass('elem-selected');
                 this.selectedElem = elem;
@@ -73,33 +77,23 @@ var List = Class({
             else if (e.key === 'Tab') {
                 e.preventDefault(); // Disable TAB
             }
-            else if (e.key == ' ') { // Triggers active element highlight
-                var canvas = $('canvas')[0];
-                if (canvas.isHighlightActive !== undefined) { // Have already triggered
+            else if (e.key == ' ') { // Space = Triggers active element highlight
+                let editor = $('canvas')[0].editor;
+                if (editor.highlightedLayers !== null) { // Have already triggered
                     return;
                 }
 
                 var elem = list.selectedElem.parentNode.elem;
-                list.editor.stage.alpha = 0.1;
                 if (elem.type == 'l') {
-                    var quad = list.editor.layers[list.editor.getLayerIndex(elem)].quad;
-                    canvas.quadOnTop = quad;
-                    quad.alpha += 10.0;
+                    editor.setHighlightedLayers(list.editor.getLayerIndex(elem));
                 }
                 else if (elem.type == 'g' && elem.elems.length > 0) {
-                    var lis = $(list.container).find('li');
-                    var lisInGroup = $(list.selectedElem.parentNode.parentNode).find('li');
-                    var firstIndex = lis.index(lisInGroup[0]);
-                    var lastIndex = firstIndex + lisInGroup.length;
-                    canvas.quadsOnTop = [];
-                    if (firstIndex == -1) return; // Group is empty
-                    for (var i = firstIndex; i < lastIndex; i++) {
-                        quad = list.editor.layers[i].quad;
-                        quad.alpha += 10.0;
-                        canvas.quadsOnTop.push(quad);
-                    }
+                    var $lis = $(list.container).find('li');
+                    var $lisInGroup = $(list.selectedElem.parentNode.parentNode).find('li');
+                    var firstIndex = $lis.index($lisInGroup[0]);
+                    var lastIndex = firstIndex + $lisInGroup.length;
+                    editor.setHighlightedLayers(firstIndex, lastIndex);
                 }
-                canvas.isHighlightActive = true;
                 list.editor.render();
             }
             else if (!e.ctrlKey) return;
@@ -117,25 +111,11 @@ var List = Class({
         }
         document.onkeyup = function (e) {
             if (list.renamingLayer || !list.ready) return;
-            if (e.keyCode == 32) { // Wraps up active element highlight
-                var canvas = $('canvas')[0];
-                if (canvas.isHighlightActive) {
-                    var elem = list.selectedElem.parentNode.elem;
-
-                    list.editor.stage.alpha = 1.0;
-                    if (elem.type == 'l') {
-                        canvas.quadOnTop.alpha -= 10.0;
-                    }
-                    else if (elem.type == 'g') {
-                        var quad;
-                        for (var i = canvas.quadsOnTop.length - 1; i >= 0; i--) {
-                            quad = canvas.quadsOnTop[i];
-                            canvas.quadsOnTop.pop();
-                            quad.alpha -= 10.0;
-                        }
-                    }
-                    canvas.isHighlightActive = undefined;
-                    list.editor.render();
+            if (e.keyCode == 32) { // Space = Wraps up active element highlight
+                let editor = $('canvas')[0].editor;
+                if (editor.highlightedLayers !== null) {
+                    editor.stopHighlightingLayers();
+                    editor.render();
                 }
             }
         }
@@ -174,6 +154,13 @@ var List = Class({
                     .spectrum('hide')
                     .spectrum('set', '#' + layerColor.toString(16));
 
+                if (editor.highlightedLayers != null) {
+                    var $lis = $(list.container).find('li');
+                    var firstIndex = $lis.index(elem[0]);
+                    editor.setHighlightedLayers(firstIndex);
+                    editor.render();
+                }
+
                 editor.showInterface();
                 editor.refreshLayerEditBox();
                 editor.disableGroupInteraction();
@@ -184,7 +171,15 @@ var List = Class({
                 editor.hideInterface();
                 editor.disableInteraction();
                 editor.enableGroupInteraction(this.elem);
-
+                
+                if (editor.highlightedLayers != null) {
+                    var $lis = $(list.container).find('li');
+                    var $lisInGroup = $(elem[0]).find('li');
+                    var firstIndex = $lis.index($lisInGroup[0]);
+                    var lastIndex = firstIndex + $lisInGroup.length;
+                    editor.setHighlightedLayers(firstIndex, lastIndex);
+                    editor.render();
+                }
             }
             else {
                 return; // Something bad happened
@@ -223,14 +218,18 @@ var List = Class({
             header.on('click', function (e) {
                 list.changeSelectedElem(this.firstChild);
             });
-            groupFolder[0].isOpen = false;
+            groupFolder[0].isFirstClick = true;
             $(groupFolder).on('collapsibleexpand', function (e) {
                 e.stopPropagation();
-                groupFolder[0].isOpen = true;
 
             }).on('collapsiblecollapse', function (e) {
                 e.stopPropagation();
-                groupFolder[0].isOpen = false;
+                if (groupFolder[0].isFirstClick) {
+                    $(this).children(':first').click();
+                    groupFolder[0].isFirstClick = false;
+                }
+                else
+                    groupFolder[0].isFirstClick = true;
             });
             groupFolder.append(listview);
             groupFolder[0].list = listview;
