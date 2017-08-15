@@ -733,7 +733,7 @@ var Editor = Class({
 
         canvas[0].movingFolder = folder;
 
-        canvas.unbind().on('vmousedown', function (e) {
+        this.groupMoveMousedownHandler = function (e) {
             if (!panZoomActive
                 && $('canvas')[0].list.selectedElem.parentNode.elem.type == 'g') {
                 this.mouseMoving = true;
@@ -764,7 +764,8 @@ var Editor = Class({
                     this.origY[i] = layer.y;
                 }
             }
-        }).on('vmousemove', function (e) {
+        }
+        this.groupMoveMousemoveHandler = function (e) {
             if (!panZoomActive
                 && this.mouseMoving) {
                 if (this.firstIndex == -1) return;
@@ -796,7 +797,8 @@ var Editor = Class({
                 }
                 this.editor.render();
             }
-        }).on('vmouseup', function (e) {
+        }
+        this.groupMoveMouseupHandler = function (e) {
             this.mouseMoving = false;
             if (this.hasChangedGroupPos) {
                 this.hasChangedGroupPos = undefined;
@@ -823,14 +825,22 @@ var Editor = Class({
                 this.endX = undefined;
                 this.endY = undefined;
             }
-        });
+        }
+        canvas.bind('vmousedown', this.groupMoveMousedownHandler)
+            .bind('vmousemove', this.groupMoveMousemoveHandler)
+            .bind('vmouseup', this.groupMoveMouseupHandler);
     },
     disableGroupInteraction: function () {
-        var canvas = $('canvas');
+        let canvas = $('canvas');
 
         canvas[0].movingFolder = undefined;
 
-        canvas.on('vmousedown', function () { }).on('vmousemove', function () { }).on('vmouseup', function () { });
+        canvas.unbind('vmousedown', this.groupMoveMousedownHandler)
+            .unbind('vmousemove', this.groupMoveMousemoveHandler)
+            .unbind('vmouseup', this.groupMoveMouseupHandler);
+        this.groupMoveMousedownHandler = undefined;
+        this.groupMoveMousemoveHandler = undefined;
+        this.groupMoveMouseupHandler = undefined;
     },
     hideInterface: function () {
         this.layerCtrl.hide();
