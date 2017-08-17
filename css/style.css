@@ -30,6 +30,10 @@ div.ui-content {
     padding: 12px !important;
 }
 
+a.ui-btn {
+    padding-right: 40px !important;
+}
+
 ul {
     margin-left: -5px !important;
 }
