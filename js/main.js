@@ -487,12 +487,16 @@ function initUI() {
             let editor = $('canvas')[0].editor;
             editor.updateLayer(ctx.layer);
             editor.render();
+            $('#colorSelector') // Update preview color on color picker
+                .spectrum('set', '#' + Math.round(ctx.layer.color).toString(16));
         },
         function (ctx) { // REDO symbol_recolor
             ctx.layer.color = ctx.newColor;
             let editor = $('canvas')[0].editor;
             editor.updateLayer(ctx.layer);
             editor.render();
+            $('#colorSelector') // Update preview color on color picker
+                .spectrum('set', '#' + Math.round(ctx.layer.color).toString(16));
         },
         ['layer', 'oldColor', 'newColor']);
         historyManager

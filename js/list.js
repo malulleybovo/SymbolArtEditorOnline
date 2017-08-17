@@ -135,7 +135,6 @@ var List = Class({
                 console.error('No editor attached to canvas. It may not have been correctly initialized./n/t' + err.message);
             }
             let elem = $(this);
-            editor.selectedLayer = null;
             let group = elem[0].group;
             if (this.elem.type == 'l') {
                 var myLayer = elem[0].elem;
@@ -146,11 +145,11 @@ var List = Class({
                     console.error('Selected layer was not found./n/t' + err.message);
                 }
 
+                $('#colorSelector').spectrum('hide');
                 editor.selectedLayer = myLayer;
                 editor.layerCtrl.update(myLayer);
                 var layerColor = Math.round(editor.selectedLayer.color);
                 $('#colorSelector')
-                    .spectrum('hide')
                     .spectrum('set', '#' + layerColor.toString(16));
 
                 if (editor.highlightedLayers != null) {
