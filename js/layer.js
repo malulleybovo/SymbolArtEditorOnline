@@ -60,16 +60,21 @@ var Layer = Class({
             g: revertPseudoCubicSplineColor(color.g),
             b: revertPseudoCubicSplineColor(color.b),
         }
-        var alphaVal = 0.121569;
+        // Convert alpha so it is compatible with the third-party
+        // .NET Symbol Art Editor desktop application (refer to README)
+        var alphaVal = 1 + 32 * (7 - this.alpha);
+        /* same as:
         switch (this.alpha) {
-            case 1: alphaVal = 0.247059; break;
-            case 2: alphaVal = 0.372549; break;
-            case 3: alphaVal = 0.498039; break;
-            case 4: alphaVal = 0.623529; break;
-            case 5: alphaVal = 0.74902; break;
-            case 6: alphaVal = 0.87451; break;
+            case 0: alphaVal = 225; break;
+            case 1: alphaVal = 193; break;
+            case 2: alphaVal = 161; break;
+            case 3: alphaVal = 129; break;
+            case 4: alphaVal = 97; break;
+            case 5: alphaVal = 65; break;
+            case 6: alphaVal = 33; break;
             case 7: alphaVal = 1; break;
-        }
+        }*/
+
         var saml = '<layer name="' + this.name
              // -1 due to SAML parts format starting from 240 and not 241
             + '" visible="true" type="' + (partsInfo.dataArray[this.part] - 1)

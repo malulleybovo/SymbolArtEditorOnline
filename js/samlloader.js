@@ -196,16 +196,24 @@ var SAMLLoader = Class({
                                 'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value);
                             break;
                         }
-
-                        node.elem.alpha = 0;
-                        switch (value) {
-                            case 0.247059: node.elem.alpha = 1; break;
-                            case 0.372549: node.elem.alpha = 2; break;
-                            case 0.498039: node.elem.alpha = 3; break;
-                            case 0.623529: node.elem.alpha = 4; break;
-                            case 0.74902: node.elem.alpha = 5; break;
-                            case 0.87451: node.elem.alpha = 6; break;
-                            case 1: node.elem.alpha = 7; break;
+                        node.elem.alpha = 0; // Default
+                        /* Convert alpha so it is compatible with this application */
+                        // WHEN file is in format output by THIS application
+                        if (value > 1) {
+                            node.elem.alpha = 7 - ((value - 1) / 32);
+                        }
+                        // WHEN file is in format output by the third-party
+                        // .NET Symbol Art Editor desktop application (refer to README)
+                        else {
+                            switch (value) {
+                                case 0.247059: node.elem.alpha = 1; break;
+                                case 0.372549: node.elem.alpha = 2; break;
+                                case 0.498039: node.elem.alpha = 3; break;
+                                case 0.623529: node.elem.alpha = 4; break;
+                                case 0.74902: node.elem.alpha = 5; break;
+                                case 0.87451: node.elem.alpha = 6; break;
+                                case 1: node.elem.alpha = 7; break;
+                            }
                         }
                     }
                     break;
