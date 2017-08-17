@@ -26,6 +26,14 @@ body {
     height: 20px !important;
 }
 
+div.ui-content {
+    padding: 12px !important;
+}
+
+ul {
+    margin-left: -5px !important;
+}
+
 .sa-color-picker-replacer {
     position: fixed;
     bottom: 0;
@@ -404,7 +412,7 @@ white { color: white; }
     color: #e61d5f !important;
 }
 
-@media screen and (max-width: 720px) {
+@media screen and (max-width: 540px) {
     div.sidebar {
         width: 100% !important;
         opacity: 0.7 !important;

@@ -2,10 +2,10 @@ var Editor = Class({
     initialize: function (parent, list) {
         EDITOR_SIZE = { x: 1920, y: 960 };
         CANVAS_PIXEL_SCALE = 3;
-        this.ZOOM_STEP = 0.35;
-        this.ZOOM_MIN = 0.3;
-        this.ZOOM_MAX = this.ZOOM_MIN + 12 * this.ZOOM_STEP; // = 4.5
-        this.zoom = this.ZOOM_MIN + 2 * this.ZOOM_STEP; // = 1
+        this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x); // = 1
+        this.ZOOM_STEP = this.zoom / 8;
+        this.ZOOM_MIN = this.zoom / 4;
+        this.ZOOM_MAX = this.zoom * 4; // = 4.5
         this.MIN_VTX_VARIATION = 2 * CANVAS_PIXEL_SCALE;
         this.LAYER_HIGHLIGHT_FACTOR = 10.0;
         // Setting option for enabling assistance in doing purely vertical/horizontal changes in symbol
@@ -442,7 +442,16 @@ var Editor = Class({
             }
         })
         $(window).resize(function () {
-            $('canvas')[0].editor.refreshLayerEditBox();
+            let editor = $('canvas')[0].editor;
+            let newScalingFactor = window.innerWidth / (0.5 * EDITOR_SIZE.x)
+            editor.ZOOM_STEP = newScalingFactor / 8;
+            editor.ZOOM_MIN = newScalingFactor / 4;
+            editor.ZOOM_MAX = newScalingFactor * 4;
+            if (editor.zoom < editor.ZOOM_MIN)
+                editor.zoom = editor.ZOOM_MIN;
+            else if (editor.zoom > editor.ZOOM_MAX)
+                editor.zoom = editor.ZOOM_MAX;
+            editor.updateSize();
         });
 
         // Initialize Layer Control
@@ -474,11 +483,18 @@ var Editor = Class({
         //Tell the `this.renderer` to `render` the `this.stage`
         this.renderer.render(this.stage);
     },
+    updateSize: function () {
+        let scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
+                + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
+        $('canvas').parent().css('transform', scale);
+
+        this.refreshLayerEditBox();
+    },
     incrSize: function () {
-        if (Math.round(this.zoom * 100) < this.ZOOM_MAX * 100) {
+        if (this.zoom + this.ZOOM_STEP <= this.ZOOM_MAX) {
             this.zoom += this.ZOOM_STEP;
 
-            var scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
+            let scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
                 + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
             $('canvas').parent().css('transform', scale);
 
@@ -486,10 +502,10 @@ var Editor = Class({
         }
     },
     decrSize: function () {
-        if (Math.round(this.zoom * 100) > this.ZOOM_MIN * 100) {
+        if (this.zoom - this.ZOOM_STEP >= this.ZOOM_MIN) {
             this.zoom -= this.ZOOM_STEP;
 
-            var scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
+            let scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
                 + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
             $('canvas').parent().css('transform', scale);
 

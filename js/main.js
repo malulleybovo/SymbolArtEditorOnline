@@ -150,6 +150,7 @@ function initUI() {
     UINodeList['Canvas'] = list.editor.renderer.view;
     $(UINodeList['Canvas Container']).append(UINodeList['Canvas Box']);
     $(UINodeList['Canvas Box']).append(UINodeList['Canvas']);
+    $('canvas')[0].editor.updateSize();
 
     UINodeList['Canvas'].onmousedown = function () {
         mousedown = true;

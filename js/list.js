@@ -203,7 +203,6 @@ var List = Class({
             header.append($headerName);
             groupFolder.append(header);
             let listview = $('<ul data-role="listview" data-divider-theme="b">');
-            listview.css('margin-left', '1px');
             var menuType = 'SubGroupMenu';
             header[0].group = group;
             header[0].elem = group.elems[group.activeElem];
