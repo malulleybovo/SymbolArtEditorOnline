@@ -1,3 +1,5 @@
+var layerCount = 0;
+
 var Layer = Class({
     initialize: function (name, part, color, x, y, scale, rotation, vertices, alpha) {
         this.type = 'l';
@@ -12,6 +14,8 @@ var Layer = Class({
         (rotation !== undefined) ? this.rotation = rotation : this.rotation = 0;
         (vertices !== undefined) ? this.vertices = vertices : this.vertices = [-halfSize, -halfSize, halfSize, -halfSize, -halfSize, halfSize, halfSize, halfSize];
         (alpha !== undefined) ? this.alpha = alpha : this.alpha = 7;
+        this.visible = true;
+        this.ID = ++layerCount;
     },
     update: function (quad) {
         this.color = quad.tint;

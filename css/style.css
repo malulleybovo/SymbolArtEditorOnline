@@ -393,6 +393,17 @@ white { color: white; }
     transform: translate(0%, -50%);
 }
 
+.symbol-hidden {
+}
+
+.symbol-hidden > a {
+    color: #e61d5f !important;
+}
+
+.symbol-hidden > h2 > a {
+    color: #e61d5f !important;
+}
+
 @media screen and (max-width: 720px) {
     div.sidebar {
         width: 100% !important;

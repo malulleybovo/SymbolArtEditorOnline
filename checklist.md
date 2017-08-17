@@ -18,15 +18,40 @@
 - [x] moving elem into a subgroup and removing it apparently removes element from its previous group
 - [x] deleting groups with nested subgroups is malfunctioning (does not delete some quads)
 - [x] alpha not implemented (bug detected on the third party .SAML to .SAR converter application that impedes itself from interpreting alpha values correctly. This application then chose to apply 0-7 scale on SAML alpha output)
+- [x] do not let user move a group inside itself
+- [x] rename context menu access key value should not be passed to input tag
+- [x] SHOULD NOT rename if name is unchanged
+- [x] PREVENT CTRL+S DEFAULT save .html
+- [x] disable undo/redo buttons after loading a valid .saml file
+- [x] moving last layer in group into another group causes bug (currLayerInSrc is incorrrect = undefined) when undoing
+- [x] missing symbol resources (not added yet)
+- [x] correct layer name validation (regex for all char but special ones) in list and samlloader
+- [x] saml load without name in span (span is from the new DOM design)
+- [x] click hideUI button after loading saml
+- [x] select mainfolder after loading saml
+- [x] undo/redo GROUP move (for moving group of symbols)
+- [x] update edit box position after resetting pan
+- [x] fix jagged movement of group of symbolls at first time moving a group
+- [x] select group, then right click layer doesnt select layer when it should (right click should select)
+- [x] rename input tag should blur on click out
+- [x] spacebar highlight on group, then move the group causes bug
+- [x] list of symbols not implemented
+- [x] list buttons do not display the symbol type preview
+- [x] include chosen BGE in SAML output
+- [x] layer color correction is not 100% correct (color in application does not always match color in game)
+- [x] only close group after second click while it is the selected element
+- [x] adding new layer in list view does not correctly highlight and select the newly created layer
+- [x] highlighting layer/group does not work correctly in various cases
+	- when adding, moving, removing, undo/redoing . . .
+- [x] hide/show layer/group
+	- disable all interaction when hidden
 
 #### TO BE FIXED
-- [ ] \(under dev - 80% done\) list of symbols not implemented
-- [ ] list buttons do not display the symbol type preview
-- [ ] include chosen BGE in SAML output
-- [ ] layer color correction is not 100% correct (color in application does not always match color in game)
-- [ ] group folder expand/collapse only on click of the + icon (rethink)
-- [ ] adding new layer in list view does not correctly highlight and select the newly created layer
-- [ ] click selected list view element again to unselect it
-- [ ] add option to output result to image file
-- [ ] hide vertex change buttons while user is moving a layer in editor
-- [ ] moving layers by group does not work for groups containing subgroups
+- [ ] add option to output result to image file (rethink)
+- [ ] lower opacity of symbol edit box while user is moving a layer in editor (low priority)
+- [ ] change color then select another layer while color picker is open causes newly selected layer to change color as well
+- [ ] comfirm exit when unsaved changes (medium priority)
+- [ ] check file format (high priority)
+- [ ] max symbol size (low priority)
+- [ ] group edit box (rethink)
+- [ ] actionManager class for managing calls to perform functions and push actions to history. Every class that calls to perform some action will use this class as medium instead.

@@ -85,14 +85,13 @@ var List = Class({
 
                 var elem = list.selectedElem.parentNode.elem;
                 if (elem.type == 'l') {
-                    editor.setHighlightedLayers(list.editor.getLayerIndex(elem));
+                    editor.setHighlightedLayers(elem);
                 }
                 else if (elem.type == 'g' && elem.elems.length > 0) {
-                    var $lis = $(list.container).find('li');
-                    var $lisInGroup = $(list.selectedElem.parentNode.parentNode).find('li');
-                    var firstIndex = $lis.index($lisInGroup[0]);
-                    var lastIndex = firstIndex + $lisInGroup.length;
-                    editor.setHighlightedLayers(firstIndex, lastIndex);
+                    let $lisInGroup = $(list.selectedElem.parentNode.parentNode).find('li');
+                    let length = $lisInGroup.length;
+                    let firstLayerElem = ($lisInGroup[0]) ? $lisInGroup[0].elem : undefined;
+                    editor.setHighlightedLayers(firstLayerElem, length);
                 }
                 list.editor.render();
             }
@@ -155,13 +154,12 @@ var List = Class({
                     .spectrum('set', '#' + layerColor.toString(16));
 
                 if (editor.highlightedLayers != null) {
-                    var $lis = $(list.container).find('li');
-                    var firstIndex = $lis.index(elem[0]);
-                    editor.setHighlightedLayers(firstIndex);
+                    editor.setHighlightedLayers(myLayer);
                     editor.render();
                 }
 
-                editor.showInterface();
+                editor.hideInterface(); // To hide if layer is hidden
+                editor.showInterface(); // To show if layer is visible
                 editor.refreshLayerEditBox();
                 editor.disableGroupInteraction();
                 editor.enableInteraction(myLayer);
@@ -170,14 +168,15 @@ var List = Class({
                 elem = elem.parent();
                 editor.hideInterface();
                 editor.disableInteraction();
-                editor.enableGroupInteraction(this.elem);
+                if (!elem.hasClass('symbol-hidden')) { // Interaction only when visible
+                    editor.enableGroupInteraction(this.elem);
+                }
                 
                 if (editor.highlightedLayers != null) {
-                    var $lis = $(list.container).find('li');
                     var $lisInGroup = $(elem[0]).find('li');
-                    var firstIndex = $lis.index($lisInGroup[0]);
-                    var lastIndex = firstIndex + $lisInGroup.length;
-                    editor.setHighlightedLayers(firstIndex, lastIndex);
+                    var length = $lisInGroup.length;
+                    let firstLayerElem = ($lisInGroup[0]) ? $lisInGroup[0].elem : undefined;
+                    editor.setHighlightedLayers(firstLayerElem, length);
                     editor.render();
                 }
             }
@@ -209,7 +208,6 @@ var List = Class({
             header[0].group = group;
             header[0].elem = group.elems[group.activeElem];
             header[0].parentFolder = folder; // Get reference to collapsible
-            //$(header).mousedown(this.elemMousedownEvtHandler);
             header.click(this.elemMousedownEvtHandler);
             header.on("swiperight", function () {
                 $(this).contextMenu();
@@ -221,7 +219,6 @@ var List = Class({
             groupFolder[0].isFirstClick = true;
             $(groupFolder).on('collapsibleexpand', function (e) {
                 e.stopPropagation();
-
             }).on('collapsiblecollapse', function (e) {
                 e.stopPropagation();
                 if (groupFolder[0].isFirstClick) {
@@ -296,7 +293,6 @@ var List = Class({
             li[0].group = group;
             li[0].parentFolder = folder;
             li[0].elem = group.elems[group.activeElem];
-            //$(li).mousedown(this.elemMousedownEvtHandler);
             li.click(this.elemMousedownEvtHandler);
             // Show menu when right clicked
             li.on('click', function (e) {
@@ -590,7 +586,9 @@ var List = Class({
             }
 
             editor.refreshDisplay();
+            editor.refreshHighlightedLayers();
             editor.render();
+            list.updateDOMGroupVisibility(list.mainFolder[0]);
 
             /* Logging */
             if (noLog === undefined) {
@@ -649,6 +647,7 @@ var List = Class({
         $(folder).trigger('create');
         
         groupFolder.children(":eq(0)").focusin().click();
+        this.updateDOMGroupVisibility(this.mainFolder[0]);
 
         if (forcedID === undefined) {
             // Save undoable action for add
@@ -679,6 +678,7 @@ var List = Class({
         $(folder).trigger('create');
 
         groupFolder.children(":eq(0)").focusin().click();
+        this.updateDOMGroupVisibility(this.mainFolder[0]);
 
         if (forcedID === undefined) {
             // Save undoable action for add
@@ -727,6 +727,7 @@ var List = Class({
 
         li.focusin();
         li.click();
+        this.updateDOMGroupVisibility(this.mainFolder[0]);
 
         if (forcedID === undefined) {
             // Save undoable action for add
@@ -765,6 +766,7 @@ var List = Class({
 
         li.focusin();
         li.click();
+        this.updateDOMGroupVisibility(this.mainFolder[0]);
 
         if (forcedID === undefined) {
             // Save undoable action for add
@@ -795,12 +797,112 @@ var List = Class({
 
             // Change editor focus to the folder of the removed branch
             let parentDOM = removedSubtree.parentDOM;
-            $(parentDOM.firstChild).click().click();
+            $(parentDOM.firstChild).click();
+            this.updateDOMGroupVisibility(this.mainFolder[0]);
 
             console.log('%cRemoved%c layer "%s" in group "%s" at position "%i".',
                 'color: #2fa1d6', 'color: #f3f3f3', removedSubtree.dataElem.name,
                 removedSubtree.dataGroup.name, removedSubtree.indexInGroup);
         }
+    },
+    /**
+     * Toggles the visibility of the layers/groups within domElem as well as 
+     * the domElem layer/group given
+     * @param {Number} domElem - the root element (H2 or LI) of changes
+     * @return {Boolean} the new visibility state
+     */
+    toggleElemVisibility: function (domElem) {
+        let $hideshowRoot = $(domElem);
+        if (domElem.tagName == 'H2') $hideshowRoot = $hideshowRoot.parent();
+        let editor = $('canvas')[0].editor;
+        editor.hideInterface(); // To hide if elem is hidden
+        let isVisibleNow = !(domElem.elem.visible); // Toggle visibility
+        // Toggle: if isVisibleNow is true, make it visible. Otherwise, hide it.
+        list.changeElemVisibility(isVisibleNow, domElem);
+        // Update visibility of all elements that may be impacted by the change made
+        this.updateDOMGroupVisibility(this.mainFolder[0]);
+
+        editor.showInterface(); // To show if elem is visible
+        let layer = domElem.elem;
+        let type = (isVisibleNow) ? 'Showed' : 'Hid';
+        console.log('%c%s%c layer/group "%s" in group "%s" at position "%i".',
+            'color: #2fa1d6', type, 'color: #f3f3f3', layer.name,
+            layer.parent.name, layer.parent.elems.indexOf(layer));
+        return isVisibleNow;
+    },
+    /**
+     * Changes the visibility of all layers* within domElem (layer or group) as  
+     * specified by bool parameter.
+     * @param {Boolean} bool - the new visibility state
+     * @param {Element} domElem - the root element (H2 or LI) of the changes
+     * @return {jQuery Selector} selector containing all changed LI Elements (layers)
+     */
+    changeElemVisibility: function (bool, domElem) {
+        if (bool === undefined || typeof bool !== 'boolean') return;
+        let editor = $('canvas')[0].editor;
+        let elem = domElem.elem; // Get data elem (layer or group)
+        let $changedElems;
+        if (elem.type == 'l') { // If a layer
+            let $lis = $(list.container).find('li'); // Find layers
+            let firstIndex = $lis.index(domElem);
+            editor.changeLayerVisibility(bool, firstIndex);
+            editor.render();
+            $changedElems = $(domElem);
+        }
+        else if (elem.type == 'g') { // If a group
+            let $lis = $(list.container).find('li'); // Find all layers
+            // Find layers in the specified group
+            let $lisInGroup = $(domElem.parentNode).find('li');
+            elem.visible = bool; // Update visibility of this group
+            if ($lisInGroup.length > 0) {
+                let firstIndex = $lis.index($lisInGroup[0]);
+                let lastIndex = firstIndex + $lisInGroup.length;
+                editor.changeLayerVisibility(bool, firstIndex, lastIndex);
+                editor.render();
+            }
+            $changedElems = $lisInGroup;
+        }
+        return $changedElems;
+    },
+    /**
+     * Updates the visibility state of every layer/group within domGroup as well 
+     * as the provided domElem. It does not modify layer visibility but it modifies 
+     * group visibility based on visibility state of its children. It applies CSS to 
+     * indicate all hidden layer/groups in the subtree with root domElem in layer manager.
+     * @param {Element} domElem - the root element (DIV) of the update
+     */
+    updateDOMGroupVisibility: function (domGroup) {
+        if (domGroup === undefined || !(domGroup instanceof Element)
+            || domGroup.tagName !== 'DIV' || domGroup.children.length < 2
+            || domGroup.children[0].tagName !== 'H2' || domGroup.children[0].elem === undefined)
+            return;
+        let group = domGroup.children[0].elem; // Get group data
+        if (group.elems === undefined) return; // Check if really is a group
+        // Get first child in group
+        if (domGroup.children[1].firstChild === undefined
+            || domGroup.children[1].firstChild.tagName != 'UL') return;
+        let $currDOMGroupChild = $(domGroup.children[1].firstChild.children).first();
+        // Only change visibility of this group if it contains children
+        if (group.elems.length > 0) group.visible = false;
+        // Update visibility of every descendant of this group
+        for (var i = 0; i < group.elems.length; i++) {
+            let currChildElem = group.elems[i];
+            if (currChildElem.type == 'l') { // If a layer
+                // Update visibility
+                $currDOMGroupChild.removeClass('symbol-hidden');
+                if (!currChildElem.visible) $currDOMGroupChild.addClass('symbol-hidden');
+            }
+            else if (currChildElem.type == 'g') { // If a group
+                // Recursive to solve for subgroup
+                this.updateDOMGroupVisibility($currDOMGroupChild[0]);
+            }
+            // Make group visible if it contains at least 1 visible child. Otherwise, hide it.
+            if (currChildElem.visible) group.visible = true;
+            $currDOMGroupChild = $currDOMGroupChild.next();
+        }
+        // Update visibility of this group
+        $(domGroup).removeClass('symbol-hidden');
+        if (!group.visible) $(domGroup).addClass('symbol-hidden');
     },
     setupGroupAsMain: function (group) {
         if (!this.ready) return;
@@ -809,11 +911,10 @@ var List = Class({
         let $headerName = $('<span>' + group.name + '</span>');
         header.append($headerName);
         groupFolder.append(header);
-        var list = $('<ul data-role="listview" data-divider-theme="b">');
+        var listview = $('<ul data-role="listview" data-divider-theme="b">');
         var menuType = 'MainGroupMenu';
         header[0].elem = group;
         header[0].list = this;
-        //header.mousedown(this.elemMousedownEvtHandler);
         header.click(this.elemMousedownEvtHandler);
         header.on("swiperight", function () {
             $(this).contextMenu();
@@ -821,18 +922,21 @@ var List = Class({
         header.on('click', function (e) {
             this.list.changeSelectedElem(this.firstChild);
         });
-        // Show menu when #myDiv is clicked
-        groupFolder[0].isOpen = false;
+        // Open menu when clicked, close when clicked twice while selected
+        groupFolder[0].isFirstClick = true;
         $(groupFolder).on('collapsibleexpand', function (e) {
             e.stopPropagation();
-            groupFolder[0].isOpen = true;
-
         }).on('collapsiblecollapse', function (e) {
             e.stopPropagation();
-            groupFolder[0].isOpen = false;
+            if (groupFolder[0].isFirstClick) {
+                $(this).children(':first').click();
+                groupFolder[0].isFirstClick = false;
+            }
+            else
+                groupFolder[0].isFirstClick = true;
         });
-        groupFolder.append(list);
-        groupFolder[0].list = list;
+        groupFolder.append(listview);
+        groupFolder[0].list = listview;
         return groupFolder;
     },
     extractSubtree: function (id) {

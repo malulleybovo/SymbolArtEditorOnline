@@ -514,17 +514,32 @@ var Editor = Class({
         return quad;
     },
     addLayer: function (layer) {
-        return this.addLayerAt(layer);
+        // Add layer at top
+        return this.addLayerAt(layer, 0);
     },
     addLayerAt: function (layer, index) {
+        // Check if valid index (there are length-1 layers in editor + SA Box)
+        if (index < 0 || index > this.stage.children.length - 1) {
+            console.error(
+                '%cEditor (%O):%c Could not add layer %O to editor because'
+                + 'provided index (%i) is invalid.',
+                'color: #a6cd94', this, 'color: #d5d5d5', layer, index);
+            return;
+        }
         var quad = this.createLayer(layer);
         var layerData = { layer: layer, quad: quad };
-        if (index === undefined || index == this.stage.children.length) {
-            this.stage.addChild(quad);
+        // Check if layer is at the bottom
+        if (index === undefined || index == this.stage.children.length - 1) {
+            // Add quad to bottom
+            this.stage.addChildAt(quad, 0);
+            // save layer data in top-down order (last index is the bottom)
             this.layers.push(layerData);
         }
         else {
+            // Add quad to specified position (index [length-2] = top, index [0] = bottom)
+            // (index [length-1] = SA Box) => should never change
             this.stage.addChildAt(quad, this.stage.children.length - 1 - index);
+            // save layer data in top-down order (index 0 is the topmost)
             this.layers.splice(index, 0, layerData);
         }
         this.updateLayer(layer);
@@ -668,10 +683,13 @@ var Editor = Class({
         }
     },
     removeLayerAtTop: function () {
-        this.stage.removeChildAt(0);
+        // Remove top layer in editor
+        // (index = length-2 because SA Box, the topmost layer, is at length-1)
+        this.stage.removeChildAt(this.stage.children.length - 2);
+        // Remove top layer data (at index 0 due to top-down ordering)
         var layerData = this.layers[0];
         this.layers.splice(0, 1);
-
+        // Hide because selected layer is not in editor anymore
         this.hideInterface();
 
         return layerData;
@@ -710,9 +728,13 @@ var Editor = Class({
             case 6: quad.alpha = 0.87451; break;
             case 7: quad.alpha = 1; break;
         }
-        if (this.highlightedLayers != null
-            && idx >= this.highlightedLayers[0] && idx < this.highlightedLayers[1]) {
-            quad.alpha *= this.LAYER_HIGHLIGHT_FACTOR;
+
+        if (this.highlightedLayers != null) {
+            let startIdx = this.getLayerIndex(this.highlightedLayers[0]);
+            if (startIdx >= 0 && startIdx < this.layers.length
+                && idx >= startIdx && idx < startIdx + this.highlightedLayers[1]) {
+                quad.alpha *= this.LAYER_HIGHLIGHT_FACTOR;
+            }
         }
 
         function findWithAttr(array, attr, value) {
@@ -726,13 +748,15 @@ var Editor = Class({
         }
     },
     enableInteraction: function (layer) {
-        var quad = null;
+        let foundQuad = false;
         for (var i = 0; i < this.layers.length; i++) {
-            if (quad == null && this.layers[i].layer == layer) {
+            if (!foundQuad && this.layers[i].layer == layer) {
+                // Make the selected interactive
                 this.layers[i].quad.interactive = true;
-                quad = this.layers[i].quad.interactive;
+                foundQuad = true; // First match found
             }
             else {
+                // Disable interaction for all other unselected layers
                 this.layers[i].quad.interactive = false;
             }
         }
@@ -747,17 +771,16 @@ var Editor = Class({
         var canvas = $('canvas');
 
         canvas[0].movingFolder = folder;
-
+        // Handlers for mousemove-based group motion
         let groupMoveMousedownHandler = function (e) {
             if (!panZoomActive
-                && $('canvas')[0].list.selectedElem.parentNode.elem.type == 'g') {
+                && list.selectedElem.parentNode.elem.type == 'g') {
                 this.mouseMoving = true;
 
                 this.canvas = $('canvas')[0];
-                this.list = this.canvas.list;
                 this.editor = this.canvas.editor;
-                this.lis = $(this.list.container).find('li');
-                this.lisInGroup = $(this.list.selectedElem.parentNode.parentNode).find('li');
+                this.lis = $(list.container).find('li');
+                this.lisInGroup = $(list.selectedElem.parentNode.parentNode).find('li');
                 this.firstIndex = this.lis.index(this.lisInGroup[0]);
                 this.lastIndex = this.firstIndex + this.lisInGroup.length;
 
@@ -854,29 +877,39 @@ var Editor = Class({
             .unbind('vmousemove.saGroupMousemove')
             .unbind('vmouseup.saGroupMouseup');
     },
-    setHighlightedLayers: function (idx, optionalIdx) {
+    setHighlightedLayers: function (startLayer, optionalLength) {
         if (this.highlightedLayers != null) {
             this.stopHighlightingLayers();
         }
-        if (idx === undefined || typeof idx !== 'number'
-            || idx < 0 || idx >= this.layers.length) return;
-        let startIdx = idx;
-        let endIdx =
-            (optionalIdx !== undefined && typeof optionalIdx === 'number'
-            && optionalIdx > idx && optionalIdx <= this.layers.length) ?
-            optionalIdx : idx + 1; // Inclusive
-        this.highlightedLayers = [ startIdx, endIdx ];
+        if (startLayer === undefined) return;
+        let length =
+            (optionalLength !== undefined && typeof optionalLength === 'number'
+            && optionalLength <= this.layers.length) ?
+            optionalLength : 1; // Inclusive
+        this.highlightedLayers = [startLayer, length];
         this.stage.alpha = 1.0 / this.LAYER_HIGHLIGHT_FACTOR;
-        for (var i = startIdx; i < endIdx; i++) {
+        let startIdx = this.getLayerIndex(startLayer);
+        for (var i = startIdx; i < startIdx + length; i++) {
             if (this.layers[i])
+                this.layers[i].quad.alpha *= this.LAYER_HIGHLIGHT_FACTOR;
+        }
+    },
+    refreshHighlightedLayers: function () {
+        if (this.highlightedLayers == null) return;
+        let startIdx = this.getLayerIndex(this.highlightedLayers[0]);
+        if (startIdx < 0 || startIdx >= this.layers.length) return;
+        for (var i = startIdx; i < startIdx + this.highlightedLayers[1]; i++) {
+            if (this.layers[i] && this.layers[i].quad.alpha <= 1)
                 this.layers[i].quad.alpha *= this.LAYER_HIGHLIGHT_FACTOR;
         }
     },
     stopHighlightingLayers: function () {
         if (this.highlightedLayers == null) return;
         this.stage.alpha = 1.0;
-        for (var i = this.highlightedLayers[0]; i < this.highlightedLayers[1]; i++) {
-            if (this.layers[i])
+        for (var i = 0; i < this.layers.length; i++) {
+            // If layer is highlighted, it will have a higher alpha value then 1
+            // in that case, reset its alpha value
+            if (this.layers[i].quad.alpha > 1)
                 this.layers[i].quad.alpha /= this.LAYER_HIGHLIGHT_FACTOR;
         }
         this.highlightedLayers = null;
@@ -895,6 +928,8 @@ var Editor = Class({
         this.editorBoxIcons.resize.hide();
     },
     showInterface: function () {
+        if (this.selectedLayer == null
+            || this.selectedLayer.visible == false) return;
         this.layerCtrl.show();
         this.editorBoxIcons.tl.show();
         this.editorBoxIcons.tr.show();
@@ -907,7 +942,24 @@ var Editor = Class({
         this.editorBoxIcons.rotation.show();
         this.editorBoxIcons.resize.show();
     },
+    changeLayerVisibility: function (bool, idx, optionalIdx) {
+        if (bool === undefined || typeof bool !== 'boolean'
+            || idx === undefined || typeof idx !== 'number'
+            || idx < 0 || idx >= this.layers.length) return;
+        let startIdx = idx;
+        let endIdx =
+            (optionalIdx !== undefined && typeof optionalIdx === 'number'
+            && optionalIdx > idx && optionalIdx <= this.layers.length) ?
+            optionalIdx : idx + 1; // Inclusive
+        for (var i = startIdx; i < endIdx; i++) {
+            if (this.layers[i])
+                this.layers[i].layer.visible = bool;
+                this.layers[i].quad.visible = bool;
+        }
+    },
     refreshLayerEditBox: function () {
+        if (this.selectedLayer == null
+            || this.selectedLayer.visible == false) return;
         if (this.editorBoxIcons.tl.is(':hidden')) return; // Ignore if UI is hidden
         var offset = $('canvas').offset();
         var basePosX = offset.left + this.zoom * this.selectedLayer.x;
@@ -937,6 +989,8 @@ var Editor = Class({
             .css('top', (basePosY + 17.5) + 'px');
     },
     refreshLayerEditBoxButton: function (index) {
+        if (this.selectedLayer == null
+            || this.selectedLayer.visible == false) return;
         var sel = {};
         sel.index = 2 * index;
         switch (index) {
@@ -973,17 +1027,25 @@ var Editor = Class({
         this.stage.removeChildren();
         this.layers = [];
 
-        refreshGroupDisplay(this.mainGroup, this);
+        // Add SA Box to top layer
         this.stage.addChild(this.SABox);
+        // Then add existing symbols below it
+        refreshGroupDisplay(this.mainGroup, this);
 
         function refreshGroupDisplay(currGroup, editor) {
+            // Add all layers inside group in bottom to top layer order
             for (var i = currGroup.elems.length - 1; i >= 0; i--) {
                 let elem = currGroup.elems[i];
-                if (elem.type == 'l') {
+                if (elem.type == 'l') { // If a layer
+                    // Add layer to the editor
+                    // (at bottom layer of editor because of for-loop ordering)
                     let layerData = editor.addLayer(elem);
-                    layerData.quad.interactive = false;
+                    // Match quad visibility with layer info
+                    layerData.quad.visible = elem.visible;
+                    layerData.quad.interactive = false; // Default interactiveness is false
                 }
-                else if (elem.type == 'g') {
+                else if (elem.type == 'g') { // If a group
+                    // Recursively add layers inside it
                     refreshGroupDisplay(elem, editor);
                 }
             }

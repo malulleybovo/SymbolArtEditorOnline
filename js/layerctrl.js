@@ -3,7 +3,7 @@ var LayerCtrl = Class({
         layerCtrlID = 'layerCtrl';
 
         this.editor = editor;
-        if (layer == undefined) layer = new Layer();
+        if (layer == undefined) layer = null;
         this.activeLayer = layer;
 
         this.gui = new dat.GUI({ autoPlace: false });

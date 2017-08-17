@@ -344,15 +344,17 @@ function initUI() {
         function (ctx) { // UNDO add
             ctx.subtree = list.extractSubtree(ctx.elemID);
             let parentDOM = ctx.subtree.parentDOM;
-            $(parentDOM.firstChild).click().click();
+            $(parentDOM.firstChild).click();
+            list.updateDOMGroupVisibility(list.mainFolder[0]);
         },
         function (ctx) { // REDO add
             list.insertSubtree(ctx.subtree);
             let elemDOM = ctx.subtree.subtreeDOM;
             if (elemDOM.tagName == 'DIV') // If Group, click header
-                $(elemDOM.firstChild).click().click();
+                $(elemDOM.firstChild).click();
             else // If Layer, click it
                 $(elemDOM).click();
+            list.updateDOMGroupVisibility(list.mainFolder[0]);
         },
         ['elemID']);
     historyManager
@@ -361,14 +363,16 @@ function initUI() {
             list.insertSubtree(ctx.subtree);
             let elemDOM = ctx.subtree.subtreeDOM;
             if (elemDOM.tagName == 'DIV') // If Group, click header
-                $(elemDOM.firstChild).click().click();
+                $(elemDOM.firstChild).click();
             else // If Layer, click it
                 $(elemDOM).click();
+            list.updateDOMGroupVisibility(list.mainFolder[0]);
         },
         function (ctx) { // REDO remove
             ctx.subtree = list.extractSubtree(ctx.elemID);
             let parentDOM = ctx.subtree.parentDOM;
-            $(parentDOM.firstChild).click().click();
+            $(parentDOM.firstChild).click();
+            list.updateDOMGroupVisibility(list.mainFolder[0]);
         },
         ['elemID', 'subtree']);
     historyManager

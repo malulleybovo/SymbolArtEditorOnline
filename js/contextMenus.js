@@ -3,6 +3,7 @@ var CONTEXT_MENU_ICONS = {
     'addlayer': 'fa-picture-o',
     'addgroup': 'fa-folder-o',
     'move': 'fa-unsorted',
+    'hideshow': 'fa-eye-slash',
     'remove': 'fa-trash-o'
 };
 
@@ -44,6 +45,9 @@ var contextMenuCallback = function (key, options, evt, selector) {
             break;
         case 'moveselectedhere':
             selector.trigger('drop');
+            break;
+        case 'hideshow':
+            list.toggleElemVisibility(selector[0]);
             break;
         case 'remove':
             let id = selector[0].id;
@@ -91,8 +95,10 @@ $(function () {
             "picktomove": { name: "6 Pick to Move", icon: CONTEXT_MENU_ICONS.move, accesskey: "6" },
             "moveselectedhere": { name: "7 Move Selected Here", icon: CONTEXT_MENU_ICONS.move, accesskey: "7" },
             "sep4": "---------",
+            "hideshow": { name: "8 Hide/Show", icon: CONTEXT_MENU_ICONS.hideshow, accesskey: "0" },
+            "sep5": "---------",
             "removal folder": {
-                "name": "8 Remove", accesskey: "8",
+                "name": "= Remove", accesskey: "=",
                 "items": {
                     "remove": { name: "Confirm" }
                 }, icon: CONTEXT_MENU_ICONS.remove
@@ -124,8 +130,10 @@ $(function () {
             "picktomove": { name: "8 Pick to Move", icon: CONTEXT_MENU_ICONS.move, accesskey: "8" },
             "moveselectedhere": { name: "9 Move Selected Here", icon: CONTEXT_MENU_ICONS.move, accesskey: "9" },
             "sep4": "---------",
+            "hideshow": { name: "0 Hide/Show", icon: CONTEXT_MENU_ICONS.hideshow, accesskey: "0" },
+            "sep5": "---------",
             "removal folder": {
-                "name": "0 Remove", accesskey: "0",
+                "name": "- Remove", accesskey: "-",
                 "items": {
                     "remove": { name: "Confirm" }
                 }, icon: CONTEXT_MENU_ICONS.remove

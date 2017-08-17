@@ -1,3 +1,5 @@
+var groupCount = 0;
+
 var Group = Class({
     initialize: function (name) {
         this.type = 'g';
@@ -5,6 +7,8 @@ var Group = Class({
         this.elems = [];
         this.activeElem = -1;
         this.parent = null;
+        this.visible = true;
+        this.ID = ++groupCount;
     },
     addSubGroup: function (name) {
         var newGroup = null;
