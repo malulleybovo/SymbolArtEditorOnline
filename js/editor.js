@@ -569,6 +569,7 @@ var Editor = Class({
                 this.origClickY = evtData.data.originalEvent.offsetY;
                 this.origX = this.x;
                 this.origY = this.y;
+                this.editor.hideLayerEditBox();
             }
         }).on('touchstart', function (evtData) {
             if (!panZoomActive && $('canvas')[0].editor.currBtnDown < 0) {
@@ -578,6 +579,7 @@ var Editor = Class({
                 this.origClickY = newPosition.y;
                 this.origX = this.x;
                 this.origY = this.y;
+                this.editor.hideLayerEditBox();
             }
         });
         quad.on('mousemove', function (evtData) {
@@ -590,7 +592,6 @@ var Editor = Class({
                 this.layerData.layer.update(this);
                 if (this.editor.highlightedLayers != null)
                     this.alpha *= this.editor.LAYER_HIGHLIGHT_FACTOR; // Restore highlight if necessary
-                this.editor.refreshLayerEditBox();
                 this.editor.layerCtrl.update(this.layerData.layer);
             }
         }).on('touchmove', function (evtData) {
@@ -605,7 +606,6 @@ var Editor = Class({
                 this.layerData.layer.update(this);
                 if (this.editor.highlightedLayers != null)
                     this.alpha *= this.editor.LAYER_HIGHLIGHT_FACTOR; // Restore highlight if necessary
-                this.editor.refreshLayerEditBox();
                 this.editor.layerCtrl.update(this.layerData.layer);
             }
         });
@@ -627,6 +627,8 @@ var Editor = Class({
                     this.origX, this.origY, layer.x, layer.y);
             }
 
+            this.editor.showLayerEditBox();
+            this.editor.refreshLayerEditBox();
             this.isMoving = false;
             delete this.origClickX;
             delete this.origClickY;
@@ -667,6 +669,8 @@ var Editor = Class({
                     layer.parent.elems.indexOf(layer));
             }
 
+            this.editor.showLayerEditBox();
+            this.editor.refreshLayerEditBox();
             this.isMoving = false;
             delete this.origClickX;
             delete this.origClickY;
@@ -932,31 +936,13 @@ var Editor = Class({
     },
     hideInterface: function () {
         this.layerCtrl.hide();
-        this.editorBoxIcons.tl.hide();
-        this.editorBoxIcons.tr.hide();
-        this.editorBoxIcons.bl.hide();
-        this.editorBoxIcons.br.hide();
-        this.editorBoxIcons.left.hide();
-        this.editorBoxIcons.up.hide();
-        this.editorBoxIcons.right.hide();
-        this.editorBoxIcons.down.hide();
-        this.editorBoxIcons.rotation.hide();
-        this.editorBoxIcons.resize.hide();
+        this.hideLayerEditBox();
     },
     showInterface: function () {
         if (this.selectedLayer == null
             || this.selectedLayer.visible == false) return;
         this.layerCtrl.show();
-        this.editorBoxIcons.tl.show();
-        this.editorBoxIcons.tr.show();
-        this.editorBoxIcons.bl.show();
-        this.editorBoxIcons.br.show();
-        this.editorBoxIcons.left.show();
-        this.editorBoxIcons.up.show();
-        this.editorBoxIcons.right.show();
-        this.editorBoxIcons.down.show();
-        this.editorBoxIcons.rotation.show();
-        this.editorBoxIcons.resize.show();
+        this.showLayerEditBox();
     },
     changeLayerVisibility: function (bool, idx, optionalIdx) {
         if (bool === undefined || typeof bool !== 'boolean'
@@ -972,6 +958,30 @@ var Editor = Class({
                 this.layers[i].layer.visible = bool;
                 this.layers[i].quad.visible = bool;
         }
+    },
+    hideLayerEditBox: function () {
+        this.editorBoxIcons.tl.hide();
+        this.editorBoxIcons.tr.hide();
+        this.editorBoxIcons.bl.hide();
+        this.editorBoxIcons.br.hide();
+        this.editorBoxIcons.left.hide();
+        this.editorBoxIcons.up.hide();
+        this.editorBoxIcons.right.hide();
+        this.editorBoxIcons.down.hide();
+        this.editorBoxIcons.rotation.hide();
+        this.editorBoxIcons.resize.hide();
+    },
+    showLayerEditBox: function () {
+        this.editorBoxIcons.tl.show();
+        this.editorBoxIcons.tr.show();
+        this.editorBoxIcons.bl.show();
+        this.editorBoxIcons.br.show();
+        this.editorBoxIcons.left.show();
+        this.editorBoxIcons.up.show();
+        this.editorBoxIcons.right.show();
+        this.editorBoxIcons.down.show();
+        this.editorBoxIcons.rotation.show();
+        this.editorBoxIcons.resize.show();
     },
     refreshLayerEditBox: function () {
         if (this.selectedLayer == null
