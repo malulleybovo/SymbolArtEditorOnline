@@ -4,6 +4,7 @@
  * @class SAMLLoader
  * @param {List} list The .SAML file to be parsed.
  */
+var isLoadingSAML = false;
 var SAMLLoader = Class({
     initialize: function (list) {
         // TODO
@@ -20,6 +21,7 @@ var SAMLLoader = Class({
         // Temporarily disable normal logging for loading purposes
         let savedConsoleLogCallback = console.log;
         console.log = function () { }
+        isLoadingSAML = true;
 
         // TODO
         var xmlTags = SAMLText.match(/<\?xml([ ]+[A-Z|a-z][A-Z|a-z|0-9|_]*[A-Z|a-z|0-9]*="[^"|\n]+")*[ ]*\?>/g);
@@ -28,7 +30,6 @@ var SAMLLoader = Class({
         }
         else {
             // Found an xml tag
-            // TODO
         }
 
         var mainFolder = this.list.container[0].firstChild;
@@ -72,9 +73,11 @@ var SAMLLoader = Class({
 
         this.editor.render();
         this.editor.hideInterface();
+        list.updateDOMGroupVisibility(list.mainFolder[0]);
 
-        $(mainFolder).children(':first').click().click();
+        $(mainFolder).children(':first').click();
 
+        isLoadingSAML = false;
         // Restore normal logging functionality
         console.log = savedConsoleLogCallback;
         return isValid;
@@ -108,30 +111,32 @@ var SAMLLoader = Class({
                     break;
                 case 'visible':
                     if (type == 'layer') {
-                        // TODO
+                        value = (value === "true") ? true : false;
+                        list.changeElemVisibility(value, node);
                     }
                     else if (type == 'g' || type == 'sa') {
-                        // TODO
+                        value = (value === "true") ? true : false;
+                        list.changeElemVisibility(value, node.firstChild);
                     }
                     break;
                 case 'version':
-                    if (type == 'sa') {
-                        // TODO
-                    }
+                    value = parseInt(value);
+                    if (type == 'sa' && typeof value === 'number') SAConfig.version = ++value;
+                    // else leave the default version 1
                     break;
                 case 'author':
-                    if (type == 'sa') {
-                        // TODO
-                    }
+                    value = parseInt(value);
+                    if (type == 'sa' && typeof value === 'number' // Check if an 8-digit number
+                        && value >= 0 && value <= 99999999) SAConfig.authorID = value;
                     break;
                 case 'width':
                     if (type == 'sa') {
-                        // TODO
+                        // Application assumes 192px width for Symbol Art
                     }
                     break;
                 case 'height':
                     if (type == 'sa') {
-                        // TODO
+                        // Aplication assumes 96px height for Symbol Art
                     }
                     break;
                 case 'sound':

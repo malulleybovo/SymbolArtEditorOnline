@@ -84,7 +84,7 @@ var Group = Class({
             newLine += '\t';
         }
 
-        var saml = '<g name="' + this.name + '" visible="true">';
+        var saml = '<g name="' + this.name + '" visible="' + this.visible + '">';
         for (var i = 0; i < this.elems.length; i++) {
             var elem = this.elems[i];
             saml += newLine + '\t' + elem.toSAML(++numTabs); // for elem = group/layer

@@ -45,13 +45,13 @@
 	- when adding, moving, removing, undo/redoing . . .
 - [x] hide/show layer/group
 	- disable all interaction when hidden
+- [x] change color then select another layer while color picker is open causes newly selected layer to change color as well
+- [x] check file format (high priority)
 
 #### TO BE FIXED
-- [ ] add option to output result to image file (rethink)
 - [ ] lower opacity of symbol edit box while user is moving a layer in editor (low priority)
-- [ ] change color then select another layer while color picker is open causes newly selected layer to change color as well
 - [ ] comfirm exit when unsaved changes (medium priority)
-- [ ] check file format (high priority)
 - [ ] max symbol size (low priority)
-- [ ] group edit box (rethink)
 - [ ] actionManager class for managing calls to perform functions and push actions to history. Every class that calls to perform some action will use this class as medium instead.
+- [ ] add option to output result to image file (rethink)
+- [ ] group edit box (rethink)

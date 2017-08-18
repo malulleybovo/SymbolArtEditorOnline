@@ -77,7 +77,8 @@ var Layer = Class({
 
         var saml = '<layer name="' + this.name
              // -1 due to SAML parts format starting from 240 and not 241
-            + '" visible="true" type="' + (partsInfo.dataArray[this.part] - 1)
+            + '" visible="' + this.visible
+            + '" type="' + (partsInfo.dataArray[this.part] - 1)
             + '" color="#' + rgbToHex(color)
             + '" alpha="' + alphaVal
             + '" ltx="' + absVtx[0]

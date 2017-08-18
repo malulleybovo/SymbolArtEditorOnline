@@ -95,10 +95,10 @@ $(function () {
             "picktomove": { name: "6 Pick to Move", icon: CONTEXT_MENU_ICONS.move, accesskey: "6" },
             "moveselectedhere": { name: "7 Move Selected Here", icon: CONTEXT_MENU_ICONS.move, accesskey: "7" },
             "sep4": "---------",
-            "hideshow": { name: "8 Hide/Show", icon: CONTEXT_MENU_ICONS.hideshow, accesskey: "0" },
+            "hideshow": { name: "8 Hide/Show", icon: CONTEXT_MENU_ICONS.hideshow, accesskey: "8" },
             "sep5": "---------",
             "removal folder": {
-                "name": "= Remove", accesskey: "=",
+                "name": "Remove", accesskey: "r",
                 "items": {
                     "remove": { name: "Confirm" }
                 }, icon: CONTEXT_MENU_ICONS.remove
@@ -133,7 +133,7 @@ $(function () {
             "hideshow": { name: "0 Hide/Show", icon: CONTEXT_MENU_ICONS.hideshow, accesskey: "0" },
             "sep5": "---------",
             "removal folder": {
-                "name": "- Remove", accesskey: "-",
+                "name": "Remove", accesskey: "r",
                 "items": {
                     "remove": { name: "Confirm" }
                 }, icon: CONTEXT_MENU_ICONS.remove

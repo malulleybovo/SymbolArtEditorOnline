@@ -1,6 +1,10 @@
 var groupID = 0;
 var layerID = 0;
 var LAYER_NAME_REGEX = /([\w'" -]|[^\x00-\x7F])+/;
+var SAConfig = {
+    version: 1, // Symbol Art Version (not application version)
+    authorID: 0 // Player ID
+}
 
 var List = Class({
     initialize: function (headerName, groupName, editorContainer) {
@@ -676,7 +680,7 @@ var List = Class({
         $(folder).trigger('create');
 
         groupFolder.children(":eq(0)").focusin().click();
-        this.updateDOMGroupVisibility(this.mainFolder[0]);
+        if (!isLoadingSAML) this.updateDOMGroupVisibility(this.mainFolder[0]);
 
         if (forcedID === undefined) {
             // Save undoable action for add
@@ -764,7 +768,7 @@ var List = Class({
 
         li.focusin();
         li.click();
-        this.updateDOMGroupVisibility(this.mainFolder[0]);
+        if (!isLoadingSAML) this.updateDOMGroupVisibility(this.mainFolder[0]);
 
         if (forcedID === undefined) {
             // Save undoable action for add
@@ -820,7 +824,8 @@ var List = Class({
         // Update visibility of all elements that may be impacted by the change made
         this.updateDOMGroupVisibility(this.mainFolder[0]);
 
-        editor.showInterface(); // To show if elem is visible
+        if (domElem.tagName == 'LI') // To show if elem is a visible layer
+            editor.showInterface();
         let layer = domElem.elem;
         let type = (isVisibleNow) ? 'Showed' : 'Hid';
         console.log('%c%s%c layer/group "%s" in group "%s" at position "%i".',
@@ -1010,8 +1015,12 @@ var List = Class({
     },
     toSAML: function () {
         if (!this.ready) return;
+        // Get file header info
         var saml = '<?xml version="1.0" encoding="utf-8"?>\n<sa name="' + this.mainGroup.name
-            + '" visible="true" version="4" author="0" width="192" height="96" sound="' + $('#player')[0].manager.currBGE + '">';
+            + '" visible="true" version="' + SAConfig.version
+            + '" author="' + SAConfig.authorID
+            + '" width="192" height="96" sound="' + $('#player')[0].manager.currBGE + '">';
+        // Get Layer/Group info
         for (var i = 0; i < this.mainGroup.elems.length; i++) {
             var elem = this.mainGroup.elems[i];
             saml += '\n\r\t' + elem.toSAML(1); // for elem = group/layer
