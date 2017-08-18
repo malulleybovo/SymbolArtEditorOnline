@@ -649,6 +649,8 @@ var Editor = Class({
                     layer.parent.elems.indexOf(layer));
             }
 
+            this.editor.showLayerEditBox();
+            this.editor.refreshLayerEditBox();
             this.isMoving = false;
             delete this.origClickX;
             delete this.origClickY;
@@ -669,8 +671,6 @@ var Editor = Class({
                     layer.parent.elems.indexOf(layer));
             }
 
-            this.editor.showLayerEditBox();
-            this.editor.refreshLayerEditBox();
             this.isMoving = false;
             delete this.origClickX;
             delete this.origClickY;
