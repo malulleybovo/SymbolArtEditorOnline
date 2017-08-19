@@ -1,13 +1,21 @@
 ﻿var Toolbar = Class({
     initialize: function (domElem) {
-        this.domElem = $('<div class="toolbar-holder no-panning">');
+        this.holder = $('<div class="toolbar-holder no-panning">');
+        this.domElem = $('<div class="toolbar-container">');
+        this.holder.append(this.domElem);
         this.toolList = {};
         this.toolListSize = 0;
         if (domElem instanceof Element) {
-            $(domElem).append(this.domElem);
+            $(domElem).append(this.holder);
         }
         else console.warn('%cToolbar (%O):%c Could not append toolbar to given DOM element %O.',
             'color: #a6cd94', this, 'color: #d5d5d5', domElem);
+        if (window.addEventListener) {
+            window.addEventListener('resize', this.updateUI, true);
+        }
+        else if (window.attachEvent) {
+            window.attachEvent('onresize', this.updateUI);
+        }
     },
     addTool: function (name, iconClassName, onClickCallback) {
         if (this.toolList[name] !== undefined) return null;
@@ -30,7 +38,7 @@
         let tool = this.toolList[name];
         if (tool.options === undefined) {
             tool.options = $('<div id="toolbar-options" class="hidden">');
-            this.domElem.append(tool.options);
+            tool.append(tool.options);
         }
         let newOption = $('<a href="#" class="tool-item"></a>');
         newOption.icon = $('<i class="' + iconClassName
@@ -50,22 +58,49 @@
         }
     },
     updateUI: function () {
-        let tools = [];
-        for (var name in this.toolList) {
-            tools.push(name);
+        let $domHolder = $('.toolbar-holder');
+        if ($domHolder.length <= 0) return;
+        let $domContainer = $domHolder.children(':first');
+        if ($domContainer.length <= 0) return;
+        let numChildren = $domContainer.children().length;
+        let newWidth = 40 * numChildren;
+        if (newWidth > 40 && newWidth >= window.innerWidth - 120) {
+            let maxW = 40 * Math.floor((window.innerWidth - 120) / 40);
+            let overflowW = newWidth - maxW;
+            newWidth = maxW;
+            if (!$domContainer[0].hasBound) {
+                $domHolder.bind('swipe', function (e) {
+                    let $domHolder = $('.toolbar-holder');
+                    if ($domHolder.length <= 0) return;
+                    let $domContainer = $domHolder.children(':first');
+                    if ($domContainer.length <= 0) return;
+                    let newX;
+                    if (e.swipestop.coords[0] - e.swipestart.coords[0] >= 0)
+                        newX = ($domContainer[0].currX + $domContainer[0].stepX);
+                    else
+                        newX = ($domContainer[0].currX - $domContainer[0].stepX);
+                    if (newX > 0 || newX < -$domContainer[0].maxX) return;
+                    $domContainer[0].currX = newX;
+                    $domContainer.css('transform', 'matrix(1, 0, 0, 1, '
+                        + $domContainer[0].currX + ', 0)');
+                });
+                $domContainer[0].currX = 0;
+                $domContainer[0].hasBound = true;
+            }
+            let whiteSpaceX = maxW - (overflowW % maxW);
+            if (whiteSpaceX < maxW) overflowW += whiteSpaceX;
+            $domContainer[0].maxX = overflowW;
+            $domContainer[0].stepX = maxW;
+            $domContainer.css('width', maxW + overflowW);
         }
-        this.toolList[tools[0]]
-            .addClass('toolbar-first')
-            .removeClass('toolbar-last');
-        for (var i = 1; i < tools.length - 1; i++) {
-            this.toolList[tools[i]]
-                .removeClass('toolbar-first')
-                .removeClass('toolbar-last');
+        else {
+            $domHolder.unbind('swipe');
+            $domContainer[0].currX = undefined;
+            $domContainer[0].hasBound = undefined;
+            $domContainer.css('width', '');
+            $domContainer.css('transform', '');
         }
-        this.toolList[tools[tools.length - 1]]
-            .removeClass('toolbarfirst')
-            .addClass('toolbar-last');
-        this.domElem.css('width', 42 * this.toolListSize);
+        $domHolder.css('width', newWidth);
     },
     enableTool: function (name) {
         if (this.toolList[name] === undefined) return null;

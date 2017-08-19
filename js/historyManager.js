@@ -146,6 +146,7 @@ var HistoryManager = Class({
     clear: function () {
         this.undoList = [];
         this.redoList = [];
+        this.pushID = 0;
     },
     onpush: function (handler) {
         if (typeof handler === 'function') {

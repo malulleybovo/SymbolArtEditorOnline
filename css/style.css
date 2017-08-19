@@ -245,34 +245,30 @@ white { color: white; }
 
 .toolbar-holder {
     width: 0;
+    height: 40px;
+    min-width: 40px;
+    max-width: 80%;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     margin: 0 auto;
+    background-color: #2c2c2c;
+    border: 1px solid #2fa1d6;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
-.renamingBox {
-    position: fixed;
-    z-index: 99999999;
-    left: 50%;
+.toolbar-container {
+    width: auto;
+    height: 100%;
+    transition: 0.2s; 
 }
 
 .toolbarbtn {
     float: left;
-    border-top: 1px solid#2fa1d6;
-    border-bottom: 1px solid#2fa1d6;
-    border-radius: 0px !important;
-}
-
-.toolbar-first {
-    border-radius: 6px 0px 0px 6px !important;
-    border-left: 1px solid#2fa1d6;
-}
-
-.toolbar-last {
-    border-radius: 0px 6px 6px 0px !important;
-    border-right: 1px solid#2fa1d6;
+    background-color: transparent;
+    border-radius: 0;
 }
 
 .toolbar-disabled-tool:hover {
@@ -301,6 +297,7 @@ white { color: white; }
     background-color: #111;
     overflow: auto;
     transition: 0.1s ease-in-out;
+    opacity: 0.85;
 }
 
 #sidenav .menu {
@@ -333,6 +330,8 @@ white { color: white; }
 }
 .img-base {
     margin: 2px;
+    width: 24px;
+    height: 24px;
 }
 
 .fade {
@@ -361,15 +360,15 @@ white { color: white; }
       animation-name: fadeOut;
     }
 
-    @-moz-keyframes fadeIn { 0% { opacity: 0; visibility: hidden; } 100% { opacity: 1; visibility: visible; }}
-    @-webkit-keyframes fadeIn { 0% { opacity: 0; visibility: hidden; } 100% { opacity: 1; visibility: visible; }}
-    @-ms-keyframes fadeIn { 0% { opacity: 0; visibility: hidden; } 100% { opacity: 1; visibility: visible; }}
-    @-keyframes fadeIn { 0% { opacity: 0; visibility: hidden; } 100% { opacity: 1; visibility: visible; }}
+    @-moz-keyframes fadeIn { 0% { opacity: 0; visibility: hidden; } }
+    @-webkit-keyframes fadeIn { 0% { opacity: 0; visibility: hidden; } }
+    @-ms-keyframes fadeIn { 0% { opacity: 0; visibility: hidden; } }
+    @-keyframes fadeIn { 0% { opacity: 0; visibility: hidden; } }
 
-    @-moz-keyframes fadeOut { 0% { opacity: 1; visibility: visible; }  100% { opacity: 0; visibility: hidden; }} 
-    @-webkit-keyframes fadeOut { 0% { opacity: 1; visibility: visible; }  100% { opacity: 0; visibility: hidden; }} 
-    @-ms-keyframes fadeOut { 0% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden; }} 
-    @-keyframes fadeOut { 0% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden;  }} 
+    @-moz-keyframes fadeOut { 100% { opacity: 0; visibility: hidden; }} 
+    @-webkit-keyframes fadeOut { 100% { opacity: 0; visibility: hidden; }} 
+    @-ms-keyframes fadeOut { 100% { opacity: 0; visibility: hidden; }} 
+    @-keyframes fadeOut { 100% { opacity: 0; visibility: hidden;  }} 
 
 /* Allow Font Awesome Icons in lieu of jQuery UI and only apply when using a FA icon */
 .ui-icon[class*=" icon-"] {
@@ -416,9 +415,21 @@ white { color: white; }
     color: #e61d5f !important;
 }
 
+.top-right {
+    position: fixed !important;
+    right: 0 !important;
+    transition: 0.1s ease-in-out !important;
+}
+
 @media screen and (max-width: 540px) {
     div.sidebar {
         width: 100% !important;
         opacity: 0.7 !important;
+    }
+    #sidenav {
+        opacity: 0.7;
+    }
+    .may-be-off-screen {
+        visibility: hidden;
     }
 }

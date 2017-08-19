@@ -46,12 +46,20 @@
 - [x] hide/show layer/group
 	- disable all interaction when hidden
 - [x] change color then select another layer while color picker is open causes newly selected layer to change color as well
-- [x] check file format (high priority)
+- [x] check file format
+- [x] hide symbol edit box while user is moving a layer in editor
+- [x] on resize, change UI of toolbar to the best fit for given resolution. Create more rows to reduce row length
 
 #### TO BE FIXED
-- [ ] lower opacity of symbol edit box while user is moving a layer in editor (low priority)
+- [ ] undo add when elem added is hidden and is the only child in group causes group to remain hidden
 - [ ] comfirm exit when unsaved changes (medium priority)
-- [ ] max symbol size (low priority)
+- [ ] symbol limits (medium priority)
+	- max symbol size (the biggest it can ever get)
+	- canvas bounding box (impacts stretches, resizes, moves, rotations)
+- [ ] max number of layers
+- [ ] layer manager header displays layer count (for instance: 100 / 225)
+- [ ] up/down arrows change active elem on same group (low priority)
+- [ ] right/left arrows go in and out of groups (low priority)
 - [ ] actionManager class for managing calls to perform functions and push actions to history. Every class that calls to perform some action will use this class as medium instead.
 - [ ] add option to output result to image file (rethink)
 - [ ] group edit box (rethink)

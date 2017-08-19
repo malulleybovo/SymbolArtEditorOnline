@@ -2,7 +2,7 @@
     initialize: function (control) {
         var defaultOpt = 0;
         this.layerCtrl = control;
-
+        $('.dg').addClass('top-right');
         // Initialize selectmenu
         this.selectmenu = new SelectMenu();
         this.selectmenu.setActiveMenu(0);

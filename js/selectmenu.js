@@ -67,7 +67,7 @@
     },
     addIconOption: function (url, handler, addonProperties) {
         url = url || "https://image.flaticon.com/teams/1-freepik.jpg";
-        var newOption = $('<img src="' + url + '" style="width: 24px; height: 24px;" class="img-base ui-li-thumb">');
+        var newOption = $('<img src="' + url + '" class="img-base ui-li-thumb">');
         newOption[0].handler = handler || function () { }; // specific function/action for a given option
         newOption[0].index = SelectMenu.activeMenu.options.length;
 
@@ -100,12 +100,18 @@
         if (SelectMenu.activeMenu.isOpen) {
             container[0].style.width = SelectMenu.activeMenu.width;
             container.find('.closebtn')[0].style.transform = 'translate(0%, 0%)';
-            $('.sp-replacer').css('transform', 'translate(-' + SelectMenu.activeMenu.width + ', 0)');
+            $('.sp-replacer').css('transform', 'translate(-' + SelectMenu.activeMenu.width + ', 0)')
+                .addClass('may-be-off-screen');
+            $('.top-right').css('transform', 'translate(-' + SelectMenu.activeMenu.width + ', 0)')
+                .addClass('may-be-off-screen');
         }
         else {
             container[0].style.width = "0px";
             container.find('.closebtn')[0].style.transform = 'translate(300%, 0%)';
-            $('.sp-replacer').css('transform', 'translate(0, 0)');
+            $('.sp-replacer').css('transform', 'translate(0, 0)')
+                .removeClass('may-be-off-screen');
+            $('.top-right').css('transform', 'translate(0, 0)')
+                .removeClass('may-be-off-screen');
         }
     },
     isOpen: function (index) {
