@@ -24,62 +24,84 @@ var SAMLLoader = Class({
         isLoadingSAML = true;
 
         // TODO
-        var xmlTags = SAMLText.match(/<\?xml([ ]+[A-Z|a-z][A-Z|a-z|0-9|_]*[A-Z|a-z|0-9]*="[^"|\n]+")*[ ]*\?>/g);
-        if (xmlTags == null || xmlTags.length <= 0) {
-            // No xml tag found
-        }
-        else {
-            // Found an xml tag
-        }
-
-        var mainFolder = this.list.container[0].firstChild;
-        var currFolder = mainFolder;
-
-        // Get all tags found in string
-        var tags = SAMLText.match(/<[^\n|<]*>/g);
-        var nestingLvl = 0;
-        var isValid = false;
-        for (var i = 0; i < tags.length; i++) {
-            var tag = tags[i];
-            if (isValid && /<layer>|<layer [^\n|<]*>/.test(tag)) { // if <layer>
-                contextMenuCallback('insert layer', null, null, $(currFolder.firstChild));
-                var newLayerNode = currFolder.lastChild.firstChild.lastChild;
-                this.setupElem(newLayerNode, tag, 'layer');
+        try {
+            var xmlTags = SAMLText.match(/<\?xml([ ]+[A-Z|a-z][A-Z|a-z|0-9|_]*[A-Z|a-z|0-9]*="[^"|\n]+")*[ ]*\?>/g);
+            if (xmlTags == null || xmlTags.length <= 0) {
+                // No xml tag found
             }
-            else if (isValid && /<g>|<g [^\n|<]*>/.test(tag)) { // if <g>
-                contextMenuCallback('insert group', null, null, $(currFolder.firstChild));
-                currFolder = currFolder.lastChild.firstChild.lastChild;
-                this.setupElem(currFolder, tag, 'g');
-                nestingLvl++;
+            else {
+                // Found an xml tag
             }
-            else if (isValid && /<\/([a-z|A-Z]+[0-9]?)>/.test(tag)) {
-                if (/<\/g>/.test(tag)) { // if </g>
-                    if (nestingLvl > 0) {
-                        currFolder = currFolder.parentNode.parentNode.parentNode;
-                        nestingLvl--;
+
+            var mainFolder = this.list.container[0].firstChild;
+            var currFolder = mainFolder;
+
+            // Get all tags found in string
+            var tags = SAMLText.match(/<[^\n|<]*>/g);
+            if (!tags || tags.length == 0) {
+                console.error(
+                    '%cSAML Loader (%O):%c Could not load file given. Text:\n%s.',
+                    'color: #a6cd94', this, 'color: #d5d5d5', SAMLText);
+                alert('Loaded file is incompatible.');
+                // Restore normal logging functionality
+                console.log = savedConsoleLogCallback;
+                return false;
+            }
+            var nestingLvl = 0;
+            var isValid = false;
+            for (var i = 0; i < tags.length; i++) {
+                var tag = tags[i];
+                if (isValid && /<layer>|<layer [^\n|<]*>/.test(tag)) { // if <layer>
+                    if (this.editor.isFull()) {
+                        console.warn(
+                            '%cSAML Loader (%O):%c Layer info (%s) could not be loaded.'
+                            + ' Editor has reached its layer capacity (%i).',
+                            'color: #a6cd94', this, 'color: #d5d5d5', tag, MAX_NUM_LAYERS);
+                    }
+                    else {
+                        contextMenuCallback('insert layer', null, null, $(currFolder.firstChild));
+                        var newLayerNode = currFolder.lastChild.firstChild.lastChild;
+                        this.setupElem(newLayerNode, tag, 'layer');
                     }
                 }
-                else if (/<\/sa>/.test(tag)) { // if </sa>
-                    break;
+                else if (isValid && /<g>|<g [^\n|<]*>/.test(tag)) { // if <g>
+                    contextMenuCallback('insert group', null, null, $(currFolder.firstChild));
+                    currFolder = currFolder.lastChild.firstChild.lastChild;
+                    this.setupElem(currFolder, tag, 'g');
+                    nestingLvl++;
+                }
+                else if (isValid && /<\/([a-z|A-Z]+[0-9]?)>/.test(tag)) {
+                    if (/<\/g>/.test(tag)) { // if </g>
+                        if (nestingLvl > 0) {
+                            currFolder = currFolder.parentNode.parentNode.parentNode;
+                            nestingLvl--;
+                        }
+                    }
+                    else if (/<\/sa>/.test(tag)) { // if </sa>
+                        break;
+                    }
+                }
+                else if (/<sa>|<sa [^\n|<]*>/.test(tag)) {
+                    this.setupElem(mainFolder, tag, 'sa');
+                    isValid = true;
                 }
             }
-            else if (/<sa>|<sa [^\n|<]*>/.test(tag)) {
-                this.setupElem(mainFolder, tag, 'sa');
-                isValid = true;
-            }
+
+            if (!isValid || nestingLvl > 0) alert('Loaded file is malformed, it may not be compatible.');
+
+            this.editor.render();
+            this.editor.hideInterface();
+            list.updateDOMGroupVisibility(list.mainFolder[0]);
+
+            $(mainFolder).children(':first').click();
+
+            isLoadingSAML = false;
         }
-
-        if (!isValid || nestingLvl > 0) alert('Loaded file is malformed, it may not be compatible.');
-
-        this.editor.render();
-        this.editor.hideInterface();
-        list.updateDOMGroupVisibility(list.mainFolder[0]);
-
-        $(mainFolder).children(':first').click();
-
-        isLoadingSAML = false;
-        // Restore normal logging functionality
-        console.log = savedConsoleLogCallback;
+        catch (e) {
+            // Restore normal logging functionality
+            console.log = savedConsoleLogCallback;
+            throw e;
+        }
         return isValid;
     },
     setupElem: function (node, tag, type) {

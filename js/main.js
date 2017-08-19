@@ -347,6 +347,7 @@ function initUI() {
             let parentDOM = ctx.subtree.parentDOM;
             $(parentDOM.firstChild).click();
             list.updateDOMGroupVisibility(list.mainFolder[0]);
+            list.updateLayerCountDisplay();
         },
         function (ctx) { // REDO add
             list.insertSubtree(ctx.subtree);
@@ -356,6 +357,7 @@ function initUI() {
             else // If Layer, click it
                 $(elemDOM).click();
             list.updateDOMGroupVisibility(list.mainFolder[0]);
+            list.updateLayerCountDisplay();
         },
         ['elemID']);
     historyManager
@@ -368,12 +370,14 @@ function initUI() {
             else // If Layer, click it
                 $(elemDOM).click();
             list.updateDOMGroupVisibility(list.mainFolder[0]);
+            list.updateLayerCountDisplay();
         },
         function (ctx) { // REDO remove
             ctx.subtree = list.extractSubtree(ctx.elemID);
             let parentDOM = ctx.subtree.parentDOM;
             $(parentDOM.firstChild).click();
             list.updateDOMGroupVisibility(list.mainFolder[0]);
+            list.updateLayerCountDisplay();
         },
         ['elemID', 'subtree']);
     historyManager

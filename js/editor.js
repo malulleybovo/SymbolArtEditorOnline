@@ -2,6 +2,7 @@ var Editor = Class({
     initialize: function (parent, list) {
         EDITOR_SIZE = { x: 1920, y: 960 };
         CANVAS_PIXEL_SCALE = 3;
+        MAX_NUM_LAYERS = 225;
         this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x); // = 1
         this.ZOOM_STEP = this.zoom / 8;
         this.ZOOM_MIN = this.zoom / 4;
@@ -512,6 +513,19 @@ var Editor = Class({
             this.refreshLayerEditBox();
         }
     },
+    isFull: function () {
+        if (this.layers.length > MAX_NUM_LAYERS) {
+            console.warn(
+            '%cEditor (%O):%c Number of layers in editor exceed the cap of %i '
+            + 'layers. There are now %i layers in editor, those being: %O.',
+            'color: #a6cd94', this, 'color: #d5d5d5', MAX_NUM_LAYERS, 
+            this.layers.length, this.layers);
+        }
+        return (this.layers.length >= MAX_NUM_LAYERS);
+    },
+    isEmpty: function () {
+        return (this.layers.length == 0);
+    },
     createLayer: function (layer) {
 
         var quad = new PIXI.mesh.Plane(
@@ -534,13 +548,20 @@ var Editor = Class({
         return this.addLayerAt(layer, 0);
     },
     addLayerAt: function (layer, index) {
+        // Do not add if full
+        if (this.isFull()) {
+            console.log(
+            '%cEditor:%c Could not add layer because editor is full (%i/%i).',
+            'color: #a6cd94', 'color: #d5d5d5', this.layers.length, MAX_NUM_LAYERS);
+            return null;
+        }
         // Check if valid index (there are length-1 layers in editor + SA Box)
         if (index < 0 || index > this.stage.children.length - 1) {
             console.error(
                 '%cEditor (%O):%c Could not add layer %O to editor because'
                 + 'provided index (%i) is invalid.',
                 'color: #a6cd94', this, 'color: #d5d5d5', layer, index);
-            return;
+            return null;
         }
         var quad = this.createLayer(layer);
         var layerData = { layer: layer, quad: quad };
@@ -682,7 +703,19 @@ var Editor = Class({
     },
     removeLayer: function (layer) {
         var index = findWithAttr(this.layers, 'layer', layer);
-        if (index == -1) return;
+        if (index == -1) {
+            console.warn(
+            '%cEditor (%O):%c Could not remove layer because layer "%O" was not found in editor "%O".',
+            'color: #a6cd94', this, 'color: #d5d5d5', layer, this.layers);
+            return null;
+        }
+        // Do not remove if empty
+        if (this.isEmpty()) {
+            console.log(
+            '%cEditor:%c Could not remove layer because editor is empty (%i/%i).',
+            'color: #a6cd94', 'color: #d5d5d5', this.layers.length, MAX_NUM_LAYERS);
+            return null;
+        }
 
         this.stage.removeChildAt(this.stage.children.length - 2 - index);
         var layerData = this.layers[index];
@@ -703,6 +736,13 @@ var Editor = Class({
         }
     },
     removeLayerAtTop: function () {
+        // Do not remove if empty
+        if (this.isEmpty()) {
+            console.log(
+            '%cEditor:%c Could not remove layer because editor is empty (%i/%i).',
+            'color: #a6cd94', 'color: #d5d5d5', this.layers.length, MAX_NUM_LAYERS);
+            return null;
+        }
         // Remove top layer in editor
         // (index = length-2 because SA Box, the topmost layer, is at length-1)
         this.stage.removeChildAt(this.stage.children.length - 2);
@@ -725,7 +765,12 @@ var Editor = Class({
     },
     updateLayer: function (layer) {
         var idx = findWithAttr(this.layers, 'layer', layer);
-        if (idx == -1) return;
+        if (idx == -1) {
+            console.warn(
+            '%cEditor (%O):%c Could not remove layer because layer "%O" was not found in editor "%O".',
+            'color: #a6cd94', this, 'color: #d5d5d5', layer, this.layers);
+            return null;
+        }
         var quad = this.layers[idx].quad;
         quad.texture = this.parts[layer.part];
         quad.tint = layer.color;

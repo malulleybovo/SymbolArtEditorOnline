@@ -17,6 +17,12 @@ body {
     transform: translate(0,-50%);
 }
 
+.layerman-header {
+    top: 0;
+    position: sticky;
+    z-index: 1;
+}
+
 .drag-ghost {
     opacity: 0.5;
     background-color: black;

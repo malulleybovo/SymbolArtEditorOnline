@@ -25,16 +25,19 @@ var List = Class({
             minScrollbarLength: 20
         });
 
-        this.header = $('<div data-role="header" class="ui-header ui-bar-inherit">');
-        this.header.append('<h1 class="ui-title no-panning no-highlight cursor-default">' + headerName + '</h1>');
+        this.mainGroup = new Group(groupName);
+        this.editor = new Editor(editorContainer, this);
+
+        this.header = $('<div data-role="header" class="layerman-header ui-header ui-bar-inherit">');
+        this.header.append(
+            '<h1 class="ui-title no-panning no-highlight cursor-default">'
+            + headerName + ' (<span id="layerCountDisplay">0</span> / '
+            + MAX_NUM_LAYERS + ')</h1>');
+
 
         this.container = $('<div data-role="main" class="ui-content">');
         this.page.append(this.header);
         this.page.append(this.container);
-
-        this.mainGroup = new Group(groupName);
-
-        this.editor = new Editor(editorContainer, this);
 
         this.movingElem = null;
         this.selectedElem = null;
@@ -350,6 +353,10 @@ var List = Class({
     },
     setReady: function (val) {
         if (val === true || val === false) this.ready = val;
+    },
+    updateLayerCountDisplay: function () {
+        let $cntHeader = $('#layerCountDisplay');
+        $cntHeader.text(this.editor.layers.length);
     },
     rename: function (domElem) {
         if (!list.ready) return;
@@ -695,7 +702,13 @@ var List = Class({
             headerNode.group.elems.indexOf(headerNode.elem));
     },
     addElem: function (name, folder, forcedID) {
-        if (!this.ready) return;
+        if (!this.ready) return null;
+        if (this.editor.isFull()) {
+            console.log(
+            '%cLayer Manager:%c Could not add layer because editor is full (%i/%i).',
+            'color: #a6cd94', 'color: #d5d5d5', this.editor.layers.length, MAX_NUM_LAYERS);
+            return null;
+        }
         if (folder === undefined) folder = this.container[0].firstChild;
         var parentNode = folder.children[1]; // Get list of node elems from folder
 
@@ -742,10 +755,17 @@ var List = Class({
             'color: #2fa1d6', 'color: #f3f3f3', li[0].elem.name, li[0].group.name,
             li[0].group.elems.indexOf(li[0].elem));
 
+        this.updateLayerCountDisplay();
         return li;
     },
     addElemAtEnd: function (name, folder, forcedID) {
-        if (!this.ready) return;
+        if (!this.ready) return null;
+        if (this.editor.isFull()) {
+            console.log(
+            '%cLayer Manager:%c Could not add layer because editor is full (%i/%i).',
+            'color: #a6cd94', 'color: #d5d5d5', this.editor.layers.length, MAX_NUM_LAYERS);
+            return null;
+        }
         if (folder === undefined) folder = this.container[0].firstChild;
         var parentNode = folder.children[1]; // Get list of node elems from folder
 
@@ -781,6 +801,7 @@ var List = Class({
             'color: #2fa1d6', 'color: #f3f3f3', li[0].elem.name, li[0].group.name,
             li[0].group.elems.indexOf(li[0].elem));
 
+        this.updateLayerCountDisplay();
         return li;
     },
     removeElem: function (id) {
@@ -805,6 +826,7 @@ var List = Class({
             console.log('%cRemoved%c layer "%s" in group "%s" at position "%i".',
                 'color: #2fa1d6', 'color: #f3f3f3', removedSubtree.dataElem.name,
                 removedSubtree.dataGroup.name, removedSubtree.indexInGroup);
+            this.updateLayerCountDisplay();
         }
     },
     /**
