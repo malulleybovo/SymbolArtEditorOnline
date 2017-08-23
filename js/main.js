@@ -131,9 +131,11 @@ function initUI() {
         let editor = $('canvas')[0].editor;
         editor.zoom = scale;
         editor.refreshLayerEditBox();
+        $('canvas').trigger('vmouseup');
     }).on("panzoomstart", function (e, panzoom, event, touches) {
         editorToolbar.enableTool('resetPan');
         panZoomActive = true;
+        $('canvas').trigger('vmouseup');
     }).on("panzoomend", function () {
         panZoomActive = false;
     }).on("panzoompan", function () {

@@ -16,10 +16,10 @@ var Editor = Class({
         MAX_SYMBOL_SIDE_LEN = CANVAS_PIXEL_SCALE * 191;
         MAX_NUM_LAYERS = 225;
         if (isMobile) {
-            this.zoom = 1; // = 1
+            this.zoom = 1;
             this.ZOOM_STEP = 0.35;
-            this.ZOOM_MIN = 0.3;
-            this.ZOOM_MAX = 4.5; // = 4.5
+            this.ZOOM_MIN = window.innerWidth / (2.0 * EDITOR_SIZE.x);
+            this.ZOOM_MAX = 8 * window.innerWidth / EDITOR_SIZE.x;
         }
         else {
             this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x); // = 1
@@ -650,6 +650,8 @@ var Editor = Class({
         $(window).resize(function () {
             let editor = $('canvas')[0].editor;
             if (isMobile) {
+                this.ZOOM_MIN = window.innerWidth / (2.0 * EDITOR_SIZE.x);
+                this.ZOOM_MAX = 8 * window.innerWidth / EDITOR_SIZE.x;
                 editor.refreshLayerEditBox();
             }
             else {
