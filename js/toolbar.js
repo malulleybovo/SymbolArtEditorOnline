@@ -1,12 +1,16 @@
 ﻿var Toolbar = Class({
     initialize: function (domElem) {
+        this.wrapper = $('<div id="SAToolbar">');
         this.holder = $('<div class="toolbar-holder no-panning">');
         this.domElem = $('<div class="toolbar-container">');
+        this.navigator = $('<div class="toolbar-nav">');
+        this.wrapper.append(this.navigator);
+        this.wrapper.append(this.holder);
         this.holder.append(this.domElem);
         this.toolList = {};
         this.toolListSize = 0;
         if (domElem instanceof Element) {
-            $(domElem).append(this.holder);
+            $(domElem).append(this.wrapper);
         }
         else console.warn('%cToolbar (%O):%c Could not append toolbar to given DOM element %O.',
             'color: #a6cd94', this, 'color: #d5d5d5', domElem);
@@ -83,23 +87,40 @@
                     $domContainer[0].currX = newX;
                     $domContainer.css('transform', 'matrix(1, 0, 0, 1, '
                         + $domContainer[0].currX + ', 0)');
+                    let $currNav = $('i.toolbar-nav-i.fa-circle')
+                            .removeClass('fa-circle').addClass('fa-circle-o');
+                    if (e.swipestop.coords[0] - e.swipestart.coords[0] >= 0) {
+                        $currNav.prev().removeClass('fa-circle-o').addClass('fa-circle');
+                    }
+                    else {
+                        $currNav.next().removeClass('fa-circle-o').addClass('fa-circle');
+                    }
                 });
-                $domContainer[0].currX = 0;
                 $domContainer[0].hasBound = true;
             }
+            $domContainer[0].currX = 0;
             let whiteSpaceX = maxW - (overflowW % maxW);
             if (whiteSpaceX < maxW) overflowW += whiteSpaceX;
             $domContainer[0].maxX = overflowW;
             $domContainer[0].stepX = maxW;
             $domContainer.css('width', maxW + overflowW);
+            let $toolbarNav = $('.toolbar-nav');
+            let extraPages = Math.floor((overflowW / maxW));
+            if (maxW > 0 && extraPages > 0) {
+                $toolbarNav.empty().append('<i class="toolbar-nav-i fa fa-circle">');
+                for (var i = 0; i < extraPages; i++) {
+                    $toolbarNav.append('<i class="toolbar-nav-i fa fa-circle-o">');
+                }
+            }
         }
         else {
             $domHolder.unbind('swipe');
             $domContainer[0].currX = undefined;
             $domContainer[0].hasBound = undefined;
             $domContainer.css('width', '');
-            $domContainer.css('transform', '');
+            $('.toolbar-nav').css('width', '').empty();
         }
+        $domContainer.css('transform', '');
         $domHolder.css('width', newWidth);
     },
     enableTool: function (name) {

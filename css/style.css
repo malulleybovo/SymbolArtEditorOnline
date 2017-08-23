@@ -427,6 +427,19 @@ white { color: white; }
     transition: 0.1s ease-in-out !important;
 }
 
+.toolbar-nav {
+    position: fixed;
+    width: 100%;
+    bottom: 46px;
+    text-align: center;
+}
+.toolbar-nav-i {
+    font-size: 6px;
+    margin-left: 2px;
+    margin-right: 2px;
+    color: #2fa1d6;
+}
+
 @media screen and (max-width: 540px) {
     div.sidebar {
         width: 100% !important;
