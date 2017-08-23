@@ -44,6 +44,10 @@ ul.ui-listview {
     margin-left: -5px !important;
 }
 
+h1.ui-title {
+    margin: 0 20% !important;
+}
+
 .sa-color-picker-replacer {
     position: fixed;
     bottom: 0;
