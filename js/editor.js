@@ -16,7 +16,8 @@ var Editor = Class({
         MAX_SYMBOL_SIDE_LEN = CANVAS_PIXEL_SCALE * 191;
         MAX_NUM_LAYERS = 225;
         if (isMobile) {
-            this.zoom = 0.5;
+            this.zoom = 1;
+            this.mobileZoom = window.innerWidth / (0.5 * EDITOR_SIZE.x);
         }
         else {
             this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x); // = 1
@@ -648,6 +649,7 @@ var Editor = Class({
             let editor = $('canvas')[0].editor;
             if (isMobile) {
                 editor.refreshLayerEditBox();
+                this.mobileZoom = window.innerWidth / (0.5 * EDITOR_SIZE.x);
             }
             else {
                 let newScalingFactor = window.innerWidth / (0.5 * EDITOR_SIZE.x)
@@ -692,10 +694,16 @@ var Editor = Class({
         this.renderer.render(this.stage);
     },
     updateSize: function () {
-        let scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
-                + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
-        $('canvas').parent().css('transform', scale);
-
+        if (isMobile) {
+            let scale = 'matrix(' + this.mobileZoom + ', 0, 0, ' + this.mobileZoom + ', '
+                    + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
+            $('canvas').parent().css('transform', scale);
+        }
+        else {
+            let scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
+                    + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
+            $('canvas').parent().css('transform', scale);
+        }
         this.refreshLayerEditBox();
     },
     incrSize: function () {
