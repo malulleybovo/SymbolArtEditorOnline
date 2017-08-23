@@ -16,8 +16,8 @@ var Editor = Class({
         MAX_SYMBOL_SIDE_LEN = CANVAS_PIXEL_SCALE * 191;
         MAX_NUM_LAYERS = 225;
         if (isMobile) {
-            this.mobileZoom = window.innerWidth / (0.5 * EDITOR_SIZE.x);
-            this.zoom = 1 / this.mobileZoom;
+            this.mobileZoom = 0.5;
+            this.zoom = 0.5;
         }
         else {
             this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x); // = 1
