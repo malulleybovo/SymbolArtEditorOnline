@@ -106,14 +106,16 @@ function initUI() {
             $(list.renamingLayer).blur();
         }
     });
-    UINodeList['Canvas Container'].onwheel = function (e) {
-        e.preventDefault();
-        //if (!e.ctrlKey) return;
-        if (e.deltaY < 0) { // Zoom +
-            list.editor.incrSize();
-        }
-        else { // Zoom -
-            list.editor.decrSize();
+    if (!isMobile) {
+        UINodeList['Canvas Container'].onwheel = function (e) {
+            e.preventDefault();
+            //if (!e.ctrlKey) return;
+            if (e.deltaY < 0) { // Zoom +
+                list.editor.incrSize();
+            }
+            else { // Zoom -
+                list.editor.decrSize();
+            }
         }
     }
 
