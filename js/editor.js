@@ -861,6 +861,7 @@ var Editor = Class({
                 if (this.editor.highlightedLayers != null)
                     this.alpha *= this.editor.LAYER_HIGHLIGHT_FACTOR; // Restore highlight if necessary
                 this.editor.layerCtrl.update(this.layerData.layer);
+                this.editor.refreshLayerEditBox();
             }
         });
         /**
