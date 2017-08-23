@@ -131,7 +131,7 @@ function initUI() {
     }).on("panzoomzoom", function (e, panzoom, scale, opts) {
         e.stopImmediatePropagation();
         let editor = $('canvas')[0].editor;
-        editor.zoom = scale;
+        if (!isMobile) editor.zoom = scale;
         editor.refreshLayerEditBox();
         $('canvas').trigger('vmouseup');
     }).on("panzoomstart", function (e, panzoom, event, touches) {

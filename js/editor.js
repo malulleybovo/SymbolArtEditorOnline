@@ -15,16 +15,10 @@ var Editor = Class({
         };
         MAX_SYMBOL_SIDE_LEN = CANVAS_PIXEL_SCALE * 191;
         MAX_NUM_LAYERS = 225;
-        if (isMobile) {
-            this.mobileZoom = 0.5;
-            this.zoom = 0.5;
-        }
-        else {
-            this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x); // = 1
-            this.ZOOM_STEP = this.zoom / 8;
-            this.ZOOM_MIN = this.zoom / 4;
-            this.ZOOM_MAX = this.zoom * 4; // = 4.5
-        }
+        this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x);
+        this.ZOOM_STEP = this.zoom / 8;
+        this.ZOOM_MIN = this.zoom / 4;
+        this.ZOOM_MAX = this.zoom * 4;
         this.MIN_VTX_VARIATION = 2 * CANVAS_PIXEL_SCALE;
         this.LAYER_HIGHLIGHT_FACTOR = 10.0;
         // Setting option for enabling assistance in doing purely vertical/horizontal changes in symbol
@@ -647,21 +641,15 @@ var Editor = Class({
         })
         $(window).resize(function () {
             let editor = $('canvas')[0].editor;
-            if (isMobile) {
-                editor.refreshLayerEditBox();
-                this.mobileZoom = window.innerWidth / (0.5 * EDITOR_SIZE.x);
-            }
-            else {
-                let newScalingFactor = window.innerWidth / (0.5 * EDITOR_SIZE.x)
-                editor.ZOOM_STEP = newScalingFactor / 8;
-                editor.ZOOM_MIN = newScalingFactor / 4;
-                editor.ZOOM_MAX = newScalingFactor * 4;
-                if (editor.zoom < editor.ZOOM_MIN)
-                    editor.zoom = editor.ZOOM_MIN;
-                else if (editor.zoom > editor.ZOOM_MAX)
-                    editor.zoom = editor.ZOOM_MAX;
-                editor.updateSize();
-            }
+            let newScalingFactor = window.innerWidth / (0.5 * EDITOR_SIZE.x)
+            editor.ZOOM_STEP = newScalingFactor / 8;
+            editor.ZOOM_MIN = newScalingFactor / 4;
+            editor.ZOOM_MAX = newScalingFactor * 4;
+            if (editor.zoom < editor.ZOOM_MIN)
+                editor.zoom = editor.ZOOM_MIN;
+            else if (editor.zoom > editor.ZOOM_MAX)
+                editor.zoom = editor.ZOOM_MAX;
+            editor.updateSize();
         });
 
         // Initialize Layer Control
@@ -694,16 +682,10 @@ var Editor = Class({
         this.renderer.render(this.stage);
     },
     updateSize: function () {
-        if (isMobile) {
-            let scale = 'matrix(' + this.mobileZoom + ', 0, 0, ' + this.mobileZoom + ', '
-                    + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
-            $('canvas').parent().css('transform', scale);
-        }
-        else {
-            let scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
-                    + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
-            $('canvas').parent().css('transform', scale);
-        }
+        let scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
+                + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
+        $('canvas').parent().css('transform', scale);
+
         this.refreshLayerEditBox();
     },
     incrSize: function () {
