@@ -255,6 +255,20 @@ var SAMLLoader = Class({
                                 'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[0]);
                             break;
                         }
+                        if (value < BOUNDING_BOX_RAW.maxNegVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid top-left '
+                                + 'vertex X value "%i" (exceeds min %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxNegVal);
+                        }
+                        if (value > BOUNDING_BOX_RAW.maxPosVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid top-left '
+                                + 'vertex X value "%i" (exceeds max %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxPosVal);
+                        }
                         rawVtces[0] = (value) * CANVAS_PIXEL_SCALE;
                     }
                     break;
@@ -268,6 +282,20 @@ var SAMLLoader = Class({
                                 + ' Using default value (%i).',
                                 'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[1]);
                             break;
+                        }
+                        if (value < BOUNDING_BOX_RAW.maxNegVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid top-left '
+                                + 'vertex Y value "%i" (exceeds min %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxNegVal);
+                        }
+                        if (value > BOUNDING_BOX_RAW.maxPosVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid top-left '
+                                + 'vertex Y value "%i" (exceeds max %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxPosVal);
                         }
                         rawVtces[1] = (value) * CANVAS_PIXEL_SCALE;
                     }
@@ -283,6 +311,20 @@ var SAMLLoader = Class({
                                 'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[4]);
                             break;
                         }
+                        if (value < BOUNDING_BOX_RAW.maxNegVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid bottom-left '
+                                + 'vertex X value "%i" (exceeds min %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxNegVal);
+                        }
+                        if (value > BOUNDING_BOX_RAW.maxPosVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid bottom-left '
+                                + 'vertex X value "%i" (exceeds max %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxPosVal);
+                        }
                         rawVtces[4] = (value) * CANVAS_PIXEL_SCALE;
                     }
                     break;
@@ -296,6 +338,20 @@ var SAMLLoader = Class({
                                 + ' Using default value (%i).',
                                 'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[5]);
                             break;
+                        }
+                        if (value < BOUNDING_BOX_RAW.maxNegVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid bottom-left '
+                                + 'vertex Y value "%i" (exceeds min %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxNegVal);
+                        }
+                        if (value > BOUNDING_BOX_RAW.maxPosVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid bottom-left '
+                                + 'vertex Y value "%i" (exceeds max %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxPosVal);
                         }
                         rawVtces[5] = (value) * CANVAS_PIXEL_SCALE;
                     }
@@ -311,6 +367,20 @@ var SAMLLoader = Class({
                                 'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[2]);
                             break;
                         }
+                        if (value < BOUNDING_BOX_RAW.maxNegVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid top-right '
+                                + 'vertex X value "%i" (exceeds min %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxNegVal);
+                        }
+                        if (value > BOUNDING_BOX_RAW.maxPosVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid top-right '
+                                + 'vertex X value "%i" (exceeds max %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxPosVal);
+                        }
                         rawVtces[2] = (value) * CANVAS_PIXEL_SCALE;
                     }
                     break;
@@ -324,6 +394,20 @@ var SAMLLoader = Class({
                                 + ' Using default value (%i).',
                                 'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[3]);
                             break;
+                        }
+                        if (value < BOUNDING_BOX_RAW.maxNegVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid top-right '
+                                + 'vertex Y value "%i" (exceeds min %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxNegVal);
+                        }
+                        if (value > BOUNDING_BOX_RAW.maxPosVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid top-right '
+                                + 'vertex Y value "%i" (exceeds max %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxPosVal);
                         }
                         rawVtces[3] = (value) * CANVAS_PIXEL_SCALE;
                     }
@@ -339,6 +423,20 @@ var SAMLLoader = Class({
                                 'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[6]);
                             break;
                         }
+                        if (value < BOUNDING_BOX_RAW.maxNegVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid bottom-right '
+                                + 'vertex X value "%i" (exceeds min %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxNegVal);
+                        }
+                        if (value > BOUNDING_BOX_RAW.maxPosVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid bottom-right '
+                                + 'vertex X value "%i" (exceeds max %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxPosVal);
+                        }
                         rawVtces[6] = (value) * CANVAS_PIXEL_SCALE;
                     }
                     break;
@@ -352,6 +450,20 @@ var SAMLLoader = Class({
                                 + ' Using default value (%i).',
                                 'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value, rawVtces[7]);
                             break;
+                        }
+                        if (value < BOUNDING_BOX_RAW.maxNegVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid bottom-right '
+                                + 'vertex Y value "%i" (exceeds min %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxNegVal);
+                        }
+                        if (value > BOUNDING_BOX_RAW.maxPosVal) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer/group element %O has invalid bottom-right '
+                                + 'vertex Y value "%i" (exceeds max %i).',
+                                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, value,
+                                BOUNDING_BOX_RAW.maxPosVal);
                         }
                         rawVtces[7] = (value) * CANVAS_PIXEL_SCALE;
                     }
@@ -367,12 +479,21 @@ var SAMLLoader = Class({
                 node.elem.vertices[i] = rawVtces[i] - x;
                 node.elem.vertices[i + 1] = rawVtces[i + 1] - y;
             }
-            if (!isValidQuad(node.elem.vertices)) {
+            if (!isQuadAParallelogram(node.elem.vertices)) {
                 console.warn(
-                    '%cSAML Loader (%O):%c Layer/group element %O has an invalid shape "%O"'
+                    '%cSAML Loader (%O):%c Layer/group element %O has an invalid shape (%O)'
                     + ' because it is not a parallelogram. '
                     + 'Top/bottom sides OR left/right sides are not equal in length.',
                     'color: #a6cd94', this, 'color: #d5d5d5', node.elem, rawVtces);
+            }
+            let invalidLens = hasQuadInvalidSideLengths(node.elem.vertices);
+            if (invalidLens != null) {
+                console.warn(
+                    '%cSAML Loader (%O):%c Layer/group element %O has one or more invalid '
+                    + 'symbol side lengths (vertices: %O, lengths: %O). '
+                    + 'One or more sides exceed the max of %i. (all values scaled by %i)',
+                    'color: #a6cd94', this, 'color: #d5d5d5', node.elem, rawVtces,
+                    invalidLens, MAX_SYMBOL_SIDE_LEN, CANVAS_PIXEL_SCALE);
             }
         }
         if (type == 'layer') {
@@ -380,12 +501,45 @@ var SAMLLoader = Class({
             this.editor.disableInteraction(node.elem);
         }
 
-        function isValidQuad (v) {
+        function isQuadAParallelogram(v) {
             // Valid only if top/botom AND left/right sides are equal in length
             return (
                 v[0] == -v[6] && v[1] == -v[7]
                 && v[2] == -v[4] && v[3] == -v[5]
                 );
+        }
+        function hasQuadInvalidSideLengths(v) {
+            // Check if any length x or y of any side of the quad
+            // has length exceeding the maximum allowed
+            let lens = {
+                v0_v2X: Math.abs(v[0] - v[2]),
+                v1_v3Y: Math.abs(v[1] - v[3]),
+                v0_v4X: Math.abs(v[0] - v[4]),
+                v1_v5Y: Math.abs(v[1] - v[5]),
+                v2_v6X: Math.abs(v[2] - v[6]),
+                v3_v7Y: Math.abs(v[3] - v[7]),
+                v4_v6X: Math.abs(v[4] - v[6]),
+                v5_v7Y: Math.abs(v[5] - v[7])
+            };
+            if (
+                // side 1
+                (lens.v0_v2X > MAX_SYMBOL_SIDE_LEN)
+                || (lens.v1_v3Y > MAX_SYMBOL_SIDE_LEN)
+                // side 2
+                || (lens.v0_v4X > MAX_SYMBOL_SIDE_LEN)
+                || (lens.v1_v5Y > MAX_SYMBOL_SIDE_LEN)
+                // side 3
+                || (lens.v2_v6X > MAX_SYMBOL_SIDE_LEN)
+                || (lens.v3_v7Y > MAX_SYMBOL_SIDE_LEN)
+                // side 4
+                || (lens.v4_v6X > MAX_SYMBOL_SIDE_LEN)
+                || (lens.v5_v7Y > MAX_SYMBOL_SIDE_LEN)
+                ) {
+                return lens;
+            }
+            else {
+                return null;
+            }
         }
         function hexToRgb(hex) {
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);

@@ -1,7 +1,19 @@
 var Editor = Class({
     initialize: function (parent, list) {
         EDITOR_SIZE = { x: 1920, y: 960 };
+        CANVAS_SIZE = { x: 192, y: 96 };
         CANVAS_PIXEL_SCALE = 3;
+        BOUNDING_BOX_RAW = {
+            size: 253,
+            maxNegVal: -127,
+            maxPosVal: 126
+        };
+        BOUNDING_BOX = {
+            size: CANVAS_PIXEL_SCALE * BOUNDING_BOX_RAW.size,
+            maxNegVal: CANVAS_PIXEL_SCALE * BOUNDING_BOX_RAW.maxNegVal,
+            maxPosVal: CANVAS_PIXEL_SCALE * BOUNDING_BOX_RAW.maxPosVal
+        };
+        MAX_SYMBOL_SIDE_LEN = CANVAS_PIXEL_SCALE * 191;
         MAX_NUM_LAYERS = 225;
         this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x); // = 1
         this.ZOOM_STEP = this.zoom / 8;
@@ -203,23 +215,74 @@ var Editor = Class({
             var editor = canvas[0].editor;
             var relPos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
             var layer = list.selectedElem.parentNode.elem;
-
+            // Get indices of vertices in the diagonal (0 and 6) or (2 and 4)
             var thisVerIndex = 2 * index, oppositeVerIndex = 6 - 2 * index;
-
+            // Get displacement from mousemove
             var dPos = {
                 x: roundPosition((relPos.left / editor.zoom) - layer.x - layer.vertices[thisVerIndex]),
                 y: roundPosition((relPos.top / editor.zoom) - layer.y - layer.vertices[thisVerIndex + 1])
             }
+            /**
+             * Check if symbol will not trespass editor boundaries 
+             */
+            var relX = (layer.x - (EDITOR_SIZE.x / 2)),
+                relY = (layer.y - (EDITOR_SIZE.y / 2));
+            let minVX = Math.min(layer.vertices[0], layer.vertices[2], layer.vertices[4], layer.vertices[6]),
+                minVY = Math.min(layer.vertices[1], layer.vertices[3], layer.vertices[5], layer.vertices[7]),
+                maxVX = Math.max(layer.vertices[0], layer.vertices[2], layer.vertices[4], layer.vertices[6]),
+                maxVY = Math.max(layer.vertices[1], layer.vertices[3], layer.vertices[5], layer.vertices[7]);
+            let halfW = Math.abs(maxVX - minVX) / 2, halfH = Math.abs(maxVY - minVY) / 2;
+            // Checking X-axis boundary
+            let minLeeway = Math.min(
+                Math.abs(BOUNDING_BOX.maxPosVal - relX - halfW),
+                Math.abs(BOUNDING_BOX.maxNegVal - relX + halfW));
+            if (layer.vertices[thisVerIndex] + dPos.x >= 0 && dPos.x > minLeeway)
+                dPos.x = roundPosition(minLeeway);
+            if (layer.vertices[thisVerIndex] + dPos.x < 0 && dPos.x < -minLeeway)
+                dPos.x = -roundPosition(minLeeway);
+            // Checking Y-axis boundary
+            minLeeway = Math.min(
+                Math.abs(BOUNDING_BOX.maxPosVal - relY - halfH),
+                Math.abs(BOUNDING_BOX.maxNegVal - relY + halfH));
+            if (layer.vertices[thisVerIndex + 1] + dPos.y >= 0 && dPos.y > minLeeway)
+                dPos.y = roundPosition(minLeeway);
+            if (layer.vertices[thisVerIndex + 1] + dPos.y < 0 && dPos.y < -minLeeway)
+                dPos.y = -roundPosition(minLeeway);
+            /**
+             * Check if symbol will have a valid size
+             */
+            let maxlen = MAX_SYMBOL_SIDE_LEN;
+            let testlen1x = Math.abs(layer.vertices[0] - layer.vertices[2]),
+                testlen1y = Math.abs(layer.vertices[1] - layer.vertices[3]),
+                testlen2x = Math.abs(layer.vertices[0] - layer.vertices[4]),
+                testlen2y = Math.abs(layer.vertices[1] - layer.vertices[5]);
+            let maxDPosX = (maxlen - Math.max(testlen1x, testlen2x)) / 2;
+            if (layer.vertices[thisVerIndex] + dPos.x >= 0 && dPos.x > maxDPosX)
+                dPos.x = roundPosition(maxDPosX);
+            if (layer.vertices[thisVerIndex] + dPos.x < 0 && dPos.x < -maxDPosX)
+                dPos.x = -roundPosition(maxDPosX);
+            let maxDPosY = (maxlen - Math.max(testlen1y, testlen2y)) / 2;
+            if (layer.vertices[thisVerIndex + 1] + dPos.y >= 0 && dPos.y > maxDPosY)
+                dPos.y = roundPosition(maxDPosY);
+            if (layer.vertices[thisVerIndex + 1] + dPos.y < 0 && dPos.y < -maxDPosY)
+                dPos.y = -roundPosition(maxDPosY);
+            /**
+             * Perform the vertex change
+             */
+            // Change X
             layer.vertices[thisVerIndex] += dPos.x;
-            layer.vertices[thisVerIndex + 1] += dPos.y;
             layer.vertices[oppositeVerIndex] -= dPos.x;
+            // Change Y
+            layer.vertices[thisVerIndex + 1] += dPos.y;
             layer.vertices[oppositeVerIndex + 1] -= dPos.y;
             if (!editor.disableSmallVtxChange) {
-                if (Math.abs(layer.vertices[thisVerIndex] - origValues.vtces[thisVerIndex]) < editor.MIN_VTX_VARIATION) {
+                if (Math.abs(layer.vertices[thisVerIndex] - origValues.vtces[thisVerIndex])
+                    < editor.MIN_VTX_VARIATION) {
                     layer.vertices[thisVerIndex] = origValues.vtces[thisVerIndex];
                     layer.vertices[oppositeVerIndex] = origValues.vtces[oppositeVerIndex];
                 }
-                if (Math.abs(layer.vertices[thisVerIndex + 1] - origValues.vtces[thisVerIndex + 1]) < editor.MIN_VTX_VARIATION) {
+                if (Math.abs(layer.vertices[thisVerIndex + 1] - origValues.vtces[thisVerIndex + 1])
+                    < editor.MIN_VTX_VARIATION) {
                     layer.vertices[thisVerIndex + 1] = origValues.vtces[thisVerIndex + 1];
                     layer.vertices[oppositeVerIndex + 1] = origValues.vtces[oppositeVerIndex + 1];
                 }
@@ -231,7 +294,7 @@ var Editor = Class({
         function sideStretch(index, clientPos, origValues) {
             var corner1Index, corner2Index, vi3, vi4;
             var isHorizontal;
-            switch (index) {
+            switch (index) { // Get index for vertices that compose quad side picked
                 case 0: corner1Index = 0; corner2Index = 4; vi3 = 2; vi4 = 6; break; // left
                 case 1: corner1Index = 0; corner2Index = 2; vi3 = 4; vi4 = 6; break; // up
                 case 2: corner1Index = 2; corner2Index = 6; vi3 = 0; vi4 = 4; break; // right
@@ -243,7 +306,7 @@ var Editor = Class({
             var canvasPos = canvas.offset();
             var editor = canvas[0].editor;
             var layer = list.selectedElem.parentNode.elem;
-
+            // Get displacement from mousemove
             var relPos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
             var dPos = {
                 x: roundPosition(((relPos.left / editor.zoom) - layer.x
@@ -251,17 +314,77 @@ var Editor = Class({
                 y: roundPosition(((relPos.top / editor.zoom) - layer.y
                     - ((layer.vertices[corner1Index + 1] + layer.vertices[corner2Index + 1]) / 2))) / 2
             };
-
+            /**
+             * Check if symbol will have a valid size
+             */
+            let maxlen = MAX_SYMBOL_SIDE_LEN;
+            // Checking X
+            // Get directional length and compute max displacement possible
+            let dirLen = layer.vertices[corner1Index] - layer.vertices[vi3];
+            let maxDPosX = (maxlen - Math.abs(dirLen)) / 2;
+            // Truncate displacement when necessary
+            if (dirLen >= 0 && dPos.x > maxDPosX)
+                dPos.x = roundPosition(maxDPosX);
+            else if (dirLen < 0 && dPos.x < -maxDPosX)
+                dPos.x = -roundPosition(maxDPosX);
+            // Checking Y
+            // Get directional length and compute max displacement possible
+            dirLen = layer.vertices[corner1Index + 1] - layer.vertices[vi3 + 1];
+            let maxDPosY = (maxlen - Math.abs(dirLen)) / 2;
+            // Truncate displacement when necessary
+            if (dirLen >= 0 && dPos.y > maxDPosY)
+                dPos.y = roundPosition(maxDPosY);
+            else if (dirLen < 0 && dPos.y < -maxDPosY)
+                dPos.y = -roundPosition(maxDPosY);
+            /**
+             * Check if symbol will not trespass editor boundaries
+             */
+            // Check if trespasses in x-axis
+            maxDPosX = ((BOUNDING_BOX.maxPosVal)
+                - layer.x + (EDITOR_SIZE.x / 2) - Math.max(
+                    layer.vertices[corner1Index],
+                    layer.vertices[corner2Index])) / 2;
+            if (maxDPosX < 0) maxDPosX = 0;
+            let minDPosX = ((BOUNDING_BOX.maxNegVal)
+                - layer.x + (EDITOR_SIZE.x / 2) - Math.min(
+                    layer.vertices[corner1Index],
+                    layer.vertices[corner2Index])) / 2;
+            if (minDPosX > 0) minDPosX = 0;
+            if (dPos.x > maxDPosX)
+                dPos.x = roundPosition(maxDPosX);
+            else if (dPos.x < minDPosX)
+                dPos.x = roundPosition(minDPosX);
+            // Check if respasses in y-axis
+            maxDPosY = ((BOUNDING_BOX.maxPosVal)
+                - layer.y + (EDITOR_SIZE.y / 2) - Math.max(
+                    layer.vertices[corner1Index + 1],
+                    layer.vertices[corner2Index + 1])) / 2;
+            if (maxDPosY < 0) maxDPosY = 0;
+            let minDPosY = ((BOUNDING_BOX.maxNegVal)
+                - layer.y + (EDITOR_SIZE.y / 2) - Math.min(
+                    layer.vertices[corner1Index + 1],
+                    layer.vertices[corner2Index + 1])) / 2;
+            if (minDPosY > 0) minDPosY = 0;
+            if (dPos.y > maxDPosY)
+                dPos.y = roundPosition(maxDPosY);
+            else if (dPos.y < minDPosY)
+                dPos.y = roundPosition(minDPosY);
+            /**
+             * Perform the vertex change
+             */
+            // Change X
             layer.x += dPos.x;
-            layer.y += dPos.y;
             layer.vertices[corner1Index] += dPos.x;
             layer.vertices[corner2Index] += dPos.x;
-            layer.vertices[corner1Index + 1] += dPos.y;
-            layer.vertices[corner2Index + 1] += dPos.y;
             layer.vertices[vi3] -= dPos.x;
             layer.vertices[vi4] -= dPos.x;
+            // Change Y
+            layer.y += dPos.y;
+            layer.vertices[corner1Index + 1] += dPos.y;
+            layer.vertices[corner2Index + 1] += dPos.y;
             layer.vertices[vi3 + 1] -= dPos.y;
             layer.vertices[vi4 + 1] -= dPos.y;
+            // Keep original x and/or y position if change is too small
             if (!editor.disableSmallVtxChange) {
                 if (Math.abs((layer.vertices[corner1Index] + layer.x) 
                     - (origValues.vtces[corner1Index] + origValues.x)) 
@@ -303,9 +426,29 @@ var Editor = Class({
             var v = origValues.vtces;
             if (dPos.y > 0) ang = Math.PI - ang;
             var sin = Math.sin(ang), cos = Math.cos(ang);
+            let boundingBoxMin = BOUNDING_BOX.maxNegVal,
+                boundingBoxMax = BOUNDING_BOX.maxPosVal,
+                relLayerX = layer.x - EDITOR_SIZE.x / 2,
+                relLayerY = layer.y - EDITOR_SIZE.y / 2;
+            var newV = [];
             for (var i = 0; i < v.length; i += 2) {
-                var x = cos * v[i] - sin * v[i + 1], y = sin * v[i] + cos * v[i + 1];
-                layer.vertices[i] = roundPosition(x); layer.vertices[i + 1] = roundPosition(y);
+                newV[i] = roundPosition(cos * v[i] - sin * v[i + 1]);
+                newV[i + 1] = roundPosition(sin * v[i] + cos * v[i + 1]);
+                /**
+                 * Check if rotation will cause symbol to trespass bounding box
+                 */
+                let testX = (relLayerX + newV[i]),
+                    testY = (relLayerY + newV[i + 1])
+                if (testX < boundingBoxMin || testX > boundingBoxMax
+                    || testY < boundingBoxMin || testY > boundingBoxMax) {
+                    return; // Do not rotate if it will trespass
+                }
+            }
+            /**
+             * Perform vertex rotation
+             */
+            for (var i = 0; i < v.length; i++) {
+                layer.vertices[i] = newV[i];
             }
             editor.updateLayer(layer);
             editor.render();
@@ -317,16 +460,49 @@ var Editor = Class({
             let layer = list.selectedElem.parentNode.elem;
             let origVtces = origValues.vtces;
             let currVtces = layer.vertices;
-
+            // Get scaling factor from mousemove displacement (based on X-coord)
             let relPos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
             let dPosX = ((relPos.left / editor.zoom) - layer.x);
             let scalingFactor = (1 + dPosX / 100);
             if (scalingFactor < 0.1) scalingFactor = 0.1;
-            for (var i = 0; i < 4; i++) {
-                currVtces[2 * i] = roundPosition(origVtces[2 * i]
-                    * scalingFactor);
-                currVtces[2 * i + 1] = roundPosition(origVtces[2 * i + 1]
-                    * scalingFactor);
+            /**
+             * Check if symbol will have a valid size
+             */
+            let maxlen = MAX_SYMBOL_SIDE_LEN;
+            let testlen1x = Math.abs(origVtces[0] - origVtces[2]),
+                testlen1y = Math.abs(origVtces[1] - origVtces[3]),
+                testlen2x = Math.abs(origVtces[0] - origVtces[4]),
+                testlen2y = Math.abs(origVtces[1] - origVtces[5]);
+            let maxside = Math.max(testlen1x, testlen1y, testlen2x, testlen2y);
+            let maxScalingFactor = maxlen / maxside;
+            if (scalingFactor > maxScalingFactor) scalingFactor = maxScalingFactor;
+            /**
+             * Check if symbol will not trespass editor boundaries
+             */
+            var relX = (layer.x - (EDITOR_SIZE.x / 2)),
+                relY = (layer.y - (EDITOR_SIZE.y / 2));
+            let minVX = Math.min(origVtces[0], origVtces[2], origVtces[4], origVtces[6]),
+                minVY = Math.min(origVtces[1], origVtces[3], origVtces[5], origVtces[7]),
+                maxVX = Math.max(origVtces[0], origVtces[2], origVtces[4], origVtces[6]),
+                maxVY = Math.max(origVtces[1], origVtces[3], origVtces[5], origVtces[7]);
+            let halfW = Math.abs(maxVX - minVX) / 2, halfH = Math.abs(maxVY - minVY) / 2;
+            // Checking X-axis boundary
+            let minLeeway = Math.min(
+                Math.abs(BOUNDING_BOX.maxPosVal - relX - halfW),
+                Math.abs(BOUNDING_BOX.maxNegVal - relX + halfW));
+            maxScalingFactor = 1 + minLeeway / halfW;
+            if (scalingFactor > maxScalingFactor) scalingFactor = maxScalingFactor;
+            // Checking Y-axis boundary
+            minLeeway = Math.min(
+                Math.abs(BOUNDING_BOX.maxPosVal - relY - halfH),
+                Math.abs(BOUNDING_BOX.maxNegVal - relY + halfH));
+            maxScalingFactor = Math.min(1 + minLeeway / halfW, 1 + minLeeway / halfH);
+            if (scalingFactor > maxScalingFactor) scalingFactor = maxScalingFactor;
+            /**
+             * Perform vertex resize
+             */
+            for (var i = 0; i < currVtces.length; i++) {
+                currVtces[i] = roundPosition(origVtces[i] * scalingFactor);
             }
             editor.updateLayer(layer);
             editor.render();
@@ -355,6 +531,7 @@ var Editor = Class({
             if (btnActive < 0) {
                 return; // Avoids useless computation
             }
+            // Make symbol edit box 80% transparent while editing
             buttons.css('opacity', 0.2).css('cursor', 'none');
 
             var pos = {
@@ -584,29 +761,46 @@ var Editor = Class({
         quad.layerData = layerData;
         quad.interactive = true;
         quad.on('mousedown', function (evtData) {
-            if ($('canvas')[0].editor.currBtnDown < 0) {
-                this.isMoving = true;
+            let canvas = $('canvas')[0];
+            if (canvas.editor.currBtnDown < 0) {
                 this.origClickX = evtData.data.originalEvent.offsetX;
                 this.origClickY = evtData.data.originalEvent.offsetY;
                 this.origX = this.x;
                 this.origY = this.y;
-                this.editor.hideLayerEditBox();
+                canvas.movingQuad = this;
+                this.editor.showLayerEditBox(0.2);
+                this.isMoving = true;
             }
         }).on('touchstart', function (evtData) {
+            let canvas = $('canvas')[0];
             if (!panZoomActive && $('canvas')[0].editor.currBtnDown < 0) {
-                this.isMoving = true;
                 var newPosition = evtData.data.getLocalPosition(this.parent);
                 this.origClickX = newPosition.x;
                 this.origClickY = newPosition.y;
                 this.origX = this.x;
                 this.origY = this.y;
-                this.editor.hideLayerEditBox();
+                canvas.movingQuad = this;
+                this.editor.showLayerEditBox(0.2);
+                this.isMoving = true;
             }
         });
         quad.on('mousemove', function (evtData) {
-            if (this.isMoving) {
-                this.x = this.origX + roundPosition(evtData.data.originalEvent.offsetX - this.origClickX);
-                this.y = this.origY + roundPosition(evtData.data.originalEvent.offsetY - this.origClickY);
+            if (this.isMoving && evtData.data.originalEvent.srcElement.tagName == 'CANVAS') {
+                let newX = this.origX + roundPosition(evtData.data.originalEvent.offsetX - this.origClickX);
+                let newY = this.origY + roundPosition(evtData.data.originalEvent.offsetY - this.origClickY);
+                /* Check horizontal limits (bounding box) */
+                let maxNewX = (BOUNDING_BOX.maxPosVal) - ((this.width - EDITOR_SIZE.x) / 2);
+                if (newX > maxNewX) newX = maxNewX;
+                let minNewX = (BOUNDING_BOX.maxNegVal) + ((this.width + EDITOR_SIZE.x) / 2);
+                if (newX < minNewX) newX = minNewX;
+                /* Check vertical limits (bounding box) */
+                let maxNewY = (BOUNDING_BOX.maxPosVal) - ((this.height - EDITOR_SIZE.y) / 2);
+                if (newY > maxNewY) newY = maxNewY;
+                let minNewY = (BOUNDING_BOX.maxNegVal) + ((this.height + EDITOR_SIZE.y) / 2);
+                if (newY < minNewY) newY = minNewY;
+                /* Perform quad position change */
+                this.x = newX;
+                this.y = newY;
                 this.editor.render();
                 if (this.editor.highlightedLayers != null)
                     this.alpha /= this.editor.LAYER_HIGHLIGHT_FACTOR; // Void highlight just to update layer
@@ -614,13 +808,27 @@ var Editor = Class({
                 if (this.editor.highlightedLayers != null)
                     this.alpha *= this.editor.LAYER_HIGHLIGHT_FACTOR; // Restore highlight if necessary
                 this.editor.layerCtrl.update(this.layerData.layer);
+                this.editor.refreshLayerEditBox();
             }
         }).on('touchmove', function (evtData) {
             // Check if moving the selected layer (only one layer active)
             if (!panZoomActive && this.isMoving) {
                 var newPosition = evtData.data.getLocalPosition(this.parent);
-                this.x = this.origX + roundPosition(newPosition.x - this.origClickX);
-                this.y = this.origY + roundPosition(newPosition.y - this.origClickY);
+                let newX = this.origX + roundPosition(newPosition.x - this.origClickX);
+                let newY = this.origY + roundPosition(newPosition.y - this.origClickY);
+                /* Check horizontal limits (bounding box) */
+                let maxNewX = (BOUNDING_BOX.maxPosVal) - ((this.width - EDITOR_SIZE.x) / 2);
+                if (newX > maxNewX) newX = maxNewX;
+                let minNewX = (BOUNDING_BOX.maxNegVal) + ((this.width + EDITOR_SIZE.x) / 2);
+                if (newX < minNewX) newX = minNewX;
+                /* Check vertical limits (bounding box) */
+                let maxNewY = (BOUNDING_BOX.maxPosVal) - ((this.height - EDITOR_SIZE.y) / 2);
+                if (newY > maxNewY) newY = maxNewY;
+                let minNewY = (BOUNDING_BOX.maxNegVal) + ((this.height + EDITOR_SIZE.y) / 2);
+                if (newY < minNewY) newY = minNewY;
+                /* Perform quad position change */
+                this.x = newX;
+                this.y = newY;
                 this.editor.render();
                 if (this.editor.highlightedLayers != null)
                     this.alpha /= this.editor.LAYER_HIGHLIGHT_FACTOR; // Void highlight just to update layer
@@ -630,14 +838,28 @@ var Editor = Class({
                 this.editor.layerCtrl.update(this.layerData.layer);
             }
         });
+        /**
+         * Set empty event handlers because PixiJS apparently
+         * requires these to also be set is order for mousedown
+         * and mousemove to fire
+         */
         quad.on('mouseup', function (evtData) {
-            let layer = this.layerData.layer;
-            if (this.isMoving // Save undoable action if moved symbol
-                && (layer.x != this.origX || layer.y != this.origY)) {
+        }).on('touchend', function (evtData) {
+        }).on('touchendoutside', function (evtData) {
+        });
+        /* Set mouseup handler on canvas container so symbol move
+         * finishes up regardless of where the user fired the mouseup
+         * (needed due to mouse not always remaining on top of symbol) */
+        $('#canvascontainer').bind('vmouseup.symbolMouseup', function () {
+            let movingQuad = $('canvas')[0].movingQuad;
+            if (movingQuad === undefined) return;
+            let layer = movingQuad.layerData.layer;
+            if (movingQuad.isMoving // Save undoable action if moved symbol
+                && (layer.x != movingQuad.origX || layer.y != movingQuad.origY)) {
                 historyManager.pushUndoAction('symbol_move', {
                     'layer': layer,
-                    'startX': this.origX,
-                    'startY': this.origY,
+                    'startX': movingQuad.origX,
+                    'startY': movingQuad.origY,
                     'endX': layer.x,
                     'endY': layer.y
                 });
@@ -645,59 +867,18 @@ var Editor = Class({
                     + 'from position (%i, %i) to (%i, %i).',
                     'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
                     layer.parent.elems.indexOf(layer),
-                    this.origX, this.origY, layer.x, layer.y);
+                    movingQuad.origX, movingQuad.origY, layer.x, layer.y);
             }
 
-            this.editor.showLayerEditBox();
-            this.editor.refreshLayerEditBox();
-            this.isMoving = false;
-            delete this.origClickX;
-            delete this.origClickY;
-            delete this.origX;
-            delete this.origY;
-        }).on('touchend', function (evtData) {
-            if (this.isMoving) { // Save undoable action if moved symbol
-                let layer = this.layerData.layer;
-                historyManager.pushUndoAction('symbol_move', {
-                    'layer': layer,
-                    'startX': this.origX,
-                    'startY': this.origY,
-                    'endX': layer.x,
-                    'endY': layer.y
-                });
-                console.log('%cMoved Symbol%c of layer "%s" in group "%s" at position "%i".',
-                    'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
-                    layer.parent.elems.indexOf(layer));
-            }
-
-            this.editor.showLayerEditBox();
-            this.editor.refreshLayerEditBox();
-            this.isMoving = false;
-            delete this.origClickX;
-            delete this.origClickY;
-            delete this.origX;
-            delete this.origY;
-        }).on('touchendoutside', function (evtData) {
-            if (this.isMoving) { // Save undoable action if moved symbol
-                let layer = this.layerData.layer;
-                historyManager.pushUndoAction('symbol_move', {
-                    'layer': layer,
-                    'startX': this.origX,
-                    'startY': this.origY,
-                    'endX': layer.x,
-                    'endY': layer.y
-                });
-                console.log('%cMoved Symbol%c of layer "%s" in group "%s" at position "%i".',
-                    'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
-                    layer.parent.elems.indexOf(layer));
-            }
-
-            this.isMoving = false;
-            delete this.origClickX;
-            delete this.origClickY;
-            delete this.origX;
-            delete this.origY;
-        });
+            movingQuad.editor.showLayerEditBox(1);
+            movingQuad.editor.refreshLayerEditBox();
+            movingQuad.isMoving = false;
+            delete movingQuad.origClickX;
+            delete movingQuad.origClickY;
+            delete movingQuad.origX;
+            delete movingQuad.origY;
+            movingQuad = undefined;
+        })
         this.layerCtrl.update(layerData.layer);
         return layerData;
     },
@@ -840,13 +1021,12 @@ var Editor = Class({
         let groupMoveMousedownHandler = function (e) {
             if (!panZoomActive
                 && list.selectedElem.parentNode.elem.type == 'g') {
-                this.mouseMoving = true;
-
                 this.canvas = $('canvas')[0];
                 this.editor = this.canvas.editor;
                 this.lis = $(list.container).find('li');
                 this.lisInGroup = $(list.selectedElem.parentNode.parentNode).find('li');
                 this.firstIndex = this.lis.index(this.lisInGroup[0]);
+                if (this.firstIndex < 0) return; // Cancel if not found
                 this.lastIndex = this.firstIndex + this.lisInGroup.length;
 
                 var ev = e.originalEvent.originalEvent;
@@ -860,39 +1040,93 @@ var Editor = Class({
                 }
                 this.origX = [];
                 this.origY = [];
+                let maxGroupX = Number.MIN_VALUE,
+                    minGroupX = Number.MAX_VALUE,
+                    maxGroupY = Number.MIN_VALUE,
+                    minGroupY = Number.MAX_VALUE;
                 var layer;
                 for (var i = this.firstIndex; i < this.lastIndex; i++) {
                     layer = this.editor.layers[i].layer;
-                    this.origX[i] = layer.x;
-                    this.origY[i] = layer.y;
+                    this.origX.push(layer.x);
+                    this.origY.push(layer.y);
+                    let maxX = layer.x + Math.max(
+                        layer.vertices[0], layer.vertices[2],
+                        layer.vertices[4], layer.vertices[6]);
+                    if (maxX > maxGroupX) maxGroupX = maxX;
+                    let minX = layer.x + Math.min(
+                        layer.vertices[0], layer.vertices[2],
+                        layer.vertices[4], layer.vertices[6]);
+                    if (minX < minGroupX) minGroupX = minX;
+                    let maxY = layer.y + Math.max(
+                        layer.vertices[1], layer.vertices[3],
+                        layer.vertices[5], layer.vertices[7]);
+                    if (maxY > maxGroupY) maxGroupY = maxY;
+                    let minY = layer.y + Math.min(
+                        layer.vertices[1], layer.vertices[3],
+                        layer.vertices[5], layer.vertices[7]);
+                    if (minY < minGroupY) minGroupY = minY;
                 }
+                this.groupW = maxGroupX - minGroupX;
+                if (this.groupW < 0) return;
+                this.groupH = maxGroupY - minGroupY;
+                if (this.groupH < 0) return;
+                this.groupX = maxGroupX - (this.groupW / 2);
+                this.groupY = maxGroupY - (this.groupH / 2);
+                this.mouseMoving = true;
             }
         }
         let groupMoveMousemoveHandler = function (e) {
             if (!panZoomActive
                 && this.mouseMoving) {
-                if (this.firstIndex == -1) return;
+                if (this.firstIndex < 0) return;
                 var layer;
+                var dPosX;
+                var dPosY;
+                var ev = e.originalEvent.originalEvent;
+                if (ev instanceof MouseEvent) { // Desktop mouse event
+                    dPosX = roundPosition(e.originalEvent.offsetX - this.origClickX);
+                    dPosY = roundPosition(e.originalEvent.offsetY - this.origClickY);
+                }
+                else if (ev instanceof TouchEvent) { // Mobile device touch event
+                    dPosX = roundPosition(ev.touches[0].pageX - ev.touches[0].target.offsetLeft - this.origClickX);
+                    dPosY = roundPosition(ev.touches[0].pageY - ev.touches[0].target.offsetTop - this.origClickY);
+                }
+                /* Check horizontal limits (bounding box) */
+                let maxDPosX = (BOUNDING_BOX.maxPosVal)
+                    - (this.groupX + ((this.groupW - EDITOR_SIZE.x) / 2));
+                if (maxDPosX < 0) maxDPosX = 0;
+                if (dPosX > maxDPosX) dPosX = maxDPosX;
+                let minDPosX = (BOUNDING_BOX.maxNegVal)
+                    - (this.groupX - ((this.groupW + EDITOR_SIZE.x) / 2));
+                if (minDPosX > 0) minDPosX = 0;
+                if (dPosX < minDPosX) dPosX = minDPosX;
+                /* Check vertical limits (bounding box) */
+                let maxDPosY = (BOUNDING_BOX.maxPosVal)
+                    - (this.groupY + ((this.groupH - EDITOR_SIZE.y) / 2));
+                if (maxDPosY < 0) maxDPosY = 0;
+                if (dPosY > maxDPosY) dPosY = maxDPosY;
+                let minDPosY = (BOUNDING_BOX.maxNegVal)
+                    - (this.groupY - ((this.groupH + EDITOR_SIZE.y) / 2));
+                if (minDPosY > 0) minDPosY = 0;
+                if (dPosY < minDPosY) dPosY = minDPosY;
+                /* Perform group position change */
                 for (var i = this.firstIndex; i < this.lastIndex; i++) {
                     layer = this.editor.layers[i].layer;
-                    var ev = e.originalEvent.originalEvent;
                     if (ev instanceof MouseEvent) { // Desktop mouse event
-                        var clickX = e.originalEvent.offsetX;
-                        var clickY = e.originalEvent.offsetY;
-                        layer.x = this.origX[i] + roundPosition(clickX - this.origClickX);
-                        layer.y = this.origY[i] + roundPosition(clickY - this.origClickY);
+                        layer.x = this.origX[i - this.firstIndex] + dPosX;
+                        layer.y = this.origY[i - this.firstIndex] + dPosY;
                         if (!this.hasChangedGroupPos // Check to see if should push to history after done
-                            && (layer.x != this.origX[i] || layer.y != this.origY[i])) {
+                            && (layer.x != this.origX[i - this.firstIndex]
+                            || layer.y != this.origY[i - this.firstIndex])) {
                             this.hasChangedGroupPos = true;
                         }
                     }
                     else if (ev instanceof TouchEvent) { // Mobile device touch event
-                        var clickX = (ev.touches[0].pageX - ev.touches[0].target.offsetLeft);
-                        var clickY = (ev.touches[0].pageY - ev.touches[0].target.offsetTop);
-                        layer.x = this.origX[i] + roundPosition(clickX - this.origClickX);
-                        layer.y = this.origY[i] + roundPosition(clickY - this.origClickY);
+                        layer.x = this.origX[i - this.firstIndex] + dPosX;
+                        layer.y = this.origY[i - this.firstIndex] + dPosY;
                         if (!this.hasChangedGroupPos // Check to see if should push to history after done
-                            && (layer.x != this.origX[i] || layer.y != this.origY[i])) {
+                            && (layer.x != this.origX[i - this.firstIndex]
+                            || layer.y != this.origY[i - this.firstIndex])) {
                             this.hasChangedGroupPos = true;
                         }
                     }
@@ -932,6 +1166,9 @@ var Editor = Class({
         canvas.bind('vmousedown.saGroupMousedown', groupMoveMousedownHandler)
             .bind('vmousemove.saGroupMousemove', groupMoveMousemoveHandler)
             .bind('vmouseup.saGroupMouseup', groupMoveMouseupHandler);
+        $('#canvascontainer').bind('vmouseup.saGroupMouseup', function () {
+            $('canvas').trigger('vmouseup');
+        });
     },
     disableGroupInteraction: function () {
         let canvas = $('canvas');
@@ -941,6 +1178,7 @@ var Editor = Class({
         canvas.unbind('vmousedown.saGroupMousedown')
             .unbind('vmousemove.saGroupMousemove')
             .unbind('vmouseup.saGroupMouseup');
+        $('#canvascontainer').unbind('vmouseup.saGroupMouseup');
     },
     setHighlightedLayers: function (startLayer, optionalLength) {
         if (this.highlightedLayers != null) {
@@ -1016,7 +1254,7 @@ var Editor = Class({
         this.editorBoxIcons.rotation.hide();
         this.editorBoxIcons.resize.hide();
     },
-    showLayerEditBox: function () {
+    showLayerEditBox: function (optOpacity) {
         this.editorBoxIcons.tl.show();
         this.editorBoxIcons.tr.show();
         this.editorBoxIcons.bl.show();
@@ -1027,6 +1265,10 @@ var Editor = Class({
         this.editorBoxIcons.down.show();
         this.editorBoxIcons.rotation.show();
         this.editorBoxIcons.resize.show();
+        if (optOpacity !== undefined) {
+            let buttons = $('.edit-button');
+            buttons.css('opacity', optOpacity);
+        }
     },
     refreshLayerEditBox: function () {
         if (this.selectedLayer == null

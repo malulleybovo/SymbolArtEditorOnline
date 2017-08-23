@@ -441,8 +441,8 @@ function initUI() {
             for (var i = ctx.startIdx; i < ctx.endIdx; i++) {
                 if (!ctx.layers[i]) continue;
                 let layer = ctx.layers[i].layer;
-                layer.x = ctx.startX[i];
-                layer.y = ctx.startY[i];
+                layer.x = ctx.startX[i - ctx.startIdx];
+                layer.y = ctx.startY[i - ctx.startIdx];
                 editor.updateLayer(layer);
             }
             editor.render();
@@ -503,23 +503,23 @@ function initUI() {
                 .spectrum('set', '#' + Math.round(ctx.layer.color).toString(16));
         },
         ['layer', 'oldColor', 'newColor']);
-        historyManager
-            .registerUndoAction('symbol_changealpha',
-            function (ctx) { // UNDO symbol_changealpha
-                ctx.layer.alpha = ctx.oldAlpha;
-                let editor = $('canvas')[0].editor;
-                editor.updateLayer(ctx.layer);
-                editor.render();
-                editor.layerCtrl.update(ctx.layer);
-            },
-            function (ctx) { // REDO symbol_changealpha
-                ctx.layer.alpha = ctx.newAlpha;
-                let editor = $('canvas')[0].editor;
-                editor.updateLayer(ctx.layer);
-                editor.render();
-                editor.layerCtrl.update(ctx.layer);
-            },
-            ['layer', 'oldAlpha', 'newAlpha']);
+    historyManager
+        .registerUndoAction('symbol_changealpha',
+        function (ctx) { // UNDO symbol_changealpha
+            ctx.layer.alpha = ctx.oldAlpha;
+            let editor = $('canvas')[0].editor;
+            editor.updateLayer(ctx.layer);
+            editor.render();
+            editor.layerCtrl.update(ctx.layer);
+        },
+        function (ctx) { // REDO symbol_changealpha
+            ctx.layer.alpha = ctx.newAlpha;
+            let editor = $('canvas')[0].editor;
+            editor.updateLayer(ctx.layer);
+            editor.render();
+            editor.layerCtrl.update(ctx.layer);
+        },
+        ['layer', 'oldAlpha', 'newAlpha']);
 
     samlLoader = new SAMLLoader(list);
 
