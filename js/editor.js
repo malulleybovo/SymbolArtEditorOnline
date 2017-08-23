@@ -15,10 +15,18 @@ var Editor = Class({
         };
         MAX_SYMBOL_SIDE_LEN = CANVAS_PIXEL_SCALE * 191;
         MAX_NUM_LAYERS = 225;
-        this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x); // = 1
-        this.ZOOM_STEP = this.zoom / 8;
-        this.ZOOM_MIN = this.zoom / 4;
-        this.ZOOM_MAX = this.zoom * 4; // = 4.5
+        if (isMobile) {
+            this.zoom = 1; // = 1
+            this.ZOOM_STEP = 0.35;
+            this.ZOOM_MIN = 0.3;
+            this.ZOOM_MAX = 4.5; // = 4.5
+        }
+        else {
+            this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x); // = 1
+            this.ZOOM_STEP = this.zoom / 8;
+            this.ZOOM_MIN = this.zoom / 4;
+            this.ZOOM_MAX = this.zoom * 4; // = 4.5
+        }
         this.MIN_VTX_VARIATION = 2 * CANVAS_PIXEL_SCALE;
         this.LAYER_HIGHLIGHT_FACTOR = 10.0;
         // Setting option for enabling assistance in doing purely vertical/horizontal changes in symbol
