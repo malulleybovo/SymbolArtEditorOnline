@@ -621,15 +621,7 @@ var Editor = Class({
         })
         $(window).resize(function () {
             let editor = $('canvas')[0].editor;
-            let newScalingFactor = window.innerWidth / (0.5 * EDITOR_SIZE.x)
-            editor.ZOOM_STEP = newScalingFactor / 8;
-            editor.ZOOM_MIN = newScalingFactor / 4;
-            editor.ZOOM_MAX = newScalingFactor * 4;
-            if (editor.zoom < editor.ZOOM_MIN)
-                editor.zoom = editor.ZOOM_MIN;
-            else if (editor.zoom > editor.ZOOM_MAX)
-                editor.zoom = editor.ZOOM_MAX;
-            editor.updateSize();
+            editor.refreshLayerEditBox();
         });
 
         // Initialize Layer Control
