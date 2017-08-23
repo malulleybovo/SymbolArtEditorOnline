@@ -1019,6 +1019,7 @@ var Editor = Class({
         canvas[0].movingFolder = folder;
         // Handlers for mousemove-based group motion
         let groupMoveMousedownHandler = function (e) {
+            e.stopPropagation();
             if (!panZoomActive
                 && list.selectedElem.parentNode.elem.type == 'g') {
                 this.canvas = $('canvas')[0];
@@ -1076,6 +1077,7 @@ var Editor = Class({
             }
         }
         let groupMoveMousemoveHandler = function (e) {
+            e.stopPropagation();
             if (!panZoomActive
                 && this.mouseMoving) {
                 if (this.firstIndex < 0) return;
@@ -1136,6 +1138,7 @@ var Editor = Class({
             }
         }
         let groupMoveMouseupHandler = function (e) {
+            e.stopPropagation();
             this.mouseMoving = false;
             if (this.hasChangedGroupPos) {
                 this.hasChangedGroupPos = undefined;
@@ -1166,9 +1169,12 @@ var Editor = Class({
         canvas.bind('vmousedown.saGroupMousedown', groupMoveMousedownHandler)
             .bind('vmousemove.saGroupMousemove', groupMoveMousemoveHandler)
             .bind('vmouseup.saGroupMouseup', groupMoveMouseupHandler);
-        $('#canvascontainer').bind('vmouseup.saGroupMouseup', function () {
-            $('canvas').trigger('vmouseup');
-        });
+        $('#canvascontainer')
+            .unbind('vmouseup.saGroupMouseup')
+            .bind('vmouseup.saGroupMouseup', function (e) {
+                e.stopPropagation();
+                $('canvas').trigger('vmouseup');
+            });
     },
     disableGroupInteraction: function () {
         let canvas = $('canvas');
