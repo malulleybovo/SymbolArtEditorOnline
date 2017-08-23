@@ -16,10 +16,7 @@ var Editor = Class({
         MAX_SYMBOL_SIDE_LEN = CANVAS_PIXEL_SCALE * 191;
         MAX_NUM_LAYERS = 225;
         if (isMobile) {
-            this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x);
-            this.ZOOM_STEP = 0.35;
-            this.ZOOM_MIN = window.innerWidth / (2.0 * EDITOR_SIZE.x);
-            this.ZOOM_MAX = 8 * window.innerWidth / EDITOR_SIZE.x;
+            this.zoom = 0.5;
         }
         else {
             this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x); // = 1
@@ -651,8 +648,6 @@ var Editor = Class({
             let editor = $('canvas')[0].editor;
             if (isMobile) {
                 editor.refreshLayerEditBox();
-                this.ZOOM_MIN = window.innerWidth / (2.0 * EDITOR_SIZE.x);
-                this.ZOOM_MAX = 8 * window.innerWidth / EDITOR_SIZE.x;
             }
             else {
                 let newScalingFactor = window.innerWidth / (0.5 * EDITOR_SIZE.x)
