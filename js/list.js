@@ -8,6 +8,17 @@ var SAConfig = {
 
 var List = Class({
     initialize: function (headerName, groupName, editorContainer) {
+        window.addEventListener("beforeunload", function (e) {
+            // Just unload if user has not touched the application
+            if (historyManager.undoList.length == 0
+                && historyManager.pushID == 0) return;
+            // Reassure if changes have been made
+            var confirmationMessage = 'Unsaved changes will be lost.'
+                                    + 'Are you sure you want to proceed?';
+
+            (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+            return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+        });
         // Initialize Canvas Control
         this.page = $(document.getElementById('canvasctrl'));
         this.async = {

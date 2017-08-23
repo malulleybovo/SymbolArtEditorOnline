@@ -16,6 +16,24 @@
     background-attachment: fixed;
     background-position: center;
     background-size: contain;
+    opacity: 0;
+}
+
+.landing-app-version {
+    position: fixed;
+    padding: 10px;
+    font-size: 20px;
+    opacity: 0;
+}
+
+.landing-help {
+    position: fixed;
+    right: 0;
+    padding-right: 20px;
+    padding-top: 10px;
+    font-size: 72px;
+    text-shadow: none;
+    opacity: 0;
 }
 
 .landing-img-ready {

@@ -63,7 +63,9 @@ var Editor = Class({
                     };
             }
         }).on('vmousemove', function () {
-        }).on('vmouseup', function () {
+        }).on('vmouseup', function (e) {
+            e.stopPropagation();
+            $('canvas').trigger('vmouseup');
         }).hide();
         var tr = $('<i class="fa fa-arrow-right fa-border edit-button corner-arrow no-highlight no-panning" ondragstart="return false;">');
         tr[0].list = list;
@@ -79,7 +81,9 @@ var Editor = Class({
                     };
             }
         }).on('vmousemove', function () {
-        }).on('vmouseup', function () {
+        }).on('vmouseup', function (e) {
+            e.stopPropagation();
+            $('canvas').trigger('vmouseup');
         }).hide();
         var br = $('<i class="fa fa-arrow-down fa-border edit-button corner-arrow no-highlight no-panning" ondragstart="return false;">');
         br[0].list = list;
@@ -95,7 +99,9 @@ var Editor = Class({
                     };
             }
         }).on('vmousemove', function () {
-        }).on('vmouseup', function () {
+        }).on('vmouseup', function (e) {
+            e.stopPropagation();
+            $('canvas').trigger('vmouseup');
         }).hide();
         var bl = $('<i class="fa fa-arrow-left fa-border edit-button corner-arrow no-highlight no-panning" ondragstart="return false;">');
         bl[0].list = list;
@@ -111,7 +117,9 @@ var Editor = Class({
                     };
             }
         }).on('vmousemove', function () {
-        }).on('vmouseup', function () {
+        }).on('vmouseup', function (e) {
+            e.stopPropagation();
+            $('canvas').trigger('vmouseup');
         }).hide();
         var btn_l = $('<i class="fa fa-arrow-left fa-border edit-button no-highlight no-panning" ondragstart="return false;">');
         btn_l[0].list = list;
@@ -127,7 +135,9 @@ var Editor = Class({
                     };
             }
         }).on('vmousemove', function () {
-        }).on('vmouseup', function () {
+        }).on('vmouseup', function (e) {
+            e.stopPropagation();
+            $('canvas').trigger('vmouseup');
         }).hide();
         var btn_u = $('<i class="fa fa-arrow-up fa-border edit-button no-highlight no-panning" ondragstart="return false;">');
         btn_u[0].list = list;
@@ -143,7 +153,9 @@ var Editor = Class({
                     };
             }
         }).on('vmousemove', function () {
-        }).on('vmouseup', function () {
+        }).on('vmouseup', function (e) {
+            e.stopPropagation();
+            $('canvas').trigger('vmouseup');
         }).hide();
         var btn_r = $('<i class="fa fa-arrow-right fa-border edit-button no-highlight no-panning" ondragstart="return false;">');
         btn_r[0].list = list;
@@ -159,7 +171,9 @@ var Editor = Class({
                     };
             }
         }).on('vmousemove', function () {
-        }).on('vmouseup', function () {
+        }).on('vmouseup', function (e) {
+            e.stopPropagation();
+            $('canvas').trigger('vmouseup');
         }).hide();
         var btn_d = $('<i class="fa fa-arrow-down fa-border edit-button no-highlight no-panning" ondragstart="false">');
         btn_d[0].list = list;
@@ -175,7 +189,9 @@ var Editor = Class({
                     };
             }
         }).on('vmousemove', function () {
-        }).on('vmouseup', function () {
+        }).on('vmouseup', function (e) {
+            e.stopPropagation();
+            $('canvas').trigger('vmouseup');
         }).hide();
         var btn_rot = $('<i class="fa fa-repeat fa-border edit-button no-highlight no-panning" ondragstart="return false;">');
         btn_rot[0].list = list;
@@ -191,7 +207,9 @@ var Editor = Class({
                     };
             }
         }).on('vmousemove', function () {
-        }).on('vmouseup', function () {
+        }).on('vmouseup', function (e) {
+            e.stopPropagation();
+            $('canvas').trigger('vmouseup');
         }).hide();
         var btn_resize = $('<i class="fa fa-expand fa-border edit-button no-highlight no-panning" ondragstart="return false;">');
         btn_resize[0].list = list;
@@ -207,7 +225,9 @@ var Editor = Class({
                     };
             }
         }).on('vmousemove', function () {
-        }).on('vmouseup', function () {
+        }).on('vmouseup', function (e) {
+            e.stopPropagation();
+            $('canvas').trigger('vmouseup');
         }).hide();
         function diagStretch(index, clientPos, origValues) {
             var canvas = $('canvas');
@@ -874,9 +894,10 @@ var Editor = Class({
                     layer.parent.elems.indexOf(layer),
                     movingQuad.origX, movingQuad.origY, layer.x, layer.y);
             }
-
-            movingQuad.editor.showLayerEditBox(1);
-            movingQuad.editor.refreshLayerEditBox();
+            if (movingQuad.isMoving) {
+                movingQuad.editor.showLayerEditBox(1);
+                movingQuad.editor.refreshLayerEditBox();
+            }
             movingQuad.isMoving = false;
             delete movingQuad.origClickX;
             delete movingQuad.origClickY;

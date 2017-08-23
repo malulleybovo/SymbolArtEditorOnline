@@ -55,9 +55,9 @@
 	- max symbol side length (impacts stretches, resizes)
 	- canvas bounding box (impacts stretches, resizes, moves, rotations)
 - [x] quick alert of number of errors/warnings after loading .saml
+- [x] comfirm exit when unsaved changes (medium priority)
 
 #### TO BE FIXED
-- [ ] comfirm exit when unsaved changes (medium priority)
 - [ ] undo add when elem added is hidden and is the only child in group causes group to remain hidden (low priority - not harmful)
 - [ ] up/down arrows change active elem on same group (low priority)
 - [ ] right/left arrows go in and out of groups (low priority)

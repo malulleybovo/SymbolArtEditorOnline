@@ -4,6 +4,11 @@
 //  Author: Arthur Malulley
 //
 ////////////////////////////////////////////////////////////////////////////////
+
+/***********************/
+var APP_VER = '1.0.0';
+/***********************/
+
 var imgWidth = 176;
 var c, ctx, alertBox, list;
 var title, description;
@@ -45,13 +50,6 @@ function initDocument() {
         e.preventDefault();
     });
 
-    // Create link to stylesheet
-    CSSFileLink = document.createElement('link');
-    CSSFileLink.setAttribute('rel', 'stylesheet');
-    CSSFileLink.setAttribute('type', 'text/css');
-    CSSFileLink.setAttribute('href', 'css/style.css');
-    HTMLHead.appendChild(CSSFileLink);
-
     // Create link to Google Material Icons
     GoogleMaterialIcons = document.createElement('link');
     GoogleMaterialIcons.setAttribute('rel', 'stylesheet');
@@ -73,77 +71,7 @@ function initUI() {
 
     UI = [];
 
-    UI.landing = $('<div class="landing">');
-    
-    UI.landing.image = $('<div class="landing-img">');
-    
-    UI.landing.menu = $('<div class="landing-menu">');
-
-    let landingOnKeyPressCallback = function (e) {
-        if (e.keyCode == 10 || e.keyCode == 13) {
-            if (e.ctrlKey) // Ctrl + Enter = Open Symbol Art
-                $(UI.landing.menu.loadAppButton).click();
-            else // Enter = New Symbol Art
-                $(UI.landing.menu.newAppButton).click();
-        }
-    }
-    $(document).bind('keypress', landingOnKeyPressCallback);
-    UI.landing.menu.newAppButton = $('<div>');
-    UI.landing.menu.newAppButton.append($('<i class="fa fa-plus">'));
-    UI.landing.menu.newAppButton.click(
-        {
-            landingOnKeyPressCallback: landingOnKeyPressCallback
-        }, function (e) {
-            list.setReady(true); // Ready the Layer Manager
-            $(document).unbind('keypress', landingOnKeyPressCallback);
-            UI.landing.animate({
-                opacity: 0
-            }, "slow", "linear", function () {
-                UI.landing.remove();
-            });
-        });
-    UI.landing.menu.append(UI.landing.menu.newAppButton);
-
-    UI.landing.menu.loadAppButton = $('<div>');
-    UI.landing.menu.loadAppButton.append($('<i class="fa fa-upload">'));
-    UI.landing.menu.loadAppButton.click(function () {
-        UI.fileHandler.click();
-    });
-    UI.landing.menu.append(UI.landing.menu.loadAppButton);
-
-    UI.fileHandler = $('<input type="file" accept=".saml" class="hidden">');
-    UI.fileHandler.change(function (e) {
-        UI.landing.animate({
-            opacity: 0
-        }, "slow", "linear", function () {
-            UI.landing.remove();
-        });
-        var reader = new FileReader();
-        reader.onload = function (evt) {
-            list.setReady(true); // Ready the Layer Manager
-            $(document).unbind('keypress', landingOnKeyPressCallback);
-            var text = evt.target.result;
-            samlLoader.load(text);
-            historyManager.clear();
-            editorToolbar.disableTool('undo');
-        }
-        reader.readAsText(e.target.files[0]);
-        reader.onerror = function (evt) {
-            alert("Error reading file.");
-        }
-    });
-
-    $('body').append(UI.landing);
-    UI.landing.append(UI.landing.image);
-    setInterval(function () {
-        UI.landing.image.addClass('landing-img-ready');
-    }, 500);
-    UI.landing.append(UI.landing.menu);
-    setInterval(function () {
-        UI.landing.menu.animate({
-            opacity: 1
-        });
-    }, 1000);
+    UI.landing = $('.landing');
 
     addNode('Canvas Container', 'div', HTMLBody, 'button medium-text no-highlight cursor-pointer');
     UINodeList['Canvas Container'].id = 'canvascontainer';
@@ -526,6 +454,102 @@ function initUI() {
         ['layer', 'oldAlpha', 'newAlpha']);
 
     samlLoader = new SAMLLoader(list);
+
+    UI.landing.image = $('<div class="landing-img">');
+
+    UI.landing.version = $('<div class="landing-app-version">');
+    UI.landing.version.text(APP_VER);
+
+    UI.landing.help = $('<div class="landing-help">');
+    UI.landing.help.append('<i class="fa fa-question">');
+    UI.landing.help.click(function () {
+        var win = window.open('https://github.com/malulleybovo/SymbolArtEditorOnline', '_blank');
+        if (win) {
+            win.focus();
+        } else {
+            alert('Please allow popups for this website to open help link.');
+        }
+    });
+
+    UI.landing.menu = $('<div class="landing-menu">');
+
+    let landingOnKeyPressCallback = function (e) {
+        if (e.keyCode == 10 || e.keyCode == 13) {
+            if (e.ctrlKey) // Ctrl + Enter = Open Symbol Art
+                $(UI.landing.menu.loadAppButton).click();
+            else // Enter = New Symbol Art
+                $(UI.landing.menu.newAppButton).click();
+        }
+    }
+    $(document).bind('keypress', landingOnKeyPressCallback);
+    UI.landing.menu.newAppButton = $('<div>');
+    UI.landing.menu.newAppButton.append($('<i class="fa fa-plus">'));
+    UI.landing.menu.newAppButton.click(
+        {
+            landingOnKeyPressCallback: landingOnKeyPressCallback
+        }, function (e) {
+            list.setReady(true); // Ready the Layer Manager
+            $(document).unbind('keypress', landingOnKeyPressCallback);
+            UI.landing.animate({
+                opacity: 0
+            }, "slow", "linear", function () {
+                UI.landing.remove();
+            });
+        });
+    UI.landing.menu.append(UI.landing.menu.newAppButton);
+
+    UI.landing.menu.loadAppButton = $('<div>');
+    UI.landing.menu.loadAppButton.append($('<i class="fa fa-upload">'));
+    UI.landing.menu.loadAppButton.click(function () {
+        UI.fileHandler.click();
+    });
+    UI.landing.menu.append(UI.landing.menu.loadAppButton);
+
+    UI.fileHandler = $('<input type="file" accept=".saml" class="hidden">');
+    UI.fileHandler.change(function (e) {
+        UI.landing.animate({
+            opacity: 0
+        }, "slow", "linear", function () {
+            UI.landing.remove();
+        });
+        var reader = new FileReader();
+        reader.onload = function (evt) {
+            list.setReady(true); // Ready the Layer Manager
+            $(document).unbind('keypress', landingOnKeyPressCallback);
+            var text = evt.target.result;
+            samlLoader.load(text);
+            historyManager.clear();
+            editorToolbar.disableTool('undo');
+        }
+        reader.readAsText(e.target.files[0]);
+        reader.onerror = function (evt) {
+            alert("Error reading file.");
+        }
+    });
+
+    UI.landing.append(UI.landing.image);
+    setInterval(function () {
+        UI.landing.image.animate({
+            opacity: 1
+        });
+    }, 100);
+    setInterval(function () {
+        UI.landing.image.addClass('landing-img-ready');
+    }, 1000);
+    UI.landing.append(UI.landing.version);
+    UI.landing.append(UI.landing.help);
+    UI.landing.append(UI.landing.menu);
+    setInterval(function () {
+        UI.landing.menu.animate({
+            opacity: 1
+        });
+        UI.landing.help.animate({
+            opacity: 1
+        });
+        UI.landing.version.animate({
+            opacity: 1
+        });
+    }, 1000);
 
     function addNode(id, type, parentNode, CSSclass, innerText) {
         if (id === undefined) return;
