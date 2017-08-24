@@ -16,7 +16,12 @@ var Editor = Class({
         MAX_SYMBOL_SIDE_LEN = CANVAS_PIXEL_SCALE * 191;
         MAX_NUM_LAYERS = 225;
         this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x);
-        this.ZOOM_STEP = this.zoom / 8;
+        if (isMobile) {
+            this.ZOOM_STEP = this.zoom / 4;
+        }
+        else {
+            this.ZOOM_STEP = this.zoom / 8;
+        }
         this.ZOOM_MIN = this.zoom / 4;
         this.ZOOM_MAX = this.zoom * 4;
         this.MIN_VTX_VARIATION = 2 * CANVAS_PIXEL_SCALE;
@@ -641,7 +646,7 @@ var Editor = Class({
         })
         $(window).resize(function () {
             let editor = $('canvas')[0].editor;
-            let newScalingFactor = window.innerWidth / (0.5 * EDITOR_SIZE.x)
+            let newScalingFactor = window.innerWidth / (0.5 * EDITOR_SIZE.x);
             editor.ZOOM_STEP = newScalingFactor / 8;
             editor.ZOOM_MIN = newScalingFactor / 4;
             editor.ZOOM_MAX = newScalingFactor * 4;
@@ -649,7 +654,12 @@ var Editor = Class({
                 editor.zoom = editor.ZOOM_MIN;
             else if (editor.zoom > editor.ZOOM_MAX)
                 editor.zoom = editor.ZOOM_MAX;
-            editor.updateSize();
+            $('#canvascontainer').panzoom("option", {
+                increment: editor.ZOOM_STEP,
+                minScale: editor.ZOOM_MIN,
+                maxScale: editor.ZOOM_MAX
+            }).panzoom("zoom", this.zoom);
+            editor.refreshLayerEditBox();
         });
 
         // Initialize Layer Control
@@ -684,7 +694,6 @@ var Editor = Class({
         }).on("panzoomzoom", function (e, panzoom, scale, opts) {
             e.stopImmediatePropagation();
             let editor = $('canvas')[0].editor;
-            //alert('zoom:' + editor.zoom + ' to ' + scale);
             editor.zoom = scale;
             editor.refreshLayerEditBox();
             $('canvas').trigger('vmouseup');
