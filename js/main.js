@@ -106,16 +106,14 @@ function initUI() {
             $(list.renamingLayer).blur();
         }
     });
-    if (!isMobile) {
-        UINodeList['Canvas Container'].onwheel = function (e) {
-            e.preventDefault();
-            //if (!e.ctrlKey) return;
-            if (e.deltaY < 0) { // Zoom +
-                list.editor.incrSize();
-            }
-            else { // Zoom -
-                list.editor.decrSize();
-            }
+    UINodeList['Canvas Container'].onwheel = function (e) {
+        e.preventDefault();
+        //if (!e.ctrlKey) return;
+        if (e.deltaY < 0) { // Zoom +
+            list.editor.incrSize();
+        }
+        else { // Zoom -
+            list.editor.decrSize();
         }
     }
 
@@ -131,8 +129,8 @@ function initUI() {
     }).on("panzoomzoom", function (e, panzoom, scale, opts) {
         e.stopImmediatePropagation();
         let editor = $('canvas')[0].editor;
-        if (!isMobile) editor.zoom = scale;
-        editor.refreshLayerEditBox();
+        editor.zoom = scale;
+        editor.updateSize();
         $('canvas').trigger('vmouseup');
     }).on("panzoomstart", function (e, panzoom, event, touches) {
         editorToolbar.enableTool('resetPan');
