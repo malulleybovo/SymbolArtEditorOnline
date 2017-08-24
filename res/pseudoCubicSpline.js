@@ -3,9 +3,28 @@
         pseudoCubicSpline[i] : i;
 }
 function revertPseudoCubicSplineColor(color) {
-    return (color >= pseudoCubicSpline[0]
-        && color < pseudoCubicSpline[pseudoCubicSpline.length - 1]) ?
-        pseudoCubicSpline.indexOf(color) : color;
+    if (color >= pseudoCubicSpline[0]
+        && color <= pseudoCubicSpline[pseudoCubicSpline.length - 1]) {
+        let rawCol = pseudoCubicSpline.indexOf(color);
+        if (rawCol >= 0) {
+            return rawCol;
+        }
+        else {
+            let subCol = pseudoCubicSpline.indexOf(color + 1);
+            if (subCol >= 0) return subCol;
+            subCol = pseudoCubicSpline.indexOf(color - 1);
+            if (subCol >= 0) return subCol;
+            subCol = pseudoCubicSpline.indexOf(color + 2);
+            if (subCol >= 0) return subCol;
+            subCol = pseudoCubicSpline.indexOf(color - 2);
+            if (subCol >= 0) return subCol;
+            subCol = pseudoCubicSpline.indexOf(color + 3);
+            if (subCol >= 0) return subCol;
+            subCol = pseudoCubicSpline.indexOf(color - 3);
+            if (subCol >= 0) return subCol;
+
+        }
+    }
 }
 
 var pseudoCubicSpline = [
