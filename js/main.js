@@ -128,6 +128,7 @@ function initUI() {
     }).on("panzoomzoom", function (e, panzoom, scale, opts) {
         e.stopImmediatePropagation();
         let editor = $('canvas')[0].editor;
+        alert('zoom:' + editor.zoom + ' to ' + scale);
         editor.zoom = scale;
         editor.updateSize();
         $('canvas').trigger('vmouseup');
