@@ -17,7 +17,7 @@ var Editor = Class({
         MAX_NUM_LAYERS = 225;
         this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x);
         if (isMobile) {
-            this.ZOOM_STEP = this.zoom / 4;
+            this.ZOOM_STEP = 1;
         }
         else {
             this.ZOOM_STEP = this.zoom / 8;
@@ -647,7 +647,12 @@ var Editor = Class({
         $(window).resize(function () {
             let editor = $('canvas')[0].editor;
             let newScalingFactor = window.innerWidth / (0.5 * EDITOR_SIZE.x);
-            editor.ZOOM_STEP = newScalingFactor / 8;
+            if (isMobile) {
+                editor.ZOOM_STEP = 1;
+            }
+            else {
+                editor.ZOOM_STEP = newScalingFactor / 8;
+            }
             editor.ZOOM_MIN = newScalingFactor / 4;
             editor.ZOOM_MAX = newScalingFactor * 4;
             if (editor.zoom < editor.ZOOM_MIN)
@@ -660,6 +665,9 @@ var Editor = Class({
                 maxScale: editor.ZOOM_MAX
             }).panzoom("zoom", this.zoom);
             editor.refreshLayerEditBox();
+            setTimeout(function () {
+                $('canvas')[0].editor.refreshLayerEditBox();
+            }, 500);
         });
 
         // Initialize Layer Control
