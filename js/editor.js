@@ -17,7 +17,7 @@ var Editor = Class({
         MAX_NUM_LAYERS = 225;
         this.zoom = window.innerWidth / (0.5 * EDITOR_SIZE.x);
         if (isMobile) {
-            this.ZOOM_STEP = 1;
+            this.ZOOM_STEP = this.zoom;
         }
         else {
             this.ZOOM_STEP = this.zoom / 8;
@@ -648,7 +648,7 @@ var Editor = Class({
             let editor = $('canvas')[0].editor;
             let newScalingFactor = window.innerWidth / (0.5 * EDITOR_SIZE.x);
             if (isMobile) {
-                editor.ZOOM_STEP = 1;
+                editor.ZOOM_STEP = newScalingFactor;
             }
             else {
                 editor.ZOOM_STEP = newScalingFactor / 8;

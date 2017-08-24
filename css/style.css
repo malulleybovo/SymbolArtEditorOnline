@@ -444,6 +444,10 @@ white { color: white; }
     color: #2fa1d6;
 }
 
+div.sp-container {
+    opacity: 0.85;
+}
+
 @media screen and (max-width: 540px) {
     div.sidebar {
         width: 100% !important;
