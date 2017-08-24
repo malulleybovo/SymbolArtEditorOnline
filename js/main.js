@@ -116,32 +116,6 @@ function initUI() {
         }
     }
 
-    // Mobile Zooming Controller
-    panZoomActive = false;
-    $(UINodeList['Canvas Container']).panzoom({
-        minScale: list.editor.ZOOM_MIN,
-        maxScale: list.editor.ZOOM_MAX,
-        increment: list.editor.ZOOM_STEP,
-        which: 2,
-        cursor: 'pointer',
-        disableOneFingerPan: true
-    }).on("panzoomzoom", function (e, panzoom, scale, opts) {
-        e.stopImmediatePropagation();
-        let editor = $('canvas')[0].editor;
-        //alert('zoom:' + editor.zoom + ' to ' + scale);
-        editor.zoom = scale;
-        editor.refreshLayerEditBox();
-        $('canvas').trigger('vmouseup');
-    }).on("panzoomstart", function (e, panzoom, event, touches) {
-        editorToolbar.enableTool('resetPan');
-        panZoomActive = true;
-        $('canvas').trigger('vmouseup');
-    }).on("panzoomend", function () {
-        panZoomActive = false;
-    }).on("panzoompan", function () {
-        $('canvas')[0].editor.refreshLayerEditBox();
-    });
-
     bgeManager = new BGEManager();
 
     // Initialize Toolbar Button

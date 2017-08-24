@@ -672,6 +672,33 @@ var Editor = Class({
         $('canvas').addClass('editor-canvas-border');
         $('canvas')[0].editor = this;
 
+        // Mobile Zooming Controller
+        panZoomActive = false;
+        $('#canvascontainer').panzoom({
+            minScale: this.ZOOM_MIN,
+            maxScale: this.ZOOM_MAX,
+            increment: this.ZOOM_STEP,
+            which: 2,
+            cursor: 'pointer',
+            disableOneFingerPan: true
+        }).on("panzoomzoom", function (e, panzoom, scale, opts) {
+            e.stopImmediatePropagation();
+            let editor = $('canvas')[0].editor;
+            //alert('zoom:' + editor.zoom + ' to ' + scale);
+            editor.zoom = scale;
+            editor.refreshLayerEditBox();
+            $('canvas').trigger('vmouseup');
+        }).on("panzoomstart", function (e, panzoom, event, touches) {
+            editorToolbar.enableTool('resetPan');
+            panZoomActive = true;
+            $('canvas').trigger('vmouseup');
+        }).on("panzoomend", function () {
+            panZoomActive = false;
+        }).on("panzoompan", function () {
+            $('canvas')[0].editor.refreshLayerEditBox();
+        });
+        $('#canvascontainer').panzoom("zoom", this.zoom);
+
         this.render();
     },
     resize: function (w, h) {
@@ -682,9 +709,7 @@ var Editor = Class({
         this.renderer.render(this.stage);
     },
     updateSize: function () {
-        let scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
-                + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
-        $('canvas').parent().css('transform', scale);
+        $('#canvascontainer').panzoom("zoom", this.zoom);
 
         this.refreshLayerEditBox();
     },
@@ -692,9 +717,7 @@ var Editor = Class({
         if (this.zoom + this.ZOOM_STEP <= this.ZOOM_MAX) {
             this.zoom += this.ZOOM_STEP;
 
-            let scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
-                + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
-            $('canvas').parent().css('transform', scale);
+            $('#canvascontainer').panzoom("zoom", this.zoom);
 
             this.refreshLayerEditBox();
         }
@@ -703,9 +726,7 @@ var Editor = Class({
         if (this.zoom - this.ZOOM_STEP >= this.ZOOM_MIN) {
             this.zoom -= this.ZOOM_STEP;
 
-            let scale = 'matrix(' + this.zoom + ', 0, 0, ' + this.zoom + ', '
-                + (-EDITOR_SIZE.x / 2) + ', ' + (-EDITOR_SIZE.y / 2) + ')';
-            $('canvas').parent().css('transform', scale);
+            $('#canvascontainer').panzoom("zoom", this.zoom);
 
             this.refreshLayerEditBox();
         }
