@@ -667,7 +667,7 @@ var Editor = Class({
             editor.refreshLayerEditBox();
             setTimeout(function () {
                 $('canvas')[0].editor.refreshLayerEditBox();
-            }, 500);
+            }, 100);
         });
 
         // Initialize Layer Control
