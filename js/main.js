@@ -61,7 +61,6 @@ function initDocument() {
 function initGlobalVars() {
     UINodeList = {};
     duplicates = [];
-    ZOOM_MAX = 5; ZOOM_MIN = 1; ZOOM_STEP = 0.4;
 }
 
 function initUI() {
@@ -120,9 +119,9 @@ function initUI() {
     // Mobile Zooming Controller
     panZoomActive = false;
     $(UINodeList['Canvas Container']).panzoom({
-        minScale: this.ZOOM_MIN,
-        maxScale: this.ZOOM_MAX,
-        increment: this.ZOOM_STEP,
+        minScale: list.editor.ZOOM_MIN,
+        maxScale: list.editor.ZOOM_MAX,
+        increment: list.editor.ZOOM_STEP,
         which: 2,
         cursor: 'pointer',
         disableOneFingerPan: true
