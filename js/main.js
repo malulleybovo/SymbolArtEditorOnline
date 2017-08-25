@@ -478,7 +478,7 @@ function initUI() {
 
     UI.landing.image = $('<div class="landing-img">');
 
-    UI.landing.version = $('<div class="landing-app-version">');
+    UI.landing.version = $('<div class="landing-app-version no-panning">');
     UI.landing.version.text(APP_VER);
 
     UI.landing.help = $('<div class="landing-help">');
@@ -548,6 +548,23 @@ function initUI() {
         }
     });
 
+    UI.landing.demoButton = $('<div class="landing-sample no-panning">TRY SAMPLE</div>');
+    UI.landing.demoButton.click(
+        function (e) {
+            $.ajax({
+                url: 'samples/demo0.saml',
+                success: function (data) {
+                    list.setReady(true); // Ready the Layer Manager
+                    samlLoader.load(data);
+                    UI.landing.animate({
+                        opacity: 0
+                    }, "slow", "linear", function () {
+                        UI.landing.remove();
+                    });
+                }
+            });
+        });
+
     UI.landing.append(UI.landing.image);
     setInterval(function () {
         UI.landing.image.animate({
@@ -559,6 +576,7 @@ function initUI() {
     }, 1000);
     UI.landing.append(UI.landing.version);
     UI.landing.append(UI.landing.help);
+    UI.landing.append(UI.landing.demoButton);
     UI.landing.append(UI.landing.menu);
     setInterval(function () {
         UI.landing.menu.animate({
@@ -568,6 +586,9 @@ function initUI() {
             opacity: 1
         });
         UI.landing.version.animate({
+            opacity: 1
+        });
+        UI.landing.demoButton.animate({
             opacity: 1
         });
     }, 1000);
