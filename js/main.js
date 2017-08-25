@@ -528,29 +528,35 @@ function initUI() {
 
     UI.fileHandler = $('<input type="file" accept=".saml" class="hidden">');
     UI.fileHandler.change(function (e) {
-        UI.landing.animate({
-            opacity: 0
-        }, "slow", "linear", function () {
-            UI.landing.remove();
-        });
-        var reader = new FileReader();
-        reader.onload = function (evt) {
-            list.setReady(true); // Ready the Layer Manager
-            $(document).unbind('keypress', landingOnKeyPressCallback);
-            var text = evt.target.result;
-            samlLoader.load(text);
-            historyManager.clear();
-            editorToolbar.disableTool('undo');
-        }
-        reader.readAsText(e.target.files[0]);
-        reader.onerror = function (evt) {
-            alert("Error reading file.");
-        }
+        $('.landing-img').addClass('loading');
+        var file = e.target.files[0];
+        setTimeout(function () {
+            var reader = new FileReader();
+            reader.onload = function (evt) {
+                list.setReady(true); // Ready the Layer Manager
+                $(document).unbind('keypress', landingOnKeyPressCallback);
+                var text = evt.target.result;
+                samlLoader.load(text);
+                historyManager.clear();
+                editorToolbar.disableTool('undo');
+                UI.landing.animate({
+                    opacity: 0
+                }, "slow", "linear", function () {
+                    UI.landing.remove();
+                });
+            }
+            reader.readAsText(file);
+            reader.onerror = function (evt) {
+                alert("Error reading file.");
+                $('.landing-img').removeClass('loading');
+            }
+        }, 1000);
     });
 
     UI.landing.demoButton = $('<div class="landing-sample no-panning">TRY SAMPLE</div>');
     UI.landing.demoButton.click(
         function (e) {
+            $('.landing-img').addClass('loading');
             $.ajax({
                 url: 'samples/demo0.saml',
                 success: function (data) {
@@ -561,15 +567,19 @@ function initUI() {
                     }, "slow", "linear", function () {
                         UI.landing.remove();
                     });
+                },
+                error: function () {
+                    $('.landing-img').removeClass('loading');
+                },
+                timeout: function () {
+                    $('.landing-img').removeClass('loading');
                 }
             });
         });
 
     UI.landing.append(UI.landing.image);
     setInterval(function () {
-        UI.landing.image.animate({
-            opacity: 1
-        });
+        UI.landing.image.css('opacity', 1);
     }, 100);
     setInterval(function () {
         UI.landing.image.addClass('landing-img-ready');
@@ -577,6 +587,7 @@ function initUI() {
     UI.landing.append(UI.landing.version);
     UI.landing.append(UI.landing.help);
     UI.landing.append(UI.landing.demoButton);
+
     UI.landing.append(UI.landing.menu);
     setInterval(function () {
         UI.landing.menu.animate({
