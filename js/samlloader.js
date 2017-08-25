@@ -105,6 +105,8 @@ var SAMLLoader = Class({
             console.log = savedConsoleLogCallback;
             throw e;
         }
+        // Restore normal logging functionality
+        console.log = savedConsoleLogCallback;
         if (onLoadNumWarnings > 0) {
             alert('Loaded Symbol Art contains invalid information ('
                 + onLoadNumWarnings + ' warnings logged). It can be edited '

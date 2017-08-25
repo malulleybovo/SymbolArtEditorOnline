@@ -49,6 +49,8 @@ var List = Class({
         this.container = $('<div data-role="main" class="ui-content">');
         this.page.append(this.header);
         this.page.append(this.container);
+        // For Copy/Paste Purposes
+        this.copiedInfo = null;
 
         this.movingElem = null;
         this.selectedElem = null;
@@ -253,7 +255,9 @@ var List = Class({
             header.draggable({
                 cursor: "move",
                 helper: function (e) {
-                    let name = e.currentTarget.elem.name;
+                    let domElem = e.currentTarget;
+                    if (!domElem.elem) return;
+                    let name = domElem.elem.name;
                     return $("<div class='drag-ghost'>" + name + "</div>");
                 }
             }).droppable();
@@ -324,7 +328,9 @@ var List = Class({
             li.draggable({
                 cursor: "move",
                 helper: function (e) {
-                    let name = e.currentTarget.elem.name;
+                    let domElem = e.currentTarget;
+                    if (!domElem.elem) return;
+                    let name = domElem.elem.name;
                     return $("<div class='drag-ghost'>" + name + "</div>");
                 }
             }).droppable();
@@ -463,6 +469,9 @@ var List = Class({
         }, 100);
     },
     moveSelectedElemTo: function (destElem) {
+        if (list.movingElem === null || list.movingElem === undefined
+            || !(list.movingElem instanceof Element)
+            || list.movingElem == destElem) return;
         let movingSrcElem = list.movingElem;
         if (movingSrcElem.tagName == 'H2') movingSrcElem = movingSrcElem.parentNode;
         let movingDestElem = destElem;
@@ -513,7 +522,10 @@ var List = Class({
         if (!this.async.hasSynced
             || srcElem == destElem) return;
         // Check if trying to nest a group somewhere inside itself
-        if (srcElem.elem.type == 'g' && $.contains(srcElem.parentNode, destElem)) return;
+        if (srcElem.elem.type == 'g' && $.contains(srcElem.parentNode, destElem)) {
+            alertManager.pushAlert('Cannot move group inside itself');
+            return;
+        }
         var src;
 
         /* Select layers in editor to move */
@@ -638,7 +650,7 @@ var List = Class({
         this.movingElem = elem;
         $(elem).children(':first').append('<i class="fa fa-check-square-o moving-checkbox">');
     },
-    addFolder: function (name, folder, forcedID) {
+    addFolder: function (name, folder, forcedID, notSaveHistory) {
         if (!this.ready) return;
         if (!this.async.hasSynced) return;
         if (folder === undefined) folder = this.container[0].firstChild;
@@ -656,7 +668,7 @@ var List = Class({
         }
         else {
             var index = group.activeElem;
-            if (index == 0) {
+            if (index <= 0) {
                 $(parentNode.firstChild).prepend(groupFolder);
             }
             else {
@@ -669,7 +681,7 @@ var List = Class({
         groupFolder.children(":eq(0)").focusin().click();
         this.updateDOMGroupVisibility(this.mainFolder[0]);
 
-        if (forcedID === undefined) {
+        if (forcedID === undefined && !notSaveHistory) {
             // Save undoable action for add
             historyManager.pushUndoAction('add', {
                 'elemID': groupFolder[0].id
@@ -680,8 +692,10 @@ var List = Class({
         console.log('%cAdded%c group "%s" in group "%s" at position "%i".',
             'color: #2fa1d6', 'color: #f3f3f3', headerNode.elem.name, headerNode.group.name,
             headerNode.group.elems.indexOf(headerNode.elem));
+
+        return groupFolder;
     },
-    addFolderAtEnd: function (name, folder, forcedID) {
+    addFolderAtEnd: function (name, folder, forcedID, notSaveHistory) {
         if (!this.ready) return;
         if (folder === undefined) folder = this.container[0].firstChild;
         var parentNode = folder.children[1]; // Get list of node elems from folder
@@ -700,7 +714,7 @@ var List = Class({
         groupFolder.children(":eq(0)").focusin().click();
         if (!isLoadingSAML) this.updateDOMGroupVisibility(this.mainFolder[0]);
 
-        if (forcedID === undefined) {
+        if (forcedID === undefined && !notSaveHistory) {
             // Save undoable action for add
             historyManager.pushUndoAction('add', {
                 'elemID': groupFolder[0].id
@@ -711,8 +725,10 @@ var List = Class({
         console.log('%cAdded%c group "%s" in group "%s" at position "%i".',
             'color: #2fa1d6', 'color: #f3f3f3', headerNode.elem.name, headerNode.group.name,
             headerNode.group.elems.indexOf(headerNode.elem));
+
+        return groupFolder;
     },
-    addElem: function (name, folder, forcedID) {
+    addElem: function (name, folder, forcedID, notSaveHistory) {
         if (!this.ready) return null;
         if (this.editor.isFull()) {
             console.log(
@@ -736,7 +752,7 @@ var List = Class({
         }
         else {
             var index = subGroup.activeElem;
-            if (index == 0) {
+            if (index <= 0) {
                 $(parentNode.firstChild).prepend(li);
             }
             else {
@@ -755,7 +771,7 @@ var List = Class({
         li.click();
         this.updateDOMGroupVisibility(this.mainFolder[0]);
 
-        if (forcedID === undefined) {
+        if (forcedID === undefined && !notSaveHistory) {
             // Save undoable action for add
             historyManager.pushUndoAction('add', {
                 'elemID': li[0].id
@@ -769,7 +785,7 @@ var List = Class({
         this.updateLayerCountDisplay();
         return li;
     },
-    addElemAtEnd: function (name, folder, forcedID) {
+    addElemAtEnd: function (name, folder, forcedID, notSaveHistory) {
         if (!this.ready) return null;
         if (this.editor.isFull()) {
             console.log(
@@ -801,7 +817,7 @@ var List = Class({
         li.click();
         if (!isLoadingSAML) this.updateDOMGroupVisibility(this.mainFolder[0]);
 
-        if (forcedID === undefined) {
+        if (forcedID === undefined && !notSaveHistory) {
             // Save undoable action for add
             historyManager.pushUndoAction('add', {
                 'elemID': li[0].id
@@ -838,6 +854,199 @@ var List = Class({
                 'color: #2fa1d6', 'color: #f3f3f3', removedSubtree.dataElem.name,
                 removedSubtree.dataGroup.name, removedSubtree.indexInGroup);
             this.updateLayerCountDisplay();
+        }
+    },
+    copyElem: function (domElem) {
+        if (domElem === undefined || !(domElem instanceof Element)) {
+            console.warn(
+            '%cLayer Manager (%O):%c Could not copy provided element %O.',
+            'color: #a6cd94', this, 'color: #d5d5d5', domElem);
+            return;
+        }
+        let info = null;
+        if (domElem.tagName == 'LI') info = {
+            subtree: domElem.elem,
+            type: 'l',
+        };
+        else if (domElem.tagName == 'H2') info = {
+            subtree: domElem.elem,
+            type: 'g',
+        };
+        else if (domElem.tagName == 'DIV') {
+            if (domElem.children[0] !== undefined
+                && domElem.children[0].tagName == 'H2')
+                info = {
+                    subtree: domElem.children[0].elem,
+                    type: 'g',
+                };
+        }
+        if (info === undefined || info == null) {
+            console.warn(
+            '%cLayer Manager (%O):%c Could not copy provided element %O '
+            + 'because no layer/group information could be found in it '
+            + '(info obtained: %O).',
+            'color: #a6cd94', this, 'color: #d5d5d5', domElem, info);
+            return;
+        }
+        var numCopiedLayers = 0;
+        info.subtree = copySubtree(info.subtree);
+        info.layerCnt = numCopiedLayers;
+        list.copiedInfo = info;
+        if (info.type == 'l')
+            alertManager.pushAlert('Copied Symbol');
+        else if (info.type == 'g')
+            alertManager.pushAlert('Copied Group');
+        /* Takes a snapshot of the layer subtree at root subtree */
+        function copySubtree(subtree, parent) {
+            let elem;
+            if (subtree.type == 'l') {
+                elem = new Layer('', undefined, undefined, undefined,
+                    undefined, undefined, undefined, undefined, undefined, true);
+                elem.pasteFrom(subtree);
+                if (parent !== undefined && parent.type == 'g') {
+                    elem.parent = parent;
+                }
+                numCopiedLayers++;
+            }
+            else if (subtree.type == 'g') {
+                elem = new Group(subtree.name, true);
+                if (parent !== undefined && parent.type == 'g') {
+                    elem.parent = parent;
+                }
+                elem.visible = subtree.visible;
+                for (var i = 0; i < subtree.elems.length; i++) {
+                    elem.elems.push(
+                        copySubtree(subtree.elems[i], elem)
+                        );
+                }
+            }
+            return elem;
+        }
+    },
+    pasteOnElem: function (domElem, dataElem) {
+        if (domElem === undefined || !(domElem instanceof Element)
+            || !(/^(LI|H2|DIV)$/.test(domElem.tagName))) {
+            console.warn(
+            '%cLayer Manager (%O):%c Could not paste on provided element %O.',
+            'color: #a6cd94', this, 'color: #d5d5d5', domElem);
+            return;
+        }
+        if (list.copiedInfo === undefined) {
+            console.warn(
+            '%cLayer Manager (%O):%c Could not paste because no valid copied info was found.',
+            'color: #a6cd94', this, 'color: #d5d5d5', list.copiedInfo);
+            return;
+        }
+        if (list.copiedInfo == null) {
+            console.log(
+            '%cLayer Manager:%c Could not paste because nothing was copied.',
+            'color: #a6cd94', 'color: #d5d5d5');
+            return;
+        }
+        if (list.editor.layers.length + list.copiedInfo.layerCnt >= MAX_NUM_LAYERS) {
+            console.log(
+            '%cLayer Manager:%c Could not paste to element %O '
+            + 'because editor layer capacity would be exceeded (%i / %i).',
+            'color: #a6cd94', 'color: #d5d5d5', domElem, list.copiedInfo.layerCnt,
+            MAX_NUM_LAYERS);
+            return;
+        }
+        let selector;
+        if (/^(LI|H2)$/.test(domElem.tagName)) {
+            selector = $(domElem);
+        }
+        else if (/^(DIV)$/.test(domElem.tagName)) {
+            selector = $(domElem.firstChild);
+        }
+        selector.click(); // Select the layer/group before editting
+        let toPaste = dataElem || list.copiedInfo.subtree;
+
+        // Temporarily disable normal logging for loading purposes
+        let savedConsoleLogCallback = console.log;
+        console.log = function () { }
+        try {
+            if (toPaste.type == 'l') {
+                let $li = list.addElem(toPaste.name, selector[0].parentFolder,
+                    undefined, true);
+                $li[0].elem.pasteFrom(toPaste);
+                $li.find('img')[0].src = partsInfo.path
+                    + partsInfo.dataArray[toPaste.part] + partsInfo.imgType;
+                list.editor.refreshDisplay();
+                list.editor.refreshLayerEditBox();
+                list.editor.render();
+                $li.click();
+                // Restore normal logging functionality
+                console.log = savedConsoleLogCallback;
+                // Save Action
+                historyManager.pushUndoAction('paste', {
+                    'elemID': $li[0].id
+                });
+                console.log('%cPasted%c layer %O in group %O at position "%i".',
+                    'color: #2fa1d6', 'color: #f3f3f3', $li[0].elem, $li[0].elem.parent,
+                    $li[0].elem.parent.elems.indexOf($li[0].elem));
+                alertManager.pushAlert('Pasted symbol');
+            }
+            else if (toPaste.type == 'g') {
+                let $div = list.addFolder(toPaste.name, selector[0].parentFolder,
+                    undefined, true);
+                let $h2 = $div[0].firstChild;
+                let group = $h2.elem;
+                group.name = toPaste.name;
+                group.visible = toPaste.visible;
+                for (var i = 0; i < toPaste.elems.length; i++) {
+                    pasteSubtree($div[0], toPaste.elems[i]);
+                }
+                list.editor.refreshDisplay();
+                list.editor.render();
+                $h2.click();
+                // Restore normal logging functionality
+                console.log = savedConsoleLogCallback;
+                // Save Action
+                historyManager.pushUndoAction('paste', {
+                    'elemID': $div[0].id
+                });
+                console.log('%cPasted%c group %O in group %O at position "%i".',
+                    'color: #2fa1d6', 'color: #f3f3f3', group, group.parent,
+                    group.parent.elems.indexOf(group));
+                alertManager.pushAlert('Pasted group');
+            }
+        }
+        catch (e) {
+            // Restore normal logging functionality
+            console.log = savedConsoleLogCallback;
+            throw e;
+        }
+
+        function pasteSubtree(domElem, dataElem) {
+            let selector;
+            if (/^(H2)$/.test(domElem.tagName)) {
+                selector = $(domElem);
+            }
+            else if (/^(DIV)$/.test(domElem.tagName)) {
+                selector = $(domElem.firstChild);
+            }
+            selector.click(); // Select the layer/group before editting
+            let toPaste = dataElem || list.copiedInfo.subtree;
+            if (toPaste.type == 'l') {
+                let $li;
+                $li = list.addElemAtEnd(toPaste.name, selector.parent()[0],
+                    undefined, true);
+                $li[0].elem.pasteFrom(toPaste);
+                $li.find('img')[0].src = partsInfo.path
+                    + partsInfo.dataArray[toPaste.part] + partsInfo.imgType;
+            }
+            else if (toPaste.type == 'g') {
+                let $div;
+                $div = list.addFolderAtEnd(toPaste.name, selector.parent()[0],
+                    undefined, true);
+                let $h2 = $div[0].firstChild;
+                let group = $h2.elem;
+                group.name = toPaste.name;
+                group.visible = toPaste.visible;
+                for (var i = 0; i < toPaste.elems.length; i++) {
+                    pasteSubtree($div[0], toPaste.elems[i]);
+                }
+            }
         }
     },
     /**
@@ -1062,7 +1271,3 @@ var List = Class({
         return saml;
     }
 });
-
-function alertError(msg) {
-
-}

@@ -1212,7 +1212,6 @@ var Editor = Class({
                 }
 
                 historyManager.pushUndoAction('symbol_groupmove', {
-                    'layers': this.editor.layers,
                     'startIdx': this.firstIndex,
                     'endIdx': this.lastIndex,
                     'startX': this.origX,

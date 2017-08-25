@@ -1,7 +1,7 @@
 <div align="center">
 
 # Symbol Art Editor Online
-#### Version 1.0.3
+#### Version 1.1.0
 
 ## [*Play with it Now*](https://malulleybovo.github.io/SymbolArtEditorOnline/)
 
@@ -61,13 +61,14 @@ Symbol Art Editor Online is a browser vector-based image editor used to produce 
     - *note:* I have not managed to understand how *.sar* files are formatted (binary file? encrypted?), so no *.sar* support until then unfortunately
 - Undo / Redo Changes Made (Add, Rename, Move, or Remove Layer/Group; Any Sort of Symbol Reshaping; Changes in Symbol Color)
 - Layer Manager to Organize and Facilitate Your Workflow
+    - Drag and Drop Layer/Group to Change Layer Priority
+    - (below features can be accessed via context menu opened by right-click, tap and hold, or swipe right)
     - Add Layer (New Symbol)
     - Add Group of Symbols
-    - Drag and Drop Layer/Group to Change Layer Priority
     - Pick Selected Layer/Group by Clicking (Tapping)
     - Delete Layer/Group
     - Rename Layer/Group
-    - (Upcoming) Copy / Paste Layers
+    - Copy / Paste Layers and Groups of Symbols
 - Symbol Edit Box to Manipulate the Symbol
     - Drag to Move Symbol Around
     - Stretch Symbol (Diagonally or by Side) using Respective Draggable Buttons on Screen

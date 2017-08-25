@@ -1,14 +1,14 @@
 var groupCount = 0;
 
 var Group = Class({
-    initialize: function (name) {
+    initialize: function (name, IDless) {
         this.type = 'g';
         this.name = name;
         this.elems = [];
         this.activeElem = -1;
         this.parent = null;
         this.visible = true;
-        this.ID = ++groupCount;
+        if (!IDless) this.ID = ++groupCount;
     },
     addSubGroup: function (name) {
         var newGroup = null;
@@ -46,7 +46,7 @@ var Group = Class({
             this.elems.splice(this.activeElem, 0, newLayer);
         }
         else if (this.elems.length == 0) {
-            this.addLayerAtEnd(name);
+            newLayer = this.addLayerAtEnd(name);
         }
         return newLayer;
     },

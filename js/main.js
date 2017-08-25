@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /***********************/
-var APP_VER = '1.0.3';
+var APP_VER = '1.1.0';
 /***********************/
 
 var imgWidth = 176;
@@ -75,6 +75,8 @@ function initUI() {
     addNode('Canvas Container', 'div', HTMLBody, 'button medium-text no-highlight cursor-pointer');
     UINodeList['Canvas Container'].id = 'canvascontainer';
     addNode('Canvas Box', 'div', UINodeList['Canvas Container'], 'canvas-box');
+
+    alertManager = new AlertManager();
 
     // Initialize Interface
     list = new List("Layers", "Symbol Art", UINodeList['Canvas Box']);
@@ -194,6 +196,7 @@ function initUI() {
             mainElem.elem.name = ctx.prevName;
             let layerTextLink = mainElem.firstChild;
             $(layerTextLink).children('span:first').text(ctx.prevName);
+            alertManager.pushAlert('Undid rename');
         },
         function (ctx) { // REDO rename
             var $domLayer = $('#' + ctx.domElemID);
@@ -204,6 +207,7 @@ function initUI() {
             mainElem.elem.name = ctx.newName;
             let layerTextLink = mainElem.firstChild;
             $(layerTextLink).children('span:first').text(ctx.newName);
+            alertManager.pushAlert('Redid rename');
         },
         ['domElemID', 'isLayer', 'prevName', 'newName']);
     historyManager
@@ -221,6 +225,7 @@ function initUI() {
                 if (srcLayer[0].tagName == 'DIV') srcLayer = $(srcLayer[0].firstChild);
                 if (currLayerInSrc[0].tagName == 'DIV') currLayerInSrc = $(currLayerInSrc[0].firstChild);
                 list.move(srcLayer[0], currLayerInSrc[0], true, !ctx.isForward);
+                alertManager.pushAlert('Undid move');
             }
             else {
                 setTimeout(function () {
@@ -238,6 +243,7 @@ function initUI() {
                 if (srcLayer[0].tagName == 'DIV') srcLayer = $(srcLayer[0].firstChild);
                 if (destLayer[0].tagName == 'DIV') destLayer = $(destLayer[0].firstChild);
                 list.move(srcLayer[0], destLayer[0], true, ctx.isForward);
+                alertManager.pushAlert('Redid move');
             }
             else {
                 setTimeout(function () {
@@ -256,6 +262,7 @@ function initUI() {
             $(parentDOM.firstChild).click();
             list.updateDOMGroupVisibility(list.mainFolder[0]);
             list.updateLayerCountDisplay();
+            alertManager.pushAlert('Undid add');
         },
         function (ctx) { // REDO add
             list.insertSubtree(ctx.subtree);
@@ -266,6 +273,30 @@ function initUI() {
                 $(elemDOM).click();
             list.updateDOMGroupVisibility(list.mainFolder[0]);
             list.updateLayerCountDisplay();
+            alertManager.pushAlert('Redid add');
+        },
+        ['elemID']);
+    // Paste is identical to add, but used to identify it as a 'Paste'
+    historyManager
+        .registerUndoAction('paste',
+        function (ctx) { // UNDO paste
+            ctx.subtree = list.extractSubtree(ctx.elemID);
+            let parentDOM = ctx.subtree.parentDOM;
+            $(parentDOM.firstChild).click();
+            list.updateDOMGroupVisibility(list.mainFolder[0]);
+            list.updateLayerCountDisplay();
+            alertManager.pushAlert('Undid paste');
+        },
+        function (ctx) { // REDO paste
+            list.insertSubtree(ctx.subtree);
+            let elemDOM = ctx.subtree.subtreeDOM;
+            if (elemDOM.tagName == 'DIV') // If Group, click header
+                $(elemDOM.firstChild).click();
+            else // If Layer, click it
+                $(elemDOM).click();
+            list.updateDOMGroupVisibility(list.mainFolder[0]);
+            list.updateLayerCountDisplay();
+            alertManager.pushAlert('Redid paste');
         },
         ['elemID']);
     historyManager
@@ -279,6 +310,7 @@ function initUI() {
                 $(elemDOM).click();
             list.updateDOMGroupVisibility(list.mainFolder[0]);
             list.updateLayerCountDisplay();
+            alertManager.pushAlert('Undid remove');
         },
         function (ctx) { // REDO remove
             ctx.subtree = list.extractSubtree(ctx.elemID);
@@ -286,6 +318,7 @@ function initUI() {
             $(parentDOM.firstChild).click();
             list.updateDOMGroupVisibility(list.mainFolder[0]);
             list.updateLayerCountDisplay();
+            alertManager.pushAlert('Redid remove');
         },
         ['elemID', 'subtree']);
     historyManager
@@ -304,6 +337,7 @@ function initUI() {
             let editor = $('canvas')[0].editor;
             editor.updateLayer(ctx.layer);
             editor.render();
+            alertManager.pushAlert('Undid symbol type change');
         },
         function (ctx) { // REDO symbol_partchange
             ctx.layer.part = ctx.newPartNum;
@@ -319,6 +353,7 @@ function initUI() {
             let editor = $('canvas')[0].editor;
             editor.updateLayer(ctx.layer);
             editor.render();
+            alertManager.pushAlert('Redid symbol type change');
         },
         ['layer', 'previewImg', 'prevPartNum', 'newPartNum']);
     historyManager
@@ -331,6 +366,7 @@ function initUI() {
             editor.render();
             editor.refreshLayerEditBox();
             editor.layerCtrl.update(ctx.layer);
+            alertManager.pushAlert('Undid symbol move');
         },
         function (ctx) { // REDO symbol_move
             ctx.layer.x = ctx.endX;
@@ -340,6 +376,7 @@ function initUI() {
             editor.render();
             editor.refreshLayerEditBox();
             editor.layerCtrl.update(ctx.layer);
+            alertManager.pushAlert('Redid symbol move');
         },
         ['layer', 'startX', 'startY', 'endX', 'endY']);
     historyManager
@@ -347,28 +384,30 @@ function initUI() {
         function (ctx) { // UNDO symbol_groupmove
             let editor = $('canvas')[0].editor;
             for (var i = ctx.startIdx; i < ctx.endIdx; i++) {
-                if (!ctx.layers[i]) continue;
-                let layer = ctx.layers[i].layer;
+                if (!editor.layers[i]) continue;
+                let layer = editor.layers[i].layer;
                 layer.x = ctx.startX[i - ctx.startIdx];
                 layer.y = ctx.startY[i - ctx.startIdx];
                 editor.updateLayer(layer);
             }
             editor.render();
             editor.refreshLayerEditBox();
+            alertManager.pushAlert('Undid symbol group move');
         },
         function (ctx) { // REDO symbol_groupmove
             let editor = $('canvas')[0].editor;
             for (var i = ctx.startIdx; i < ctx.endIdx; i++) {
-                if (!ctx.layers[i]) continue;
-                let layer = ctx.layers[i].layer;
+                if (!editor.layers[i]) continue;
+                let layer = editor.layers[i].layer;
                 layer.x = ctx.endX[i];
                 layer.y = ctx.endY[i];
                 editor.updateLayer(layer);
             }
             editor.render();
             editor.refreshLayerEditBox();
+            alertManager.pushAlert('Redid symbol group move');
         },
-        ['layers', 'startIdx', 'endIdx', 'startX', 'startY', 'endX', 'endY']);
+        ['startIdx', 'endIdx', 'startX', 'startY', 'endX', 'endY']);
     historyManager
         .registerUndoAction('symbol_reshape',
         function (ctx) { // UNDO symbol_reshape
@@ -380,6 +419,7 @@ function initUI() {
             editor.render();
             editor.refreshLayerEditBox();
             editor.layerCtrl.update(ctx.layer);
+            alertManager.pushAlert('Undid symbol reshape');
         },
         function (ctx) { // REDO symbol_reshape
             ctx.layer.vertices = ctx.newVals.vtces.slice(0);
@@ -390,6 +430,7 @@ function initUI() {
             editor.render();
             editor.refreshLayerEditBox();
             editor.layerCtrl.update(ctx.layer);
+            alertManager.pushAlert('Redid symbol reshape');
         },
         ['layer', 'origVals', 'newVals']);
     historyManager
@@ -401,6 +442,7 @@ function initUI() {
             editor.render();
             $('#colorSelector') // Update preview color on color picker
                 .spectrum('set', '#' + Math.round(ctx.layer.color).toString(16));
+            alertManager.pushAlert('Undid symbol recolor');
         },
         function (ctx) { // REDO symbol_recolor
             ctx.layer.color = ctx.newColor;
@@ -409,6 +451,7 @@ function initUI() {
             editor.render();
             $('#colorSelector') // Update preview color on color picker
                 .spectrum('set', '#' + Math.round(ctx.layer.color).toString(16));
+            alertManager.pushAlert('Redid symbol recolor');
         },
         ['layer', 'oldColor', 'newColor']);
     historyManager
@@ -419,6 +462,7 @@ function initUI() {
             editor.updateLayer(ctx.layer);
             editor.render();
             editor.layerCtrl.update(ctx.layer);
+            alertManager.pushAlert('Undid symbol transparency change');
         },
         function (ctx) { // REDO symbol_changealpha
             ctx.layer.alpha = ctx.newAlpha;
@@ -426,6 +470,7 @@ function initUI() {
             editor.updateLayer(ctx.layer);
             editor.render();
             editor.layerCtrl.update(ctx.layer);
+            alertManager.pushAlert('Redid symbol transparency change');
         },
         ['layer', 'oldAlpha', 'newAlpha']);
 

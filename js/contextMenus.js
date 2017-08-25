@@ -3,6 +3,8 @@ var CONTEXT_MENU_ICONS = {
     'addlayer': 'fa-picture-o',
     'addgroup': 'fa-folder-o',
     'move': 'fa-unsorted',
+    'copy': 'fa-copy',
+    'paste': 'fa-paste',
     'hideshow': 'fa-eye-slash',
     'remove': 'fa-trash-o'
 };
@@ -15,17 +17,17 @@ var contextMenuCallback = function (key, options, evt, selector) {
             list.rename(selector[0]);
             break;
         case 'new layer':
-            list.addElem("Layer " + layerNum, selector[0].parentFolder); layerNum++;
+            list.addElem("Symbol " + layerNum, selector[0].parentFolder); layerNum++;
             break;
         case 'insert layer':
             var folder = selector[0].parentNode;
             if (selector[0].elem.type == 'g') {
                 $(folder).collapsible('expand');
             }
-            list.addElemAtEnd("Layer " + layerNum, folder); layerNum++;
+            list.addElemAtEnd("Symbol " + layerNum, folder); layerNum++;
             break;
         case 'append layer':
-            list.addElemAtEnd("Layer " + layerNum, selector[0].parentFolder); layerNum++;
+            list.addElemAtEnd("Symbol " + layerNum, selector[0].parentFolder); layerNum++;
             break;
         case 'new group':
             list.addFolder("Group " + groupNum, selector[0].parentFolder); groupNum++;
@@ -45,6 +47,12 @@ var contextMenuCallback = function (key, options, evt, selector) {
             break;
         case 'moveselectedhere':
             selector.trigger('drop');
+            break;
+        case 'copy':
+            list.copyElem(selector[0]);
+            break;
+        case 'paste':
+            list.pasteOnElem(selector[0]);
             break;
         case 'hideshow':
             list.toggleElemVisibility(selector[0]);
@@ -67,7 +75,7 @@ $(function () {
         items: {
             "rename": { name: "1 Rename", icon: CONTEXT_MENU_ICONS.rename, accesskey: "1" },
             "sep1": "---------",
-            "insert layer": { name: "2 Add Layer Inside", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "2" },
+            "insert layer": { name: "2 Add Symbol Inside", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "2" },
             "sep2": "---------",
             "insert group": { name: "3 Add Group Inside", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "3" }
         }
@@ -86,16 +94,18 @@ $(function () {
         items: {
             "rename": { name: "1 Rename", icon: CONTEXT_MENU_ICONS.rename, accesskey: "1" },
             "sep1": "---------",
-            "new layer": { name: "2 Add Layer Here", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "2" },
-            "append layer": { name: "3 Add Layer At End", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "3" },
+            "new layer": { name: "2 Add Symbol Here", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "2" },
+            "append layer": { name: "3 Add Symbol At End", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "3" },
             "sep2": "---------",
             "new group": { name: "4 Add Group Here", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "4" },
             "append group": { name: "5 Add Group At End", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "5" },
             "sep3": "---------",
-            "picktomove": { name: "6 Pick to Move", icon: CONTEXT_MENU_ICONS.move, accesskey: "6" },
-            "moveselectedhere": { name: "7 Move Selected Here", icon: CONTEXT_MENU_ICONS.move, accesskey: "7" },
+            "picktomove": { name: "9 Pick to Move", icon: CONTEXT_MENU_ICONS.move, accesskey: "9" },
+            "moveselectedhere": { name: "0 Move Your Pick Here", icon: CONTEXT_MENU_ICONS.move, accesskey: "0" },
             "sep4": "---------",
-            "hideshow": { name: "8 Hide/Show", icon: CONTEXT_MENU_ICONS.hideshow, accesskey: "8" },
+            "hideshow": { name: "Hide/Show", icon: CONTEXT_MENU_ICONS.hideshow, accesskey: "h" },
+            "copy": { name: "Copy", icon: CONTEXT_MENU_ICONS.copy, accesskey: "c" },
+            "paste": { name: "Paste", icon: CONTEXT_MENU_ICONS.paste, accesskey: "p" },
             "sep5": "---------",
             "removal folder": {
                 "name": "Remove", accesskey: "r",
@@ -119,19 +129,22 @@ $(function () {
         items: {
             "rename": { name: "1 Rename", icon: CONTEXT_MENU_ICONS.rename, accesskey: "1" },
             "sep1": "---------",
-            "new layer": { name: "2 Add Layer Here", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "2" },
-            "insert layer": { name: "3 Add Layer Inside", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "3" },
-            "append layer": { name: "4 Add Layer At End", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "4" },
+            "new layer": { name: "2 Add Symbol Here", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "2" },
+            "append layer": { name: "3 Add Symbol At End", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "3" },
             "sep2": "---------",
-            "new group": { name: "5 Add Group Here", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "5" },
-            "insert group": { name: "6 Add Group Inside", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "6" },
-            "append group": { name: "7 Add Group At End", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "7" },
+            "new group": { name: "4 Add Group Here", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "4" },
+            "append group": { name: "5 Add Group At End", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "5" },
             "sep3": "---------",
-            "picktomove": { name: "8 Pick to Move", icon: CONTEXT_MENU_ICONS.move, accesskey: "8" },
-            "moveselectedhere": { name: "9 Move Selected Here", icon: CONTEXT_MENU_ICONS.move, accesskey: "9" },
+            "insert layer": { name: "6 Add Symbol Inside", icon: CONTEXT_MENU_ICONS.addlayer, accesskey: "6" },
+            "insert group": { name: "7 Add Group Inside", icon: CONTEXT_MENU_ICONS.addgroup, accesskey: "7" },
             "sep4": "---------",
-            "hideshow": { name: "0 Hide/Show", icon: CONTEXT_MENU_ICONS.hideshow, accesskey: "0" },
+            "picktomove": { name: "9 Pick to Move", icon: CONTEXT_MENU_ICONS.move, accesskey: "9" },
+            "moveselectedhere": { name: "0 Move Your Pick Here", icon: CONTEXT_MENU_ICONS.move, accesskey: "0" },
             "sep5": "---------",
+            "hideshow": { name: "Hide/Show", icon: CONTEXT_MENU_ICONS.hideshow, accesskey: "h" },
+            "copy": { name: "Copy", icon: CONTEXT_MENU_ICONS.copy, accesskey: "c" },
+            "paste": { name: "Paste", icon: CONTEXT_MENU_ICONS.paste, accesskey: "p" },
+            "sep6": "---------",
             "removal folder": {
                 "name": "Remove", accesskey: "r",
                 "items": {

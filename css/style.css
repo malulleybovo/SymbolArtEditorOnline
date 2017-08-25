@@ -30,6 +30,7 @@ body {
     padding: 5px 10px;
     width: 50% !important;
     height: 20px !important;
+    transform: translate(50%, 0);
 }
 
 div.ui-content {
@@ -446,6 +447,28 @@ white { color: white; }
 
 div.sp-container {
     opacity: 0.85;
+}
+
+#alertBox {
+    background-color: #2c2c2c;
+    color: #f3f3f3;
+    font-size: 14px;
+    position: fixed;
+    top: 8px;
+    transition: 0.1s ease-in-out;
+    transform: translate(0, -110%);
+    width: 30%;
+    min-width: 200px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    border-radius: 10px;
+    padding: 6px 12px;
+    text-align: center;
+    z-index: 100000;
+}
+#alertBox.alerting-msg {
+    transform: translate(0, 0) !important;
 }
 
 @media screen and (max-width: 540px) {

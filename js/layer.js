@@ -1,7 +1,7 @@
 var layerCount = 0;
 
 var Layer = Class({
-    initialize: function (name, part, color, x, y, scale, rotation, vertices, alpha) {
+    initialize: function (name, part, color, x, y, scale, rotation, vertices, alpha, IDless) {
         this.type = 'l';
         this.name = name;
         var halfSize = 64 * 3 / 2;
@@ -15,7 +15,7 @@ var Layer = Class({
         (vertices !== undefined) ? this.vertices = vertices : this.vertices = [-halfSize, -halfSize, halfSize, -halfSize, -halfSize, halfSize, halfSize, halfSize];
         (alpha !== undefined) ? this.alpha = alpha : this.alpha = 7;
         this.visible = true;
-        this.ID = ++layerCount;
+        if (!IDless) this.ID = ++layerCount;
     },
     update: function (quad) {
         this.color = quad.tint;
@@ -36,6 +36,38 @@ var Layer = Class({
             case 0.74902: this.alpha = 5; break;
             case 0.87451: this.alpha = 6; break;
             case 1: this.alpha = 7; break;
+        }
+    },
+    pasteFrom: function (layerToPasteFrom) {
+        if (layerToPasteFrom.type != 'l' || typeof layerToPasteFrom.name !== 'string'
+            || typeof layerToPasteFrom.part !== 'number'
+            || typeof layerToPasteFrom.color !== 'number'
+            || typeof layerToPasteFrom.scaleX !== 'number'
+            || typeof layerToPasteFrom.scaleY !== 'number'
+            || typeof layerToPasteFrom.x !== 'number'
+            || typeof layerToPasteFrom.y !== 'number'
+            || typeof layerToPasteFrom.rotation !== 'number'
+            || Object.prototype.toString.call(layerToPasteFrom.vertices) !== '[object Array]'
+            || layerToPasteFrom.vertices.length != this.vertices.length
+            || typeof layerToPasteFrom.alpha !== 'number'
+            || typeof layerToPasteFrom.visible !== 'boolean') {
+            console.log(
+            '%cLayer:%c Could not paste to layer %O because info provided (%O) is invalid.',
+            'color: #a6cd94', 'color: #d5d5d5', this, layerToPasteFrom);
+            return;
+        }
+        this.name = layerToPasteFrom.name;
+        this.part = layerToPasteFrom.part;
+        this.color = layerToPasteFrom.color;
+        this.scaleX = layerToPasteFrom.scaleX;
+        this.scaleY = layerToPasteFrom.scaleY;
+        this.x = layerToPasteFrom.x;
+        this.y = layerToPasteFrom.y;
+        this.rotation = layerToPasteFrom.rotation;
+        this.alpha = layerToPasteFrom.alpha;
+        this.visible = layerToPasteFrom.visible;
+        for (var i = 0; i < this.vertices.length; i++) {
+            this.vertices[i] = layerToPasteFrom.vertices[i];
         }
     },
     getAbsVertices: function () {
