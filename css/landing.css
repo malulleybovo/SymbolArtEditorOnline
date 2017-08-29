@@ -77,9 +77,9 @@
 }
 
 .loading {
-  -moz-animation: swing 5s linear infinite;
+  -moz-animation: swing 2s linear infinite;
   -moz-animation-timing-function: ease-out;
-  -webkit-animation: swing 5s linear infinite;
+  -webkit-animation: swing 2s linear infinite;
   -webkit-animation-timing-function: ease-out;
   animation: swing 2s linear infinite;
   animation-timing-function: ease-out;
