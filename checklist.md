@@ -58,6 +58,7 @@
 - [x] comfirm exit when unsaved changes (medium priority)
 
 #### TO BE FIXED
+- [ ] spacing bug on output .saml. Nested groups keep increasing amount of prespacing as the number of groups increases.
 - [ ] undo add when elem added is hidden and is the only child in group causes group to remain hidden (low priority - not harmful)
 - [ ] up/down arrows change active elem on same group (low priority)
 - [ ] right/left arrows go in and out of groups (low priority)

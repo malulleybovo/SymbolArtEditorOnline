@@ -734,6 +734,7 @@ var List = Class({
             console.log(
             '%cLayer Manager:%c Could not add layer because editor is full (%i/%i).',
             'color: #a6cd94', 'color: #d5d5d5', this.editor.layers.length, MAX_NUM_LAYERS);
+            alertManager.pushAlert('Cannot add layer because Symbol Art is full.');
             return null;
         }
         if (folder === undefined) folder = this.container[0].firstChild;
@@ -791,6 +792,7 @@ var List = Class({
             console.log(
             '%cLayer Manager:%c Could not add layer because editor is full (%i/%i).',
             'color: #a6cd94', 'color: #d5d5d5', this.editor.layers.length, MAX_NUM_LAYERS);
+            alertManager.pushAlert('Cannot add layer because Symbol Art is full.');
             return null;
         }
         if (folder === undefined) folder = this.container[0].firstChild;
@@ -949,6 +951,7 @@ var List = Class({
             + 'because editor layer capacity would be exceeded (%i / %i).',
             'color: #a6cd94', 'color: #d5d5d5', domElem, list.copiedInfo.layerCnt,
             MAX_NUM_LAYERS);
+            alertManager.pushAlert('Cannot paste because Symbol Art would exceed layer limit.');
             return;
         }
         let selector;

@@ -88,174 +88,135 @@
 
 @-moz-keyframes swing{
   0% {
-    -webkit-transform: perspective(400px) rotateX(0) rotateY(0) scale(0.8);
-    -moz-transform: perspective(400px) rotateX(0) rotateY(0) scale(0.8);
-    -ms-transform: perspective(400px) rotateX(0) rotateY(0) scale(0.8);
-    transform: perspective(400px) rotateX(0) rotateY(0) scale(0.8);
+    -webkit-transform: rotateX(0) rotateY(0) scale(0.8);
+    -moz-transform: rotateX(0) rotateY(0) scale(0.8);
+    -ms-transform: rotateX(0) rotateY(0) scale(0.8);
+    transform: rotateX(0) rotateY(0) scale(0.8);
   }
   10% {
     -webkit-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
     -moz-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
     -ms-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
-    transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
+    transform: rotateX(0deg) rotateY(0) scale(0.5);
   }
-  42% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    filter: contrast(100%);
-  }
-  48% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
+  30% {
+    -webkit-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    -moz-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    -ms-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    transform: rotateX(0deg) rotateY(180deg) scale(0.5);
   }
   50% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
+    -webkit-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
+    -moz-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
+    -ms-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
+    transform: rotateX(0deg) rotateY(360deg) scale(0.5);
   }
-  52% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-  }
-  58% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
+  70% {
+    -webkit-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    -moz-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    -ms-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    transform: rotateX(0deg) rotateY(180deg) scale(0.5);
   }
   90% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.6);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.6);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.6);
-    transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.6);
+    -webkit-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
+    -moz-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
+    -ms-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
+    transform: rotateX(0deg) rotateY(0deg) scale(0.5);
   }
   100% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.8);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.8);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.8);
-    transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.8);
+    -webkit-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
+    -moz-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
+    -ms-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
+    transform: rotateX(0deg) rotateY(0deg) scale(0.8);
   }
 }
 
 @-webkit-keyframes swing{
   0% {
-    -webkit-transform: perspective(400px) rotateX(0) rotateY(0) scale(0.8);
-    -moz-transform: perspective(400px) rotateX(0) rotateY(0) scale(0.8);
-    -ms-transform: perspective(400px) rotateX(0) rotateY(0) scale(0.8);
-    transform: perspective(400px) rotateX(0) rotateY(0) scale(0.8);
+    -webkit-transform: rotateX(0) rotateY(0) scale(0.8);
+    -moz-transform: rotateX(0) rotateY(0) scale(0.8);
+    -ms-transform: rotateX(0) rotateY(0) scale(0.8);
+    transform: rotateX(0) rotateY(0) scale(0.8);
   }
   10% {
     -webkit-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
     -moz-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
     -ms-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
-    transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
+    transform: rotateX(0deg) rotateY(0) scale(0.5);
   }
-  42% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    filter: contrast(100%);
-  }
-  48% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
+  30% {
+    -webkit-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    -moz-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    -ms-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    transform: rotateX(0deg) rotateY(180deg) scale(0.5);
   }
   50% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
+    -webkit-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
+    -moz-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
+    -ms-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
+    transform: rotateX(0deg) rotateY(360deg) scale(0.5);
   }
-  52% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-  }
-  58% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
+  70% {
+    -webkit-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    -moz-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    -ms-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    transform: rotateX(0deg) rotateY(180deg) scale(0.5);
   }
   90% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.6);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.6);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.6);
-    transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.6);
+    -webkit-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
+    -moz-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
+    -ms-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
+    transform: rotateX(0deg) rotateY(0deg) scale(0.5);
   }
   100% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.8);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.8);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.8);
-    transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.8);
+    -webkit-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
+    -moz-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
+    -ms-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
+    transform: rotateX(0deg) rotateY(0deg) scale(0.8);
   }
 }
 
 @keyframes swing{
   0% {
-    -webkit-transform: perspective(400px) rotateX(0) rotateY(0) scale(0.8);
-    -moz-transform: perspective(400px) rotateX(0) rotateY(0) scale(0.8);
-    -ms-transform: perspective(400px) rotateX(0) rotateY(0) scale(0.8);
-    transform: perspective(400px) rotateX(0) rotateY(0) scale(0.8);
+    -webkit-transform: rotateX(0) rotateY(0) scale(0.8);
+    -moz-transform: rotateX(0) rotateY(0) scale(0.8);
+    -ms-transform: rotateX(0) rotateY(0) scale(0.8);
+    transform: rotateX(0) rotateY(0) scale(0.8);
   }
   10% {
     -webkit-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
     -moz-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
     -ms-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
-    transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
+    transform: rotateX(0deg) rotateY(0) scale(0.5);
   }
-  42% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    filter: contrast(100%);
-  }
-  48% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
+  30% {
+    -webkit-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    -moz-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    -ms-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    transform: rotateX(0deg) rotateY(180deg) scale(0.5);
   }
   50% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
+    -webkit-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
+    -moz-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
+    -ms-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
+    transform: rotateX(0deg) rotateY(360deg) scale(0.5);
   }
-  52% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-  }
-  58% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: perspective(400px) rotateX(0deg) rotateY(360deg) scale(0.5);
+  70% {
+    -webkit-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    -moz-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    -ms-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+    transform: rotateX(0deg) rotateY(180deg) scale(0.5);
   }
   90% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.6);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.6);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.6);
-    transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.6);
+    -webkit-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
+    -moz-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
+    -ms-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
+    transform: rotateX(0deg) rotateY(0deg) scale(0.5);
   }
   100% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.8);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.8);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.8);
-    transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(0.8);
+    -webkit-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
+    -moz-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
+    -ms-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
+    transform: rotateX(0deg) rotateY(0deg) scale(0.8);
   }
 }

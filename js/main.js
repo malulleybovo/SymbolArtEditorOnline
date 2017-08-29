@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /***********************/
-var APP_VER = '1.1.0';
+var APP_VER = '1.1.1';
 /***********************/
 
 var imgWidth = 176;
@@ -484,7 +484,7 @@ function initUI() {
     UI.landing.help = $('<div class="landing-help">');
     UI.landing.help.append('<i class="fa fa-question">');
     UI.landing.help.click(function () {
-        var win = window.open('https://github.com/malulleybovo/SymbolArtEditorOnline', '_blank');
+        var win = window.open('https://github.com/malulleybovo/SymbolArtEditorOnline/wiki', '_blank');
         if (win) {
             win.focus();
         } else {
@@ -562,6 +562,8 @@ function initUI() {
                 success: function (data) {
                     list.setReady(true); // Ready the Layer Manager
                     samlLoader.load(data);
+                    historyManager.clear();
+                    editorToolbar.disableTool('undo');
                     UI.landing.animate({
                         opacity: 0
                     }, "slow", "linear", function () {
