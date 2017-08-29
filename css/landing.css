@@ -81,142 +81,124 @@
   -moz-animation-timing-function: ease-out;
   -webkit-animation: swing 5s linear infinite;
   -webkit-animation-timing-function: ease-out;
-  animation: swing 5s linear infinite;
+  animation: swing 2s linear infinite;
   animation-timing-function: ease-out;
   transition: 0.5s ease-in-out;
 }
 
 @-moz-keyframes swing{
   0% {
-    -webkit-transform: rotateX(0) rotateY(0) scale(0.8);
-    -moz-transform: rotateX(0) rotateY(0) scale(0.8);
-    -ms-transform: rotateX(0) rotateY(0) scale(0.8);
-    transform: rotateX(0) rotateY(0) scale(0.8);
+    -webkit-transform: scale(0.8);
+    -moz-transform: scale(0.8);
+    -ms-transform: scale(0.8);
+    transform: scale(0.8);
   }
-  10% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
-    transform: rotateX(0deg) rotateY(0) scale(0.5);
+  20% {
+    -webkit-transform: scale(0.7);
+    -moz-transform: scale(0.7);
+    -ms-transform: scale(0.7);
+    transform: scale(0.7);
   }
-  30% {
-    -webkit-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    -moz-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    -ms-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+  40% {
+    -webkit-transform: scale(0.7);
+    -moz-transform: scale(0.7);
+    -ms-transform: scale(0.7);
+    transform: scale(0.7);
   }
-  50% {
-    -webkit-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: rotateX(0deg) rotateY(360deg) scale(0.5);
+  60% {
+    -webkit-transform: scale(0.6);
+    -moz-transform: scale(0.6);
+    -ms-transform: scale(0.6);
+    transform: scale(0.6);
   }
-  70% {
-    -webkit-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    -moz-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    -ms-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-  }
-  90% {
-    -webkit-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
-    -moz-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
-    -ms-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
-    transform: rotateX(0deg) rotateY(0deg) scale(0.5);
+  80% {
+    -webkit-transform: scale(0.6);
+    -moz-transform: scale(0.6);
+    -ms-transform: scale(0.6);
+    transform: scale(0.6);
   }
   100% {
-    -webkit-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
-    -moz-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
-    -ms-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
-    transform: rotateX(0deg) rotateY(0deg) scale(0.8);
+    -webkit-transform: scale(0.8);
+    -moz-transform: scale(0.8);
+    -ms-transform: scale(0.8);
+    transform: scale(0.8);
   }
 }
 
 @-webkit-keyframes swing{
   0% {
-    -webkit-transform: rotateX(0) rotateY(0) scale(0.8);
-    -moz-transform: rotateX(0) rotateY(0) scale(0.8);
-    -ms-transform: rotateX(0) rotateY(0) scale(0.8);
-    transform: rotateX(0) rotateY(0) scale(0.8);
+    -webkit-transform: scale(0.8);
+    -moz-transform: scale(0.8);
+    -ms-transform: scale(0.8);
+    transform: scale(0.8);
   }
-  10% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
-    transform: rotateX(0deg) rotateY(0) scale(0.5);
+  20% {
+    -webkit-transform: scale(0.7);
+    -moz-transform: scale(0.7);
+    -ms-transform: scale(0.7);
+    transform: scale(0.7);
   }
-  30% {
-    -webkit-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    -moz-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    -ms-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+  40% {
+    -webkit-transform: scale(0.7);
+    -moz-transform: scale(0.7);
+    -ms-transform: scale(0.7);
+    transform: scale(0.7);
   }
-  50% {
-    -webkit-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: rotateX(0deg) rotateY(360deg) scale(0.5);
+  60% {
+    -webkit-transform: scale(0.6);
+    -moz-transform: scale(0.6);
+    -ms-transform: scale(0.6);
+    transform: scale(0.6);
   }
-  70% {
-    -webkit-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    -moz-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    -ms-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-  }
-  90% {
-    -webkit-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
-    -moz-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
-    -ms-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
-    transform: rotateX(0deg) rotateY(0deg) scale(0.5);
+  80% {
+    -webkit-transform: scale(0.6);
+    -moz-transform: scale(0.6);
+    -ms-transform: scale(0.6);
+    transform: scale(0.6);
   }
   100% {
-    -webkit-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
-    -moz-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
-    -ms-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
-    transform: rotateX(0deg) rotateY(0deg) scale(0.8);
+    -webkit-transform: scale(0.8);
+    -moz-transform: scale(0.8);
+    -ms-transform: scale(0.8);
+    transform: scale(0.8);
   }
 }
 
 @keyframes swing{
   0% {
-    -webkit-transform: rotateX(0) rotateY(0) scale(0.8);
-    -moz-transform: rotateX(0) rotateY(0) scale(0.8);
-    -ms-transform: rotateX(0) rotateY(0) scale(0.8);
-    transform: rotateX(0) rotateY(0) scale(0.8);
+    -webkit-transform: scale(0.8);
+    -moz-transform: scale(0.8);
+    -ms-transform: scale(0.8);
+    transform: scale(0.8);
   }
-  10% {
-    -webkit-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
-    -moz-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
-    -ms-transform: perspective(400px) rotateX(0deg) rotateY(0) scale(0.6);
-    transform: rotateX(0deg) rotateY(0) scale(0.5);
+  20% {
+    -webkit-transform: scale(0.7);
+    -moz-transform: scale(0.7);
+    -ms-transform: scale(0.7);
+    transform: scale(0.7);
   }
-  30% {
-    -webkit-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    -moz-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    -ms-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    transform: rotateX(0deg) rotateY(180deg) scale(0.5);
+  40% {
+    -webkit-transform: scale(0.7);
+    -moz-transform: scale(0.7);
+    -ms-transform: scale(0.7);
+    transform: scale(0.7);
   }
-  50% {
-    -webkit-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
-    -moz-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
-    -ms-transform: rotateX(0deg) rotateY(360deg) scale(0.5);
-    transform: rotateX(0deg) rotateY(360deg) scale(0.5);
+  60% {
+    -webkit-transform: scale(0.6);
+    -moz-transform: scale(0.6);
+    -ms-transform: scale(0.6);
+    transform: scale(0.6);
   }
-  70% {
-    -webkit-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    -moz-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    -ms-transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-    transform: rotateX(0deg) rotateY(180deg) scale(0.5);
-  }
-  90% {
-    -webkit-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
-    -moz-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
-    -ms-transform: rotateX(0deg) rotateY(0deg) scale(0.5);
-    transform: rotateX(0deg) rotateY(0deg) scale(0.5);
+  80% {
+    -webkit-transform: scale(0.6);
+    -moz-transform: scale(0.6);
+    -ms-transform: scale(0.6);
+    transform: scale(0.6);
   }
   100% {
-    -webkit-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
-    -moz-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
-    -ms-transform: rotateX(0deg) rotateY(0deg) scale(0.8);
-    transform: rotateX(0deg) rotateY(0deg) scale(0.8);
+    -webkit-transform: scale(0.8);
+    -moz-transform: scale(0.8);
+    -ms-transform: scale(0.8);
+    transform: scale(0.8);
   }
 }
