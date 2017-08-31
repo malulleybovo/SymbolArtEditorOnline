@@ -814,7 +814,7 @@ var Editor = Class({
             // Add quad to specified position (index [length-3] = top, index [0] = bottom)
             // (index [length-1] = SA Box) => should never change
             // (index [length-2] = Overlay Image) => should never change
-            this.stage.addChildAt(quad, this.stage.children.length - 3 - index);
+            this.stage.addChildAt(quad, this.stage.children.length - 2 - index);
             // save layer data in top-down order (index 0 is the topmost)
             this.layers.splice(index, 0, layerData);
         }
