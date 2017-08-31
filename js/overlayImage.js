@@ -305,6 +305,6 @@ var OverlayImage = Class({
             + '" rot="' + this.plane.rotation
             + '" alpha="' + this.plane.alpha
             + '" green-screen="' + this.backgroundInfo.green
-            + '">';
+            + '"/>';
     }
 });

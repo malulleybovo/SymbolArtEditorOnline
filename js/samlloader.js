@@ -699,6 +699,9 @@ var SAMLLoader = Class({
                         onLoadNumWarnings++;
                         break;
                     }
+                    if (value === 'true') value = true;
+                    else if (value === 'false') value = false;
+
                     if (value)
                         overlay.backgroundInfo.DOM.domElement.click();
                     break;
