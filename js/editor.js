@@ -34,7 +34,10 @@ var Editor = Class({
         this.mainGroup = list.mainGroup;
 
         //Create the renderer
-        this.renderer = PIXI.autoDetectRenderer(EDITOR_SIZE.x, EDITOR_SIZE.y, { transparent: true });
+        this.renderer = PIXI.autoDetectRenderer(EDITOR_SIZE.x, EDITOR_SIZE.y, {
+            transparent: true,
+            preserveDrawingBuffer: true
+        });
 
         //Create a container object called the `this.stage`
         this.stage = new PIXI.Container();
@@ -475,8 +478,16 @@ var Editor = Class({
             /**
              * Perform vertex rotation
              */
-            for (var i = 0; i < v.length; i++) {
+            let ctrlFactorX = 0, ctrlFactorY = 0;
+            if (Math.abs(layer.x) % 3 == 1.5) ctrlFactorX = 1.5;
+            if (Math.abs(layer.y) % 3 == 1.5) ctrlFactorY = 1.5;
+            for (var i = 0; i < v.length; i += 2) {
                 layer.vertices[i] = newV[i];
+                if (layer.vertices[i] >= 0) layer.vertices[i] += ctrlFactorX;
+                else layer.vertices[i] -= ctrlFactorX;
+                layer.vertices[i + 1] = newV[i + 1];
+                if (layer.vertices[i + 1] >= 0) layer.vertices[i + 1] += ctrlFactorY;
+                else layer.vertices[i + 1] -= ctrlFactorY;
             }
             editor.updateLayer(layer);
             editor.render();
@@ -529,8 +540,16 @@ var Editor = Class({
             /**
              * Perform vertex resize
              */
-            for (var i = 0; i < currVtces.length; i++) {
+            let ctrlFactorX = 0, ctrlFactorY = 0;
+            if (Math.abs(layer.x) % 3 == 1.5) ctrlFactorX = 1.5;
+            if (Math.abs(layer.y) % 3 == 1.5) ctrlFactorY = 1.5;
+            for (var i = 0; i < currVtces.length; i += 2) {
                 currVtces[i] = roundPosition(origVtces[i] * scalingFactor);
+                if (currVtces[i] >= 0) currVtces[i] += ctrlFactorX;
+                else currVtces[i] -= ctrlFactorX;
+                currVtces[i + 1] = roundPosition(origVtces[i + 1] * scalingFactor);
+                if (currVtces[i + 1] >= 0) currVtces[i + 1] += ctrlFactorY;
+                else currVtces[i + 1] -= ctrlFactorY;
             }
             editor.updateLayer(layer);
             editor.render();

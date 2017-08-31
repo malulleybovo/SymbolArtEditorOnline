@@ -56,12 +56,12 @@
 	- canvas bounding box (impacts stretches, resizes, moves, rotations)
 - [x] quick alert of number of errors/warnings after loading .saml
 - [x] comfirm exit when unsaved changes (medium priority)
+- [x] spacing bug on output .saml. Nested groups keep increasing amount of prespacing as the number of groups increases.
+- [x] add option to output result to image file
 
 #### TO BE FIXED
-- [ ] spacing bug on output .saml. Nested groups keep increasing amount of prespacing as the number of groups increases.
 - [ ] undo add when elem added is hidden and is the only child in group causes group to remain hidden (low priority - not harmful)
 - [ ] up/down arrows change active elem on same group (low priority)
 - [ ] right/left arrows go in and out of groups (low priority)
 - [ ] actionManager class for managing calls to perform functions and push actions to history. Every class that calls to perform some action will use this class as medium instead.
-- [ ] add option to output result to image file (rethink)
 - [ ] group edit box (rethink)

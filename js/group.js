@@ -79,15 +79,15 @@ var Group = Class({
     toSAML: function (numTabs) {
         if (numTabs === undefined) numTabs = 0;
 
-        var newLine = '\n\r';
+        var newLine = '\n';
         for (var i = 0; i < numTabs; i++) {
             newLine += '\t';
         }
 
-        var saml = '<g name="' + this.name + '" visible="' + this.visible + '">';
+        var saml = newLine + '<g name="' + this.name + '" visible="' + this.visible + '">';
         for (var i = 0; i < this.elems.length; i++) {
             var elem = this.elems[i];
-            saml += newLine + '\t' + elem.toSAML(++numTabs); // for elem = group/layer
+            saml += elem.toSAML(numTabs + 1); // for elem = group/layer
         }
         saml += newLine + '</g>';
         return saml;

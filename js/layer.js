@@ -107,7 +107,12 @@ var Layer = Class({
             case 7: alphaVal = 1; break;
         }*/
 
-        var saml = '<layer name="' + this.name
+        var newLine = '\n';
+        for (var i = 0; i < numTabs; i++) {
+            newLine += '\t';
+        }
+
+        var saml = newLine + '<layer name="' + this.name
              // -1 due to SAML parts format starting from 240 and not 241
             + '" visible="' + this.visible
             + '" type="' + (partsInfo.dataArray[this.part] - 1)

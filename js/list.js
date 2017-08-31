@@ -1264,16 +1264,16 @@ var List = Class({
         // Get file header info
         var saml = '<?xml version="1.0" encoding="utf-8"?>\n'
             + this.editor.overlayImg.toSAML()
-            + '<sa name="' + this.mainGroup.name
+            + '\n<sa name="' + this.mainGroup.name
             + '" visible="true" version="' + SAConfig.version
             + '" author="' + SAConfig.authorID
-            + '" width="192" height="96" sound="' + $('#player')[0].manager.currBGE + '">\n\r';
+            + '" width="192" height="96" sound="' + $('#player')[0].manager.currBGE + '">';
         // Get Layer/Group info
         for (var i = 0; i < this.mainGroup.elems.length; i++) {
             var elem = this.mainGroup.elems[i];
-            saml += '\n\r\t' + elem.toSAML(1); // for elem = group/layer
+            saml += elem.toSAML(1); // for elem = group/layer
         }
-        saml += '\n\r</sa>';
+        saml += '\n</sa>';
         return saml;
     }
 });

@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /***********************/
-var APP_VER = '1.2.0';
+var APP_VER = '1.2.1';
 /***********************/
 
 var imgWidth = 176;
@@ -193,6 +193,33 @@ function initUI() {
     editorToolbar.addTool('save', 'fa fa-download', function () {
         var blob = new Blob([list.toSAML()], { type: "text/plain;charset=utf-8" });
         saveAs(blob, list.mainGroup.name + ".saml");
+    });
+    editorToolbar.addTool('saveAsJPG', 'fa fa-file-image-o', function () {
+        let hidden_canv = document.createElement('canvas');
+        hidden_canv.width = CANVAS_PIXEL_SCALE * CANVAS_SIZE.x;
+        hidden_canv.height = CANVAS_PIXEL_SCALE * CANVAS_SIZE.y;
+        let saCanvas = $('canvas')[0];
+        let savedTransp = saCanvas.editor.overlayImg.plane.alpha;
+        saCanvas.editor.overlayImg.plane.alpha = 0;
+        saCanvas.editor.render();
+        //Draw the data you want to download to the hidden canvas
+        let hidden_ctx = hidden_canv.getContext('2d');
+        hidden_ctx.drawImage(
+            saCanvas,
+            (EDITOR_SIZE.x - hidden_canv.width) / 2,//Start Clipping
+            (EDITOR_SIZE.y - hidden_canv.height) / 2,//Start Clipping
+            hidden_canv.width,//Clipping Width
+            hidden_canv.height,//Clipping Height
+            0,//Place X
+            0,//Place Y
+            hidden_canv.width,//Place Width
+            hidden_canv.height//Place Height
+        );
+        hidden_canv.toBlob(function (blob) {
+            saveAs(blob, list.mainGroup.name + ".png");
+        });
+        saCanvas.editor.overlayImg.plane.alpha = savedTransp;
+        saCanvas.editor.render();
     });
     editorToolbar.setup(); // Ready the toolbar for use
     editorToolbar.disableTool('resetPan');
