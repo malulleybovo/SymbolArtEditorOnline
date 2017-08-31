@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /***********************/
-var APP_VER = '1.1.1';
+var APP_VER = '1.2.0';
 /***********************/
 
 var imgWidth = 176;
@@ -161,6 +161,35 @@ function initUI() {
     editorToolbar.addMenuOptionToTool('sound', 'fa fa-play-circle-o', function () {
         $('#player')[0].play();
     });
+    editorToolbar.addTool('overlay', 'fa fa-picture-o');
+    editorToolbar.addMenuOptionToTool('overlay', 'fa fa-plus',
+        function () {
+            let handler = $('<input type="file" accept="image/*" id="getval">');
+            handler.change(function (e) {
+                var file = e.target.files[0];
+                var reader = new FileReader();
+                reader.onloadend = function () {
+                    let editor = $('canvas')[0].editor;
+                    editor.disableGroupInteraction();
+                    editor.hideInterface();
+                    editor.overlayImg.setImage(reader.result);
+                    editor.overlayImg.toggleController(true);
+                    editor.render();
+                    editorToolbar.enableOptionInTool(1, 'overlay');
+                }
+                if (file) {
+                    reader.readAsDataURL(file);
+                }
+            });
+            handler.click();
+        });
+    editorToolbar.addMenuOptionToTool('overlay', 'fa fa-pencil',
+        function () {
+            let editor = $('canvas')[0].editor;
+            editor.disableGroupInteraction();
+            editor.hideInterface();
+            editor.overlayImg.toggleController();
+        });
     editorToolbar.addTool('save', 'fa fa-download', function () {
         var blob = new Blob([list.toSAML()], { type: "text/plain;charset=utf-8" });
         saveAs(blob, list.mainGroup.name + ".saml");
@@ -169,6 +198,7 @@ function initUI() {
     editorToolbar.disableTool('resetPan');
     editorToolbar.disableTool('undo');
     editorToolbar.disableTool('redo');
+    editorToolbar.disableOptionInTool(1, 'overlay');
 
     historyManager = new HistoryManager();
     historyManager.onpush(function () {

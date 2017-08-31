@@ -35,6 +35,8 @@ var SAMLLoader = Class({
                 // Found an xml tag
             }
 
+            this.setupOverlay(SAMLText);
+
             var mainFolder = this.list.container[0].firstChild;
             var currFolder = mainFolder;
 
@@ -94,6 +96,7 @@ var SAMLLoader = Class({
 
             this.editor.render();
             this.editor.hideInterface();
+            //this.editor.overlayImg.toggleController(false);
             list.updateDOMGroupVisibility(list.mainFolder[0]);
 
             $(mainFolder).children(':first').click();
@@ -596,5 +599,112 @@ var SAMLLoader = Class({
             var hex = c.toString(16);
             return hex.length == 1 ? "0" + hex : hex;
         }
+    },
+    setupOverlay: function (xml) {
+        let tags = xml.match(/<overlay-img>|<overlay-img [^\n]*>/);
+        if (tags == null || tags.length <= 0) return;
+        var keyValues = tags[0].match(/([A-Z|a-z][A-Z|a-z|0-9|_]*[A-Z|a-z|0-9|-]*="[^"|\n]+")+/g);
+        let overlay = $('canvas')[0].editor.overlayImg;
+        for (var i = 0; i < keyValues.length; i++) {
+            let keyValue = keyValues[i];
+            let key = keyValue.substr(0, keyValue.indexOf('='));
+            let value = keyValue.substr(keyValue.indexOf('=') + 1).match(/([^"|\n]+)/)[0].trim();
+
+            switch (key) {
+                case 'src':
+                    let base64Pattern = /^data:image\/(jpg|jpeg|tiff|png|bmp);base64,([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=)|([0-9a-zA-Z+/]{3}))?$/;
+                    if (!base64Pattern.test(value)) {
+                        // Invalid Input
+                        console.warn(
+                            '%cSAML Loader (%O):%c Overlay Image has invalid source "%s".',
+                            'color: #a6cd94', this, 'color: #d5d5d5', value);
+                        onLoadNumWarnings++;
+                        break;
+                    }
+                    overlay.setImage(value);
+                    break;
+                case 'pos-x':
+                    value = parseFloat(value);
+                    if (value === undefined) {
+                        // Invalid Input
+                        console.warn(
+                            '%cSAML Loader (%O):%c Overlay Image has invalid pos-x value "%i".'
+                            + ' Using default value (%i).',
+                            'color: #a6cd94', this, 'color: #d5d5d5', value, overlay.getImage().x);
+                        onLoadNumWarnings++;
+                        break;
+                    }
+                    overlay.moveToX(value);
+                    break;
+                case 'pos-y':
+                    value = parseFloat(value);
+                    if (value === undefined) {
+                        // Invalid Input
+                        console.warn(
+                            '%cSAML Loader (%O):%c Overlay Image %O has invalid pos-y value "%i".'
+                            + ' Using default value (%i).',
+                            'color: #a6cd94', this, 'color: #d5d5d5', value, overlay.getImage().y);
+                        onLoadNumWarnings++;
+                        break;
+                    }
+                    overlay.moveToY(value);
+                    break;
+                case 'scale':
+                    value = parseFloat(value);
+                    if (value === undefined) {
+                        // Invalid Input
+                        console.warn(
+                            '%cSAML Loader (%O):%c Overlay Image %O has invalid scale "%i".'
+                            + ' Using default value (%i).',
+                            'color: #a6cd94', this, 'color: #d5d5d5', value, overlay.getImage().scale.x);
+                        onLoadNumWarnings++;
+                        break;
+                    }
+                    overlay.scale(value);
+                    break;
+                case 'rot':
+                    value = parseFloat(value);
+                    if (value === undefined) {
+                        // Invalid Input
+                        console.warn(
+                            '%cSAML Loader (%O):%c Overlay Image %O has invalid scale "%i".'
+                            + ' Using default value (%i).',
+                            'color: #a6cd94', this, 'color: #d5d5d5', value, overlay.getImage().rotation);
+                        onLoadNumWarnings++;
+                        break;
+                    }
+                    overlay.rotate(value);
+                    break;
+                case 'alpha':
+                    value = parseFloat(value);
+                    if (value === undefined) {
+                        // Invalid Input
+                        console.warn(
+                            '%cSAML Loader (%O):%c Overlay Image %O has invalid transparency "%i".'
+                            + ' Using default value (%i).',
+                            'color: #a6cd94', this, 'color: #d5d5d5', value, overlay.getImage().alpha);
+                        onLoadNumWarnings++;
+                        break;
+                    }
+                    overlay.transparency(value);
+                    break;
+                case 'green-screen':
+                    if (value === undefined
+                        || (value !== 'true' && value !== 'false')) {
+                        // Invalid Input
+                        console.warn(
+                            '%cSAML Loader (%O):%c Overlay Image %O has invalid green-screen value "%o".'
+                            + ' Using default value (%o).',
+                            'color: #a6cd94', this, 'color: #d5d5d5', value, false);
+                        onLoadNumWarnings++;
+                        break;
+                    }
+                    if (value)
+                        overlay.backgroundInfo.DOM.domElement.click();
+                    break;
+            }
+        }
+
+        editorToolbar.enableOptionInTool(1, 'overlay');
     }
 });

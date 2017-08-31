@@ -1,5 +1,6 @@
 ﻿var Toolbar = Class({
     initialize: function (domElem) {
+        this.TOOL_OPTIONS_NUM = 0;
         this.wrapper = $('<div id="SAToolbar">');
         this.holder = $('<div class="toolbar-holder no-panning">');
         this.domElem = $('<div class="toolbar-container">');
@@ -41,14 +42,18 @@
         if (this.toolList[name] === undefined) return null;
         let tool = this.toolList[name];
         if (tool.options === undefined) {
-            tool.options = $('<div id="toolbar-options" class="hidden">');
+            tool.options = $('<div id="toolbar-options'
+                + this.TOOL_OPTIONS_NUM + '" class="hidden">');
+            this.TOOL_OPTIONS_NUM++
             tool.append(tool.options);
         }
         let newOption = $('<a href="#" class="tool-item"></a>');
         newOption.icon = $('<i class="' + iconClassName
             + ' toolbaritem" style="text-shadow: none;margin-top: 2.5px;"></i>');
+        newOption[0].isEnabled = true;
+        newOption[0].onclickRef = onClickCallback;
         newOption.append(newOption.icon);
-        newOption.click(onClickCallback);
+        newOption.on('click', onClickCallback);
         tool.options.append(newOption);
         return newOption;
     },
@@ -56,7 +61,7 @@
         for (var name in this.toolList) {
             if (this.toolList[name].options) {
                 this.toolList[name].toolbar({
-                    content: '#toolbar-options',
+                    content: '#' + this.toolList[name].options[0].id,
                 });
             }
         }
@@ -138,5 +143,31 @@
         tool.isEnabled = false;
         tool.addClass('toolbar-disabled-tool');
         if (tool.onclickRef !== undefined) tool.off();
+    },
+    enableOptionInTool: function (idx, toolName) {
+        if (this.toolList[toolName] === undefined) return null;
+        let tool = this.toolList[toolName];
+        if (tool.options === undefined
+            || tool.options[0].children[idx] === undefined
+            || tool.options[0].children[idx].isEnabled) return null;
+        let option = $(tool.options[0].children[idx]);
+        let $classes = option.children(':first').attr('class').replace(/ /g, '.');
+        let $domElem = $('.' + $classes).parent();
+        option[0].isEnabled = true;
+        $domElem.removeClass('toolbar-disabled-tool');
+        $domElem.on('click', option[0].onclickRef);
+    },
+    disableOptionInTool: function (idx, toolName) {
+        if (this.toolList[toolName] === undefined) return null;
+        let tool = this.toolList[toolName];
+        if (tool.options === undefined
+            || tool.options[0].children[idx] === undefined
+            || !tool.options[0].children[idx].isEnabled) return null;
+        let option = $(tool.options[0].children[idx]);
+        let classes = option.children(':first').attr('class').replace(/ /g, '.');
+        let $domElem = $('.' + classes).parent();
+        option[0].isEnabled = false;
+        $domElem.addClass('toolbar-disabled-tool');
+        $domElem.off();
     }
 });

@@ -1,7 +1,7 @@
 <div align="center">
 
 # Symbol Art Editor Online
-#### Version 1.1.1
+#### Version 1.2.0
 
 ## [*Play with it Now*](https://malulleybovo.github.io/SymbolArtEditorOnline/)
 
@@ -38,6 +38,7 @@ Symbol Art Editor Online is a browser vector-based image editor used to produce 
 - *Click* (*Tap*) the Toolbar Option with the Musical Note to Show the Sound Manager Menu
     - List Icon in Menu Shows/Hides the List of Available Sounds
     - Volume Icon in Menu Plays the Currently Selected Sound
+- *Click* (*Tap*) the Toolbar Option with the Picture Icon to Upload an Overlay Image to Guide Your Creation
 - *Click* (*Tap*, or press Ctrl+S) the Toolbar Option with the Download Icon to Save Your Work (Due to Restriction, in iOs, this Feature will Result in Opening a New Tab with the Contents of the *.saml* File Representing Your Work)
 - If the Toolbar Does Not Display All Tools, Swipe Left or Right to Display Move Tools
 
@@ -85,7 +86,7 @@ Symbol Art Editor Online is a browser vector-based image editor used to produce 
     - Show/Hide List of Available Sounds and Pick the One You Desire
     - Play Button to Test the Sound
 - Hold *Space Bar* to View Which Symbol is Currently Selected (Desktop only)
-- (Upcoming) Upload an Image to Serve as Overlay to Guide You in Making Art
+- Upload an Image to Serve as Overlay to Guide You in Making Art
 
 ### [Acknowledgement](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/5-Acknowledgement):
 - [PixiJS](http://www.pixijs.com/): For the amazing WebGL renderer that tremendously reduced the amount of work needed to make this application.

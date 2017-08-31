@@ -47,6 +47,9 @@ var Editor = Class({
             this.parts[i] = new PIXI.Texture(new PIXI.BaseTexture(LoadedImageFiles[partsInfo.dataArray[i] + partsInfo.imgType]));
         }
 
+        this.overlayImg = new OverlayImage();
+        this.stage.addChild(this.overlayImg.getImage());
+
         this.SABox = new PIXI.mesh.NineSlicePlane(new PIXI.Texture(new PIXI.BaseTexture(LoadedImageFiles["SABoxSprite.png"])), 2, 2, 2, 2);
         this.SABox.height = 960;
         this.SABox.width = 1920;
@@ -790,8 +793,8 @@ var Editor = Class({
             'color: #a6cd94', 'color: #d5d5d5', this.layers.length, MAX_NUM_LAYERS);
             return null;
         }
-        // Check if valid index (there are length-1 layers in editor + SA Box)
-        if (index < 0 || index > this.stage.children.length - 1) {
+        // Check if valid index (there are length-2 layers in editor + SA Box and Overlay)
+        if (index < 0 || index > this.stage.children.length - 2) {
             console.error(
                 '%cEditor (%O):%c Could not add layer %O to editor because'
                 + 'provided index (%i) is invalid.',
@@ -801,16 +804,17 @@ var Editor = Class({
         var quad = this.createLayer(layer);
         var layerData = { layer: layer, quad: quad };
         // Check if layer is at the bottom
-        if (index === undefined || index == this.stage.children.length - 1) {
+        if (index === undefined || index == this.stage.children.length - 2) {
             // Add quad to bottom
             this.stage.addChildAt(quad, 0);
             // save layer data in top-down order (last index is the bottom)
             this.layers.push(layerData);
         }
         else {
-            // Add quad to specified position (index [length-2] = top, index [0] = bottom)
+            // Add quad to specified position (index [length-3] = top, index [0] = bottom)
             // (index [length-1] = SA Box) => should never change
-            this.stage.addChildAt(quad, this.stage.children.length - 1 - index);
+            // (index [length-2] = Overlay Image) => should never change
+            this.stage.addChildAt(quad, this.stage.children.length - 3 - index);
             // save layer data in top-down order (index 0 is the topmost)
             this.layers.splice(index, 0, layerData);
         }
@@ -958,7 +962,7 @@ var Editor = Class({
             return null;
         }
 
-        this.stage.removeChildAt(this.stage.children.length - 2 - index);
+        this.stage.removeChildAt(this.stage.children.length - 3 - index);
         var layerData = this.layers[index];
         this.layers.splice(index, 1);
 
@@ -986,7 +990,7 @@ var Editor = Class({
         }
         // Remove top layer in editor
         // (index = length-2 because SA Box, the topmost layer, is at length-1)
-        this.stage.removeChildAt(this.stage.children.length - 2);
+        this.stage.removeChildAt(this.stage.children.length - 3);
         // Remove top layer data (at index 0 due to top-down ordering)
         var layerData = this.layers[0];
         this.layers.splice(0, 1);
@@ -1096,8 +1100,8 @@ var Editor = Class({
                     this.origClickY = e.originalEvent.offsetY;
                 }
                 else if (ev instanceof TouchEvent) { // Mobile device touch event
-                    this.origClickX = (ev.touches[0].pageX - ev.touches[0].target.offsetLeft);
-                    this.origClickY = (ev.touches[0].pageY - ev.touches[0].target.offsetTop);
+                    this.origClickX = ((ev.touches[0].pageX - ev.touches[0].target.offsetLeft) / this.editor.zoom);
+                    this.origClickY = ((ev.touches[0].pageY - ev.touches[0].target.offsetTop) / this.editor.zoom);
                 }
                 this.origX = [];
                 this.origY = [];
@@ -1150,8 +1154,8 @@ var Editor = Class({
                     dPosY = roundPosition(e.originalEvent.offsetY - this.origClickY);
                 }
                 else if (ev instanceof TouchEvent) { // Mobile device touch event
-                    dPosX = roundPosition(ev.touches[0].pageX - ev.touches[0].target.offsetLeft - this.origClickX);
-                    dPosY = roundPosition(ev.touches[0].pageY - ev.touches[0].target.offsetTop - this.origClickY);
+                    dPosX = roundPosition((ev.touches[0].pageX - ev.touches[0].target.offsetLeft) / this.editor.zoom - this.origClickX);
+                    dPosY = roundPosition((ev.touches[0].pageY - ev.touches[0].target.offsetTop) / this.editor.zoom - this.origClickY);
                 }
                 /* Check horizontal limits (bounding box) */
                 let maxDPosX = (BOUNDING_BOX.maxPosVal)
@@ -1320,6 +1324,7 @@ var Editor = Class({
         this.editorBoxIcons.resize.hide();
     },
     showLayerEditBox: function (optOpacity) {
+        this.overlayImg.toggleController(false);
         this.editorBoxIcons.tl.show();
         this.editorBoxIcons.tr.show();
         this.editorBoxIcons.bl.show();
@@ -1405,7 +1410,8 @@ var Editor = Class({
         this.stage.removeChildren();
         this.layers = [];
 
-        // Add SA Box to top layer
+        // Add control layers on top
+        this.stage.addChild(this.overlayImg.getImage());
         this.stage.addChild(this.SABox);
         // Then add existing symbols below it
         refreshGroupDisplay(this.mainGroup, this);

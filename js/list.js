@@ -189,6 +189,7 @@ var List = Class({
                 editor.disableInteraction();
                 if (!elem.hasClass('symbol-hidden')) { // Interaction only when visible
                     editor.enableGroupInteraction(this.elem);
+                    editor.overlayImg.toggleController(false);
                 }
                 
                 if (editor.highlightedLayers != null) {
@@ -1264,7 +1265,8 @@ var List = Class({
         var saml = '<?xml version="1.0" encoding="utf-8"?>\n<sa name="' + this.mainGroup.name
             + '" visible="true" version="' + SAConfig.version
             + '" author="' + SAConfig.authorID
-            + '" width="192" height="96" sound="' + $('#player')[0].manager.currBGE + '">';
+            + '" width="192" height="96" sound="' + $('#player')[0].manager.currBGE + '">\n\r';
+        saml += this.editor.overlayImg.toSAML();
         // Get Layer/Group info
         for (var i = 0; i < this.mainGroup.elems.length; i++) {
             var elem = this.mainGroup.elems[i];
