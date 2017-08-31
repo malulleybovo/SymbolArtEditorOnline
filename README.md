@@ -39,6 +39,7 @@ Symbol Art Editor Online is a browser vector-based image editor used to produce 
     - List Icon in Menu Shows/Hides the List of Available Sounds
     - Volume Icon in Menu Plays the Currently Selected Sound
 - *Click* (*Tap*) the Toolbar Option with the Picture Icon to Upload an Overlay Image to Guide Your Creation
+- Hold *I* Key on Keyboard to Toggle Transparency of Overlay Image Between Full Opaque and the Selected Transparency for Quick Comparisons While Working
 - *Click* (*Tap*, or press Ctrl+S) the Toolbar Option with the Download Icon to Save Your Work (Due to Restriction, in iOs, this Feature will Result in Opening a New Tab with the Contents of the *.saml* File Representing Your Work)
 - If the Toolbar Does Not Display All Tools, Swipe Left or Right to Display Move Tools
 
