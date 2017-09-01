@@ -465,6 +465,7 @@ div.sp-container {
     padding: 6px 12px;
     text-align: center;
     z-index: 100000;
+    cursor: default;
 }
 #alertBox.alerting-msg {
     transform: translate(0, 0) !important;

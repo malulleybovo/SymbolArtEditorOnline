@@ -118,6 +118,7 @@ var OverlayImage = Class({
             });
         $('body').append(this.ctrller.domElement);
         $(this.ctrller.domElement).css('opacity', 0);
+        $(this.ctrller.domElement).addClass("no-panning no-highlight fade");
     },
     getImage: function () {
         return this.plane;

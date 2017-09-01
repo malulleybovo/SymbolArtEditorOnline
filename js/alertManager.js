@@ -4,7 +4,7 @@ var AlertManager = Class({
         this.pendingAlerts = [];
         this.capacity = 40;
 
-        this.alertBox = $('<div id="alertBox">');
+        this.alertBox = $('<div id="alertBox" class="no-highlight no-panning">');
         this.alertBox[0].obj = this;
         $('body').append(this.alertBox);
     },

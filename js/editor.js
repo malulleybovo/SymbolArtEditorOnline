@@ -481,13 +481,44 @@ var Editor = Class({
             let ctrlFactorX = 0, ctrlFactorY = 0;
             if (Math.abs(layer.x) % 3 == 1.5) ctrlFactorX = 1.5;
             if (Math.abs(layer.y) % 3 == 1.5) ctrlFactorY = 1.5;
-            for (var i = 0; i < v.length; i += 2) {
+            for (var i = 0; i < v.length; i++) {
                 layer.vertices[i] = newV[i];
-                if (layer.vertices[i] >= 0) layer.vertices[i] += ctrlFactorX;
-                else layer.vertices[i] -= ctrlFactorX;
-                layer.vertices[i + 1] = newV[i + 1];
-                if (layer.vertices[i + 1] >= 0) layer.vertices[i + 1] += ctrlFactorY;
-                else layer.vertices[i + 1] -= ctrlFactorY;
+            }
+            if (ctrlFactorX == 1.5) {
+                if (layer.vertices[0] >= 0) {
+                    layer.vertices[0] += ctrlFactorX;
+                    layer.vertices[6] -= ctrlFactorX;
+                }
+                else {
+                    layer.vertices[0] -= ctrlFactorX;
+                    layer.vertices[6] += ctrlFactorX;
+                }
+                if (layer.vertices[2] >= 0) {
+                    layer.vertices[2] += ctrlFactorX;
+                    layer.vertices[4] -= ctrlFactorX;
+                }
+                else {
+                    layer.vertices[2] -= ctrlFactorX;
+                    layer.vertices[4] += ctrlFactorX;
+                }
+            }
+            if (ctrlFactorY == 1.5) {
+                if (layer.vertices[1] >= 0) {
+                    layer.vertices[1] += ctrlFactorY;
+                    layer.vertices[7] -= ctrlFactorY;
+                }
+                else {
+                    layer.vertices[1] -= ctrlFactorY;
+                    layer.vertices[7] += ctrlFactorY;
+                }
+                if (layer.vertices[3] >= 0) {
+                    layer.vertices[3] += ctrlFactorY;
+                    layer.vertices[5] -= ctrlFactorY;
+                }
+                else {
+                    layer.vertices[3] -= ctrlFactorY;
+                    layer.vertices[5] += ctrlFactorY;
+                }
             }
             editor.updateLayer(layer);
             editor.render();
@@ -543,13 +574,44 @@ var Editor = Class({
             let ctrlFactorX = 0, ctrlFactorY = 0;
             if (Math.abs(layer.x) % 3 == 1.5) ctrlFactorX = 1.5;
             if (Math.abs(layer.y) % 3 == 1.5) ctrlFactorY = 1.5;
-            for (var i = 0; i < currVtces.length; i += 2) {
+            for (var i = 0; i < currVtces.length; i++) {
                 currVtces[i] = roundPosition(origVtces[i] * scalingFactor);
-                if (currVtces[i] >= 0) currVtces[i] += ctrlFactorX;
-                else currVtces[i] -= ctrlFactorX;
-                currVtces[i + 1] = roundPosition(origVtces[i + 1] * scalingFactor);
-                if (currVtces[i + 1] >= 0) currVtces[i + 1] += ctrlFactorY;
-                else currVtces[i + 1] -= ctrlFactorY;
+            }
+            if (ctrlFactorX == 1.5) {
+                if (currVtces[0] >= 0) {
+                    currVtces[0] += ctrlFactorX;
+                    currVtces[6] -= ctrlFactorX;
+                }
+                else {
+                    currVtces[0] -= ctrlFactorX;
+                    currVtces[6] += ctrlFactorX;
+                }
+                if (currVtces[2] >= 0) {
+                    currVtces[2] += ctrlFactorX;
+                    currVtces[4] -= ctrlFactorX;
+                }
+                else {
+                    currVtces[2] -= ctrlFactorX;
+                    currVtces[4] += ctrlFactorX;
+                }
+            }
+            if (ctrlFactorY == 1.5) {
+                if (currVtces[1] >= 0) {
+                    currVtces[1] += ctrlFactorY;
+                    currVtces[7] -= ctrlFactorY;
+                }
+                else {
+                    currVtces[1] -= ctrlFactorY;
+                    currVtces[7] += ctrlFactorY;
+                }
+                if (currVtces[3] >= 0) {
+                    currVtces[3] += ctrlFactorY;
+                    currVtces[5] -= ctrlFactorY;
+                }
+                else {
+                    currVtces[3] -= ctrlFactorY;
+                    currVtces[5] += ctrlFactorY;
+                }
             }
             editor.updateLayer(layer);
             editor.render();
