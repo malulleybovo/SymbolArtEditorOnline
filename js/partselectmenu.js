@@ -25,6 +25,7 @@
                     layer.parent.elems.indexOf(layer));
 
                 layer.part = this.index;
+                Layer.setDefaultSymbol(layer.part);
 
                 $liImgTag[0].src = partsInfo.path + partsInfo.dataArray[layer.part] + partsInfo.imgType;
 

@@ -5,8 +5,8 @@ var Layer = Class({
         this.type = 'l';
         this.name = name;
         var halfSize = 64 * 3 / 2;
-        (part !== undefined) ? this.part = part : this.part = 0;
-        (color !== undefined) ? this.color = color : this.color = 0xffffff;
+        (part !== undefined) ? this.part = part : this.part = Layer.defaultSymbol;
+        (color !== undefined) ? this.color = color : this.color = Layer.defaultColor;
         (scale !== undefined && scale.x !== undefined) ? this.scaleX = scale.x : this.scaleX = 1;
         (scale !== undefined && scale.y !== undefined) ? this.scaleY = scale.y : this.scaleY = 1;
         (x !== undefined) ? this.x = x : this.x = EDITOR_SIZE.x / 2;
@@ -152,3 +152,17 @@ var Layer = Class({
         }
     }
 });
+/* Static Fields */
+Layer.defaultSymbol = 0;
+Layer.defaultColor = 0xffffff;
+/* Static Functions */
+Layer.setDefaultSymbol = function (num) {
+    if (num === undefined || typeof num !== 'number'
+        || num < 0 || num >= partsInfo.dataArray.length) return;
+    Layer.defaultSymbol = num;
+}
+Layer.setDefaultColor = function (hex) {
+    if (hex === undefined || typeof hex !== 'number'
+        || hex < 0 || hex >= 0xffffff) return;
+    Layer.defaultColor = hex;
+}

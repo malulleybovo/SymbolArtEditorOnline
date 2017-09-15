@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /***********************/
-var APP_VER = '1.2.1';
+var APP_VER = '1.2.2';
 /***********************/
 
 var imgWidth = 176;
@@ -78,8 +78,9 @@ function initUI() {
 
     alertManager = new AlertManager();
 
-    // Initialize Interface
-    list = new List("Layers", "Symbol Art", UINodeList['Canvas Box']);
+    /* Initialize Interface */
+    // Initialize list
+    new List("Layers", "Symbol Art", UINodeList['Canvas Box']);
     UINodeList['Canvas'] = list.editor.renderer.view;
     $(UINodeList['Canvas Container']).append(UINodeList['Canvas Box']);
     $(UINodeList['Canvas Box']).append(UINodeList['Canvas']);
@@ -282,6 +283,8 @@ function initUI() {
                 if (srcLayer[0].tagName == 'DIV') srcLayer = $(srcLayer[0].firstChild);
                 if (currLayerInSrc[0].tagName == 'DIV') currLayerInSrc = $(currLayerInSrc[0].firstChild);
                 list.move(srcLayer[0], currLayerInSrc[0], true, !ctx.isForward);
+                let editor = $('canvas')[0].editor;
+                editor.updateGroupEditBoxSize();
                 alertManager.pushAlert('Undid move');
             }
             else {
@@ -300,6 +303,8 @@ function initUI() {
                 if (srcLayer[0].tagName == 'DIV') srcLayer = $(srcLayer[0].firstChild);
                 if (destLayer[0].tagName == 'DIV') destLayer = $(destLayer[0].firstChild);
                 list.move(srcLayer[0], destLayer[0], true, ctx.isForward);
+                let editor = $('canvas')[0].editor;
+                editor.updateGroupEditBoxSize();
                 alertManager.pushAlert('Redid move');
             }
             else {
@@ -422,6 +427,7 @@ function initUI() {
             editor.updateLayer(ctx.layer);
             editor.render();
             editor.refreshLayerEditBox();
+            editor.updateGroupEditBoxSize();
             editor.layerCtrl.update(ctx.layer);
             alertManager.pushAlert('Undid symbol move');
         },
@@ -432,6 +438,7 @@ function initUI() {
             editor.updateLayer(ctx.layer);
             editor.render();
             editor.refreshLayerEditBox();
+            editor.updateGroupEditBoxSize();
             editor.layerCtrl.update(ctx.layer);
             alertManager.pushAlert('Redid symbol move');
         },
@@ -449,6 +456,7 @@ function initUI() {
             }
             editor.render();
             editor.refreshLayerEditBox();
+            editor.updateGroupEditBoxSize();
             alertManager.pushAlert('Undid symbol group move');
         },
         function (ctx) { // REDO symbol_groupmove
@@ -462,6 +470,7 @@ function initUI() {
             }
             editor.render();
             editor.refreshLayerEditBox();
+            editor.updateGroupEditBoxSize();
             alertManager.pushAlert('Redid symbol group move');
         },
         ['startIdx', 'endIdx', 'startX', 'startY', 'endX', 'endY']);
@@ -475,6 +484,7 @@ function initUI() {
             editor.updateLayer(ctx.layer);
             editor.render();
             editor.refreshLayerEditBox();
+            editor.updateGroupEditBoxSize();
             editor.layerCtrl.update(ctx.layer);
             alertManager.pushAlert('Undid symbol reshape');
         },
@@ -486,6 +496,7 @@ function initUI() {
             editor.updateLayer(ctx.layer);
             editor.render();
             editor.refreshLayerEditBox();
+            editor.updateGroupEditBoxSize();
             editor.layerCtrl.update(ctx.layer);
             alertManager.pushAlert('Redid symbol reshape');
         },

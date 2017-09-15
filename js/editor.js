@@ -749,6 +749,7 @@ var Editor = Class({
                 maxScale: editor.ZOOM_MAX
             }).panzoom("zoom", this.zoom);
             editor.refreshLayerEditBox();
+            if (editor.groupEditBox) editor.groupEditBox.updateUI();
             setTimeout(function () {
                 $('canvas')[0].editor.refreshLayerEditBox();
             }, 100);
@@ -788,6 +789,7 @@ var Editor = Class({
             let editor = $('canvas')[0].editor;
             editor.zoom = scale;
             editor.refreshLayerEditBox();
+            if (editor.groupEditBox) editor.groupEditBox.updateUI();
             $('canvas').trigger('vmouseup');
         }).on("panzoomstart", function (e, panzoom, event, touches) {
             editorToolbar.enableTool('resetPan');
@@ -797,6 +799,7 @@ var Editor = Class({
             panZoomActive = false;
         }).on("panzoompan", function () {
             $('canvas')[0].editor.refreshLayerEditBox();
+            if (editor.groupEditBox) editor.groupEditBox.updateUI();
         });
         $('#canvascontainer').panzoom("zoom", this.zoom);
 
@@ -1158,149 +1161,179 @@ var Editor = Class({
             this.layers[i].quad.interactive = false;
         }
     },
+    updateGroupEditBoxSize: function () {
+        if (!this.groupMoving) return;
+        this.groupMoving.maxXCoord = Number.MIN_VALUE,
+        this.groupMoving.minXCoord = Number.MAX_VALUE,
+        this.groupMoving.maxYCoord = Number.MIN_VALUE,
+        this.groupMoving.minYCoord = Number.MAX_VALUE;
+        var layer;
+        for (var i = this.groupMoving.firstIdx; i < this.groupMoving.lastIdx; i++) {
+            layer = this.layers[i].layer;
+            let maxX = layer.x + Math.max(
+                layer.vertices[0], layer.vertices[2],
+                layer.vertices[4], layer.vertices[6]);
+            if (maxX > this.groupMoving.maxXCoord) this.groupMoving.maxXCoord = maxX;
+            let minX = layer.x + Math.min(
+                layer.vertices[0], layer.vertices[2],
+                layer.vertices[4], layer.vertices[6]);
+            if (minX < this.groupMoving.minXCoord) this.groupMoving.minXCoord = minX;
+            let maxY = layer.y + Math.max(
+                layer.vertices[1], layer.vertices[3],
+                layer.vertices[5], layer.vertices[7]);
+            if (maxY > this.groupMoving.maxYCoord) this.groupMoving.maxYCoord = maxY;
+            let minY = layer.y + Math.min(
+                layer.vertices[1], layer.vertices[3],
+                layer.vertices[5], layer.vertices[7]);
+            if (minY < this.groupMoving.minYCoord) this.groupMoving.minYCoord = minY;
+        }
+        if (this.groupEditBox) this.groupEditBox.displace(0, 0);
+    },
     enableGroupInteraction: function (folder) {
-        var canvas = $('canvas');
-
+        let canvas = $('canvas');
         canvas[0].movingFolder = folder;
+        if (!list.selectedElem) return;
+        this.groupMoving = {};
+        let lis = $(list.container).find('li');
+        let lisInGroup = $(list.selectedElem.parentNode.parentNode).find('li');
+        this.groupMoving.firstIdx = lis.index(lisInGroup[0]);
+        if (this.groupMoving.firstIdx < 0) return; // Cancel if not found
+        this.groupMoving.lastIdx = this.groupMoving.firstIdx + lisInGroup.length;
+
+        canvas[0].editor.groupEditBox = new GroupEditBox(this.groupMoving);
+        this.updateGroupEditBoxSize();
+
         // Handlers for mousemove-based group motion
         let groupMoveMousedownHandler = function (e) {
             e.stopPropagation();
             if (!panZoomActive
                 && list.selectedElem.parentNode.elem.type == 'g') {
-                this.canvas = $('canvas')[0];
-                this.editor = this.canvas.editor;
-                this.lis = $(list.container).find('li');
-                this.lisInGroup = $(list.selectedElem.parentNode.parentNode).find('li');
-                this.firstIndex = this.lis.index(this.lisInGroup[0]);
-                if (this.firstIndex < 0) return; // Cancel if not found
-                this.lastIndex = this.firstIndex + this.lisInGroup.length;
-
+                let editor = $('canvas')[0].editor;
+                let groupMoving = editor.groupMoving;
+                if (groupMoving === undefined) return;
                 var ev = e.originalEvent.originalEvent;
                 if (ev instanceof MouseEvent) { // Desktop mouse event
-                    this.origClickX = e.originalEvent.offsetX;
-                    this.origClickY = e.originalEvent.offsetY;
+                    groupMoving.origClickX = e.originalEvent.offsetX;
+                    groupMoving.origClickY = e.originalEvent.offsetY;
                 }
                 else if (ev instanceof TouchEvent) { // Mobile device touch event
-                    this.origClickX = ((ev.touches[0].pageX - ev.touches[0].target.offsetLeft) / this.editor.zoom);
-                    this.origClickY = ((ev.touches[0].pageY - ev.touches[0].target.offsetTop) / this.editor.zoom);
+                    groupMoving.origClickX = ((ev.touches[0].pageX - ev.touches[0].target.offsetLeft) / editor.zoom);
+                    groupMoving.origClickY = ((ev.touches[0].pageY - ev.touches[0].target.offsetTop) / editor.zoom);
                 }
-                this.origX = [];
-                this.origY = [];
-                let maxGroupX = Number.MIN_VALUE,
-                    minGroupX = Number.MAX_VALUE,
-                    maxGroupY = Number.MIN_VALUE,
-                    minGroupY = Number.MAX_VALUE;
+                groupMoving.origXPos = [];
+                groupMoving.origYPos = [];
                 var layer;
-                for (var i = this.firstIndex; i < this.lastIndex; i++) {
-                    layer = this.editor.layers[i].layer;
-                    this.origX.push(layer.x);
-                    this.origY.push(layer.y);
-                    let maxX = layer.x + Math.max(
-                        layer.vertices[0], layer.vertices[2],
-                        layer.vertices[4], layer.vertices[6]);
-                    if (maxX > maxGroupX) maxGroupX = maxX;
-                    let minX = layer.x + Math.min(
-                        layer.vertices[0], layer.vertices[2],
-                        layer.vertices[4], layer.vertices[6]);
-                    if (minX < minGroupX) minGroupX = minX;
-                    let maxY = layer.y + Math.max(
-                        layer.vertices[1], layer.vertices[3],
-                        layer.vertices[5], layer.vertices[7]);
-                    if (maxY > maxGroupY) maxGroupY = maxY;
-                    let minY = layer.y + Math.min(
-                        layer.vertices[1], layer.vertices[3],
-                        layer.vertices[5], layer.vertices[7]);
-                    if (minY < minGroupY) minGroupY = minY;
+                for (var i = groupMoving.firstIdx; i < groupMoving.lastIdx; i++) {
+                    layer = editor.layers[i].layer;
+                    groupMoving.origXPos.push(layer.x);
+                    groupMoving.origYPos.push(layer.y);
                 }
-                this.groupW = maxGroupX - minGroupX;
-                if (this.groupW < 0) return;
-                this.groupH = maxGroupY - minGroupY;
-                if (this.groupH < 0) return;
-                this.groupX = maxGroupX - (this.groupW / 2);
-                this.groupY = maxGroupY - (this.groupH / 2);
-                this.mouseMoving = true;
+                editor.updateGroupEditBoxSize();
+                groupMoving.width = groupMoving.maxXCoord - groupMoving.minXCoord;
+                groupMoving.height = groupMoving.maxYCoord - groupMoving.minYCoord;
+                // Check if something went wrong
+                if (groupMoving.width < 0 || groupMoving.height < 0) {
+                    groupMoving = undefined; // Release info and return
+                    return;
+                }
+                groupMoving.xPos = groupMoving.maxXCoord - (groupMoving.width / 2);
+                groupMoving.yPos = groupMoving.maxYCoord - (groupMoving.height / 2);
+
+                editor.groupEditBox.displace(0, 0);
+
+                this.mouseDown = true;
+                this.hasChangedGroupPos = false;
             }
         }
         let groupMoveMousemoveHandler = function (e) {
             e.stopPropagation();
             if (!panZoomActive
-                && this.mouseMoving) {
-                if (this.firstIndex < 0) return;
+                && this.mouseDown) {
+                let editor = $('canvas')[0].editor;
+                let groupMoving = editor.groupMoving;
+                if (groupMoving === undefined) return;
+                if (groupMoving.firstIdx < 0) return;
+                if (GroupEditBox.isVisible()) GroupEditBox.container.css('opacity', 0.2);
                 var layer;
                 var dPosX;
                 var dPosY;
                 var ev = e.originalEvent.originalEvent;
                 if (ev instanceof MouseEvent) { // Desktop mouse event
-                    dPosX = roundPosition(e.originalEvent.offsetX - this.origClickX);
-                    dPosY = roundPosition(e.originalEvent.offsetY - this.origClickY);
+                    dPosX = roundPosition(e.originalEvent.offsetX - groupMoving.origClickX);
+                    dPosY = roundPosition(e.originalEvent.offsetY - groupMoving.origClickY);
                 }
                 else if (ev instanceof TouchEvent) { // Mobile device touch event
-                    dPosX = roundPosition((ev.touches[0].pageX - ev.touches[0].target.offsetLeft) / this.editor.zoom - this.origClickX);
-                    dPosY = roundPosition((ev.touches[0].pageY - ev.touches[0].target.offsetTop) / this.editor.zoom - this.origClickY);
+                    dPosX = roundPosition((ev.touches[0].pageX - ev.touches[0].target.offsetLeft) / editor.zoom - groupMoving.origClickX);
+                    dPosY = roundPosition((ev.touches[0].pageY - ev.touches[0].target.offsetTop) / editor.zoom - groupMoving.origClickY);
                 }
                 /* Check horizontal limits (bounding box) */
                 let maxDPosX = (BOUNDING_BOX.maxPosVal)
-                    - (this.groupX + ((this.groupW - EDITOR_SIZE.x) / 2));
+                    - (groupMoving.xPos + ((groupMoving.width - EDITOR_SIZE.x) / 2));
                 if (maxDPosX < 0) maxDPosX = 0;
                 if (dPosX > maxDPosX) dPosX = maxDPosX;
                 let minDPosX = (BOUNDING_BOX.maxNegVal)
-                    - (this.groupX - ((this.groupW + EDITOR_SIZE.x) / 2));
+                    - (groupMoving.xPos - ((groupMoving.width + EDITOR_SIZE.x) / 2));
                 if (minDPosX > 0) minDPosX = 0;
                 if (dPosX < minDPosX) dPosX = minDPosX;
                 /* Check vertical limits (bounding box) */
                 let maxDPosY = (BOUNDING_BOX.maxPosVal)
-                    - (this.groupY + ((this.groupH - EDITOR_SIZE.y) / 2));
+                    - (groupMoving.yPos + ((groupMoving.height - EDITOR_SIZE.y) / 2));
                 if (maxDPosY < 0) maxDPosY = 0;
                 if (dPosY > maxDPosY) dPosY = maxDPosY;
                 let minDPosY = (BOUNDING_BOX.maxNegVal)
-                    - (this.groupY - ((this.groupH + EDITOR_SIZE.y) / 2));
+                    - (groupMoving.yPos - ((groupMoving.height + EDITOR_SIZE.y) / 2));
                 if (minDPosY > 0) minDPosY = 0;
                 if (dPosY < minDPosY) dPosY = minDPosY;
                 /* Perform group position change */
-                for (var i = this.firstIndex; i < this.lastIndex; i++) {
-                    layer = this.editor.layers[i].layer;
+                for (var i = groupMoving.firstIdx; i < groupMoving.lastIdx; i++) {
+                    layer = editor.layers[i].layer;
                     if (ev instanceof MouseEvent) { // Desktop mouse event
-                        layer.x = this.origX[i - this.firstIndex] + dPosX;
-                        layer.y = this.origY[i - this.firstIndex] + dPosY;
+                        layer.x = groupMoving.origXPos[i - groupMoving.firstIdx] + dPosX;
+                        layer.y = groupMoving.origYPos[i - groupMoving.firstIdx] + dPosY;
                         if (!this.hasChangedGroupPos // Check to see if should push to history after done
-                            && (layer.x != this.origX[i - this.firstIndex]
-                            || layer.y != this.origY[i - this.firstIndex])) {
+                            && (layer.x != groupMoving.origXPos[i - groupMoving.firstIdx]
+                            || layer.y != groupMoving.origYPos[i - groupMoving.firstIdx])) {
                             this.hasChangedGroupPos = true;
                         }
                     }
                     else if (ev instanceof TouchEvent) { // Mobile device touch event
-                        layer.x = this.origX[i - this.firstIndex] + dPosX;
-                        layer.y = this.origY[i - this.firstIndex] + dPosY;
+                        layer.x = groupMoving.origXPos[i - groupMoving.firstIdx] + dPosX;
+                        layer.y = groupMoving.origYPos[i - groupMoving.firstIdx] + dPosY;
                         if (!this.hasChangedGroupPos // Check to see if should push to history after done
-                            && (layer.x != this.origX[i - this.firstIndex]
-                            || layer.y != this.origY[i - this.firstIndex])) {
+                            && (layer.x != groupMoving.origXPos[i - groupMoving.firstIdx]
+                            || layer.y != groupMoving.origYPos[i - groupMoving.firstIdx])) {
                             this.hasChangedGroupPos = true;
                         }
                     }
-                    this.editor.updateLayer(layer);
+                    editor.updateLayer(layer);
                 }
-                this.editor.render();
+                editor.render();
+                editor.groupEditBox.displace(dPosX, dPosY);
             }
         }
         let groupMoveMouseupHandler = function (e) {
             e.stopPropagation();
-            this.mouseMoving = false;
+            this.mouseDown = undefined;
             if (this.hasChangedGroupPos) {
                 this.hasChangedGroupPos = undefined;
+                let editor = $('canvas')[0].editor;
+                if (GroupEditBox.isVisible()) GroupEditBox.container.css('opacity', 1);
+                let groupMoving = editor.groupMoving;
+                if (groupMoving === undefined) return;
                 let endX = [];
                 let endY = [];
                 var layer;
-                for (var i = this.firstIndex; i < this.lastIndex; i++) {
-                    layer = this.editor.layers[i].layer;
+                for (var i = groupMoving.firstIdx; i < groupMoving.lastIdx; i++) {
+                    layer = editor.layers[i].layer;
                     endX[i] = layer.x;
                     endY[i] = layer.y;
                 }
 
                 historyManager.pushUndoAction('symbol_groupmove', {
-                    'startIdx': this.firstIndex,
-                    'endIdx': this.lastIndex,
-                    'startX': this.origX,
-                    'startY': this.origY,
+                    'startIdx': groupMoving.firstIdx,
+                    'endIdx': groupMoving.lastIdx,
+                    'startX': groupMoving.origXPos,
+                    'startY': groupMoving.origYPos,
                     'endX': endX,
                     'endY': endY
                 });
@@ -1309,11 +1342,12 @@ var Editor = Class({
                 this.endX = undefined;
                 this.endY = undefined;
             }
+            this.hasChangedGroupPos = undefined;
         }
         canvas.bind('vmousedown.saGroupMousedown', groupMoveMousedownHandler)
             .bind('vmousemove.saGroupMousemove', groupMoveMousemoveHandler)
             .bind('vmouseup.saGroupMouseup', groupMoveMouseupHandler);
-        $('#canvascontainer')
+        $('body')
             .unbind('vmouseup.saGroupMouseup')
             .bind('vmouseup.saGroupMouseup', function (e) {
                 e.stopPropagation();
@@ -1324,11 +1358,13 @@ var Editor = Class({
         let canvas = $('canvas');
 
         canvas[0].movingFolder = undefined;
+        GroupEditBox.hide();
+        canvas[0].editor.groupEditBox = undefined;
 
         canvas.unbind('vmousedown.saGroupMousedown')
             .unbind('vmousemove.saGroupMousemove')
             .unbind('vmouseup.saGroupMouseup');
-        $('#canvascontainer').unbind('vmouseup.saGroupMouseup');
+        $('body').unbind('vmouseup.saGroupMouseup');
     },
     setHighlightedLayers: function (startLayer, optionalLength) {
         if (this.highlightedLayers != null) {

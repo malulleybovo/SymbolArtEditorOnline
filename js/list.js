@@ -6,8 +6,12 @@ var SAConfig = {
     authorID: 0 // Player ID
 }
 
+var list;
+
 var List = Class({
     initialize: function (headerName, groupName, editorContainer) {
+        if (list !== undefined) return;
+        list = this;
         window.addEventListener("beforeunload", function (e) {
             // Just unload if user has not touched the application
             if (historyManager.undoList.length == 0

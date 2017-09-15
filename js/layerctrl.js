@@ -184,6 +184,7 @@ var LayerCtrl = Class({
             hide: function (color) {
                 let newColor = updateColor(color);
                 if (newColor != this.colorBeforeChange) {
+                    Layer.setDefaultColor(newColor);
                     historyManager.pushUndoAction('symbol_recolor', {
                         'layer': this.layer,
                         'oldColor': this.colorBeforeChange,
