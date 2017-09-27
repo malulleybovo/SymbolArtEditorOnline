@@ -798,7 +798,8 @@ var Editor = Class({
         }).on("panzoomend", function () {
             panZoomActive = false;
         }).on("panzoompan", function () {
-            $('canvas')[0].editor.refreshLayerEditBox();
+            let editor = $('canvas')[0].editor;
+            editor.refreshLayerEditBox();
             if (editor.groupEditBox) editor.groupEditBox.updateUI();
         });
         $('#canvascontainer').panzoom("zoom", this.zoom);
