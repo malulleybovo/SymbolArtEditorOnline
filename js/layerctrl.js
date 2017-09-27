@@ -229,7 +229,7 @@ var LayerCtrl = Class({
             menu: this.partselectmenu
         };
         this.part = this.gui.add(this.partManager, 'part')
-            .name('symbol type');
+            .name('change symbol');
 
         var layerAlphaHolder = { alpha: 7, isFirstChange: true };
         this.alpha = this.gui.add(layerAlphaHolder, 'alpha').min(0).step(1).max(7).listen()

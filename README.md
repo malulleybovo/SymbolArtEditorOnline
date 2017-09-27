@@ -1,7 +1,7 @@
 <div align="center">
 
 # Symbol Art Editor Online
-#### Version 1.2.2
+#### Version 1.2.3
 
 ## [*Play with it Now*](https://malulleybovo.github.io/SymbolArtEditorOnline/)
 
@@ -99,6 +99,7 @@ Symbol Art Editor Online is a browser vector-based image editor used to produce 
 - [jQuery Sidebar Plugin](http://jillix.github.io/jQuery-sidebar/): For providing a great sidebar for storing a list of symbols and sounds.
 - [jQuery Panzoom Plugin](https://github.com/timmywil/jquery.panzoom): For enabling cross-platform pan and zoom in the application.
 - [Toolbar.js](http://paulkinzett.github.io/toolbar/): For providing a great addition to the toolbar designed for the application.
+- [Intro.js](https://github.com/usablica/intro.js/): For providing a beautiful user walkthrough interface.
 - [FileSaver.js](https://github.com/eligrey/FileSaver.js/): For enabling the needed saveAs feature.
 - [DatGUI](https://github.com/dataarts/dat.gui): For becoming the skeleton of the layer controller.
 - [perfect-scrollbar](https://github.com/noraesae/perfect-scrollbar): For providing a beautiful scrollbar to override the default

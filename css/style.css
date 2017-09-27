@@ -471,6 +471,16 @@ div.sp-container {
     transform: translate(0, 0) !important;
 }
 
+a.introjs-hint > div {
+    border-color: #e61d5f !important;
+    z-index: 99999999 !important;
+}
+
+.introjs-tooltiptext > p > a {
+    text-decoration: none;
+    color: #2fa1d6;
+}
+
 @media screen and (max-width: 540px) {
     div.sidebar {
         width: 100% !important;

@@ -1197,6 +1197,7 @@ var Editor = Class({
         this.groupMoving = {};
         let lis = $(list.container).find('li');
         let lisInGroup = $(list.selectedElem.parentNode.parentNode).find('li');
+        if (lisInGroup.length <= 0) return; // Cancel if no layer inside group
         this.groupMoving.firstIdx = lis.index(lisInGroup[0]);
         if (this.groupMoving.firstIdx < 0) return; // Cancel if not found
         this.groupMoving.lastIdx = this.groupMoving.firstIdx + lisInGroup.length;
@@ -1407,6 +1408,7 @@ var Editor = Class({
     hideInterface: function () {
         this.layerCtrl.hide();
         this.hideLayerEditBox();
+        if (this.groupEditBox) GroupEditBox.hide();
     },
     showInterface: function () {
         if (this.selectedLayer == null
