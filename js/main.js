@@ -153,6 +153,7 @@ function initUI() {
     editorToolbar.addTool('hideUI', 'fa fa-eye-slash', function () {
         let editor = $('canvas')[0].editor;
         editor.disableInteraction();
+        editor.disableGroupInteraction();
         editor.hideInterface();
     });
     editorToolbar.addTool('sound', 'fa fa-music');
@@ -691,7 +692,7 @@ function initUI() {
                       hintPosition: 'top-right'
                   }
                 ]
-            });
+            });/*
             intro.addHints();
             intro.hideHints();
             setTimeout(function () {
@@ -700,7 +701,7 @@ function initUI() {
             setTimeout(function () {
                 intro.userDidNotRequestHelp = true;
                 intro.hideHint(14);
-            }, 60000);
+            }, 60000);*/
             intro.onhintclose(function (stepId) {
                 // Check which hint was closed and move to the next step
                 if (stepId < 7) intro.showHint(stepId + 1);
