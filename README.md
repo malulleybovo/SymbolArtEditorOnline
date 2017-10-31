@@ -20,7 +20,6 @@ Symbol Art Editor Online is a browser vector-based image editor used to produce 
 
 <div align="center">
 <img src="https://github.com/malulleybovo/SymbolArtEditorOnline/blob/master/res/walkthrough/welcome.gif" width="200" height="358" />
-</div>
 
 ### [Usage Visual Guide](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1-Usage):
 #### GIFs explaining how to use the editor:
@@ -28,6 +27,7 @@ Symbol Art Editor Online is a browser vector-based image editor used to produce 
 - [Feature Guide Part 2](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.2-Features-Part-2)
 - [Feature Guide Part 3](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.3-Features-Part-3)
 - [Feature Guide Part 4](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.4-Features-Part-4)
+</div>
 
 ----
 ### [Importing Symbol Art in *.sar* Format](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/2-Importing-Symbol-Art):
