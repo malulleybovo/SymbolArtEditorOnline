@@ -23,10 +23,10 @@ Symbol Art Editor Online is a browser vector-based image editor used to produce 
 
 ### [Usage Visual Guide](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1-Usage):
 #### GIFs explaining how to use the editor:
-[Feature Guide Part 1](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.1-Features-Part-1)
-[Feature Guide Part 2](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.2-Features-Part-2)
-[Feature Guide Part 3](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.3-Features-Part-3)
-[Feature Guide Part 4](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.4-Features-Part-4)
+<div>[Feature Guide Part 1](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.1-Features-Part-1)</div>
+<div>[Feature Guide Part 2](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.2-Features-Part-2)</div>
+<div>[Feature Guide Part 3](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.3-Features-Part-3)</div>
+<div>[Feature Guide Part 4](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.4-Features-Part-4)</div>
 </div>
 
 ----
