@@ -3,7 +3,7 @@
 # Symbol Art Editor Online
 #### Version 1.2.3
 
-## [*Play with it Now*](https://malulleybovo.github.io/SymbolArtEditorOnline/)
+## [*Play with it Here*](https://malulleybovo.github.io/SymbolArtEditorOnline/)
 
 <img height="25%" width="25%" src="https://raw.githubusercontent.com/malulleybovo/SymbolArtEditorOnline/master/css/images/arks_logo.png">
 
