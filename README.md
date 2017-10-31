@@ -13,12 +13,6 @@ Inspired by the in-game editor from [Phantasy Star Online 2](http://pso2.jp/) (S
 Symbol Art Editor Online is a browser vector-based image editor used to produce digital art made of symbols.
 
 <div align="center">
-
-##### Tell me your ideas if you think about an extra feature I have not thought about already. Also, if you have knowledge about how *.sar* files are formatted, please enlighten me so I can add support for it.
-
-</div>
-
-<div align="center">
 <img src="https://github.com/malulleybovo/SymbolArtEditorOnline/blob/master/res/walkthrough/welcome.gif" width="200" height="358" />
 
 ### [Usage Visual Guide](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1-Usage):
@@ -27,6 +21,12 @@ Symbol Art Editor Online is a browser vector-based image editor used to produce 
 <span>[Feature Guide Part 2](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.2-Features-Part-2)</span>
 <span>[Feature Guide Part 3](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.3-Features-Part-3)</span>
 <span>[Feature Guide Part 4](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.4-Features-Part-4)</span>
+</div>
+
+<div align="center">
+
+##### Tell me your ideas if you think about an extra feature I have not thought about already. Also, if you have knowledge about how *.sar* files are formatted, please enlighten me so I can add support for it.
+
 </div>
 
 ----
