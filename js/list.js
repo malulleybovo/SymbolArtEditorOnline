@@ -275,6 +275,11 @@ var List = Class({
                 event.stopPropagation();
                 $(this).addClass('dragging');
                 list.changeMovingElem(this);
+                try {
+                    $('.drag-ghost').css('margin-left', (event.offsetX));
+                    $('.drag-ghost').css('margin-top', (event.offsetY));
+                }
+                catch (err) { };
             });
             header.on("dragleave", function (event) {
                 event.preventDefault();
@@ -349,6 +354,11 @@ var List = Class({
                 event.stopPropagation();
                 $(this).addClass('dragging');
                 list.changeMovingElem(this);
+                try {
+                    $('.drag-ghost').css('margin-left', (event.offsetX));
+                    $('.drag-ghost').css('margin-top', (event.offsetY));
+                }
+                catch (err) {};
             });
             li.on("dragleave", function (event) {
                 event.preventDefault();
@@ -626,6 +636,7 @@ var List = Class({
             editor.refreshHighlightedLayers();
             editor.render();
             list.updateDOMGroupVisibility(list.mainFolder[0]);
+            $(srcElem).click();
 
             /* Logging */
             if (noLog === undefined) {

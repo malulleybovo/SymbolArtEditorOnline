@@ -291,7 +291,6 @@ function initUI() {
                 if (currLayerInSrc[0].tagName == 'DIV') currLayerInSrc = $(currLayerInSrc[0].firstChild);
                 list.move(srcLayer[0], currLayerInSrc[0], true, !ctx.isForward);
                 let editor = $('canvas')[0].editor;
-                editor.updateGroupEditBoxSize();
                 alertManager.pushAlert('Undid move');
             }
             else {
@@ -311,7 +310,6 @@ function initUI() {
                 if (destLayer[0].tagName == 'DIV') destLayer = $(destLayer[0].firstChild);
                 list.move(srcLayer[0], destLayer[0], true, ctx.isForward);
                 let editor = $('canvas')[0].editor;
-                editor.updateGroupEditBoxSize();
                 alertManager.pushAlert('Redid move');
             }
             else {
@@ -692,7 +690,7 @@ function initUI() {
                       hintPosition: 'top-right'
                   }
                 ]
-            });/*
+            });
             intro.addHints();
             intro.hideHints();
             setTimeout(function () {
@@ -701,7 +699,7 @@ function initUI() {
             setTimeout(function () {
                 intro.userDidNotRequestHelp = true;
                 intro.hideHint(14);
-            }, 60000);*/
+            }, 60000);
             intro.onhintclose(function (stepId) {
                 // Check which hint was closed and move to the next step
                 if (stepId < 7) intro.showHint(stepId + 1);

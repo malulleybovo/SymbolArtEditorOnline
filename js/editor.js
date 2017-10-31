@@ -1362,6 +1362,7 @@ var Editor = Class({
         canvas[0].movingFolder = undefined;
         GroupEditBox.hide();
         canvas[0].editor.groupEditBox = undefined;
+        canvas[0].editor.groupMoving = undefined;
 
         canvas.unbind('vmousedown.saGroupMousedown')
             .unbind('vmousemove.saGroupMousemove')
