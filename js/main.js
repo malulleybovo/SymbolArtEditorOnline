@@ -557,7 +557,7 @@ function initUI() {
     UI.landing.help = $('<div class="landing-help">');
     UI.landing.help.append('<i class="fa fa-question">');
     UI.landing.help.click(function () {
-        var win = window.open('https://github.com/malulleybovo/SymbolArtEditorOnline/wiki', '_blank');
+        var win = window.open('https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1-Usage', '_blank');
         if (win) {
             win.focus();
         } else {
