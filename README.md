@@ -7,12 +7,9 @@
 
 <img height="25%" width="25%" src="https://raw.githubusercontent.com/malulleybovo/SymbolArtEditorOnline/master/css/images/arks_logo.png">
 
-</div>
-
 Inspired by the in-game editor from [Phantasy Star Online 2](http://pso2.jp/) (SEGA), 
 Symbol Art Editor Online is a browser vector-based image editor used to produce digital art made of symbols.
 
-<div align="center">
 <img src="https://github.com/malulleybovo/SymbolArtEditorOnline/blob/master/res/walkthrough/welcome.gif" width="200" height="358" />
 
 ### [Usage Visual Guide](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1-Usage):
