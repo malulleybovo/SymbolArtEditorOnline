@@ -240,6 +240,42 @@ var Editor = Class({
             e.stopPropagation();
             $('canvas').trigger('vmouseup');
         }).hide();
+        var btn_resizeX = $('<i class="fa fa-arrows-h fa-border edit-button no-highlight no-panning" ondragstart="return false;">');
+        btn_resizeX[0].list = list;
+        btn_resizeX[0].editor = this;
+        btn_resizeX.on('vmousedown', function (e) {
+            if (!panZoomActive) {
+                this.editor.currBtnDown = 10;
+                if (!this.editor.disableSmallVtxChange)
+                    this.editor.origEditbtn = {
+                        vtces: this.editor.layerCtrl.activeLayer.vertices.slice(0),
+                        x: this.editor.layerCtrl.activeLayer.x,
+                        y: this.editor.layerCtrl.activeLayer.y
+                    };
+            }
+        }).on('vmousemove', function () {
+        }).on('vmouseup', function (e) {
+            e.stopPropagation();
+            $('canvas').trigger('vmouseup');
+        }).hide();
+        var btn_resizeY = $('<i class="fa fa-arrows-v fa-border edit-button no-highlight no-panning" ondragstart="return false;">');
+        btn_resizeY[0].list = list;
+        btn_resizeY[0].editor = this;
+        btn_resizeY.on('vmousedown', function (e) {
+            if (!panZoomActive) {
+                this.editor.currBtnDown = 11;
+                if (!this.editor.disableSmallVtxChange)
+                    this.editor.origEditbtn = {
+                        vtces: this.editor.layerCtrl.activeLayer.vertices.slice(0),
+                        x: this.editor.layerCtrl.activeLayer.x,
+                        y: this.editor.layerCtrl.activeLayer.y
+                    };
+            }
+        }).on('vmousemove', function () {
+        }).on('vmouseup', function (e) {
+            e.stopPropagation();
+            $('canvas').trigger('vmouseup');
+        }).hide();
         function diagStretch(index, clientPos, origValues) {
             var canvas = $('canvas');
             var canvasPos = canvas.offset();
@@ -616,6 +652,80 @@ var Editor = Class({
             editor.updateLayer(layer);
             editor.render();
         }
+        function directionalResizeSymbol(direction, clientPos, origValues) {
+            let axis = 0; // Default to X-axis resize
+            if (direction == 1) axis = 1; // Y-axis resize if direction is 1
+            let canvas = $('canvas');
+            let canvasPos = canvas.offset();
+            let editor = canvas[0].editor;
+            let layer = list.selectedElem.parentNode.elem;
+            let origVtces = origValues.vtces;
+            let currVtces = layer.vertices;
+            // Get scaling factor from mousemove displacement (based on X-coord)
+            let relPos = { left: clientPos.left - canvasPos.left, top: clientPos.top - canvasPos.top };
+            let scalingFactor = 1.0;
+            if (axis == 0) { // If horizontal resize, move cursor left/right to scale
+                let dPosX = ((relPos.left / editor.zoom) - layer.x);
+                scalingFactor = (1 + dPosX / 100);
+            }
+            else { // If vertical resize, move cursor up/down to scale
+                let dPosY = ((relPos.top / editor.zoom) - layer.y);
+                scalingFactor = (1 - dPosY / 100);
+            }
+            if (scalingFactor < 0.1) scalingFactor = 0.1;
+            /**
+             * Check if symbol will have a valid size
+             */
+            let maxlen = MAX_SYMBOL_SIDE_LEN;
+            let testlen1x = Math.abs(origVtces[0] - origVtces[2]),
+                testlen1y = Math.abs(origVtces[1] - origVtces[3]),
+                testlen2x = Math.abs(origVtces[0] - origVtces[4]),
+                testlen2y = Math.abs(origVtces[1] - origVtces[5]);
+            let maxside = Math.max(testlen1x, testlen1y, testlen2x, testlen2y);
+            let maxScalingFactor = maxlen / maxside;
+            if (scalingFactor > maxScalingFactor) scalingFactor = maxScalingFactor;
+            /**
+             * Check if symbol will not trespass editor boundaries
+             */
+            var relX = (layer.x - (EDITOR_SIZE.x / 2)),
+                relY = (layer.y - (EDITOR_SIZE.y / 2));
+            let minVX = Math.min(origVtces[0], origVtces[2], origVtces[4], origVtces[6]),
+                minVY = Math.min(origVtces[1], origVtces[3], origVtces[5], origVtces[7]),
+                maxVX = Math.max(origVtces[0], origVtces[2], origVtces[4], origVtces[6]),
+                maxVY = Math.max(origVtces[1], origVtces[3], origVtces[5], origVtces[7]);
+            let halfW = Math.abs(maxVX - minVX) / 2, halfH = Math.abs(maxVY - minVY) / 2;
+            // Checking X-axis boundary
+            let minLeeway = Math.min(
+                Math.abs(BOUNDING_BOX.maxPosVal - relX - halfW),
+                Math.abs(BOUNDING_BOX.maxNegVal - relX + halfW));
+            maxScalingFactor = 1 + minLeeway / halfW;
+            if (scalingFactor > maxScalingFactor) scalingFactor = maxScalingFactor;
+            // Checking Y-axis boundary
+            minLeeway = Math.min(
+                Math.abs(BOUNDING_BOX.maxPosVal - relY - halfH),
+                Math.abs(BOUNDING_BOX.maxNegVal - relY + halfH));
+            maxScalingFactor = Math.min(1 + minLeeway / halfW, 1 + minLeeway / halfH);
+            if (scalingFactor > maxScalingFactor) scalingFactor = maxScalingFactor;
+            /**
+             * Perform vertex resize
+             */
+            let ctrlFactorX = 0, ctrlFactorY = 0;
+            if (Math.abs(layer.x) % 3 == 1.5) ctrlFactorX = 1.5;
+            if (Math.abs(layer.y) % 3 == 1.5) ctrlFactorY = 1.5;
+            for (var i = axis; i < currVtces.length; i += 2) {
+                currVtces[i] = roundPosition(origVtces[i] * scalingFactor);
+                if (ctrlFactorX == 1.5) {
+                    if (currVtces[i] >= 0) {
+                        currVtces[i] += ctrlFactorX;
+                    }
+                    else {
+                        currVtces[i] -= ctrlFactorX;
+                    }
+                }
+            }
+            editor.updateLayer(layer);
+            editor.render();
+        }
         this.editorBoxIcons = {
             tl: tl,
             tr: tr,
@@ -626,7 +736,9 @@ var Editor = Class({
             right: btn_r,
             down: btn_d,
             rotation: btn_rot,
-            resize: btn_resize
+            resize: btn_resize,
+            resizeX: btn_resizeX,
+            resizeY: btn_resizeY
         };
 
         $('body').on('vmousemove', function (e) {
@@ -668,6 +780,10 @@ var Editor = Class({
                 case 9:
                     resizeSymbol(pos, editor.origEditbtn);
                     break;
+                case 10: // Horizontal Resize 
+                case 11: // Vertical Resize
+                    directionalResizeSymbol(btnActive - 10, pos, editor.origEditbtn);
+                    break;
                 default:
                     break;
             }
@@ -692,6 +808,10 @@ var Editor = Class({
                     reshapeType = reshapeType || 'Rotated';
                 case 9:
                     reshapeType = reshapeType || 'Resized';
+                case 10:
+                    reshapeType = reshapeType || 'Horizontally Resized';
+                case 11:
+                    reshapeType = reshapeType || 'Vertically Resized';
                     let layer = list.selectedElem.parentNode.elem;
                     let vals = {
                         'layer': layer,
@@ -769,6 +889,8 @@ var Editor = Class({
         $('body').append(this.editorBoxIcons.down);
         $('body').append(this.editorBoxIcons.rotation);
         $('body').append(this.editorBoxIcons.resize);
+        $('body').append(this.editorBoxIcons.resizeX);
+        $('body').append(this.editorBoxIcons.resizeY);
         //Add the canvas to the HTML document
         parent.appendChild(this.renderer.view);
 
@@ -1443,6 +1565,8 @@ var Editor = Class({
         this.editorBoxIcons.down.hide();
         this.editorBoxIcons.rotation.hide();
         this.editorBoxIcons.resize.hide();
+        this.editorBoxIcons.resizeX.hide();
+        this.editorBoxIcons.resizeY.hide();
     },
     showLayerEditBox: function (optOpacity) {
         this.overlayImg.toggleController(false);
@@ -1456,6 +1580,8 @@ var Editor = Class({
         this.editorBoxIcons.down.show();
         this.editorBoxIcons.rotation.show();
         this.editorBoxIcons.resize.show();
+        this.editorBoxIcons.resizeX.show();
+        this.editorBoxIcons.resizeY.show();
         if (optOpacity !== undefined) {
             let buttons = $('.edit-button');
             buttons.css('opacity', optOpacity);
@@ -1491,6 +1617,10 @@ var Editor = Class({
             .css('top', (basePosY - 42.5) + 'px');
         this.editorBoxIcons.resize.css('left', (basePosX - 11.3) + 'px')
             .css('top', (basePosY + 17.5) + 'px');
+        this.editorBoxIcons.resizeX.css('left', (basePosX + 18.7) + 'px')
+            .css('top', (basePosY - 12.5) + 'px');
+        this.editorBoxIcons.resizeY.css('left', (basePosX - 41.3) + 'px')
+            .css('top', (basePosY - 12.5) + 'px');
     },
     refreshLayerEditBoxButton: function (index) {
         if (this.selectedLayer == null
