@@ -628,7 +628,7 @@ function initUI() {
                   { // 6
                       element: $('.toolbarbtn')[6],
                       hint: "Click here to save your work. Load that file into the application later to continue your work. For exporting"
-                          + " Symbol Art into PSO2, <a href='https://github.com/malulleybovo/SymbolArtEditorOnline/wiki' target='_blank'>click here.</a>",
+                          + " Symbol Art into PSO2, <a href='https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/3-Exporting-Symbol-Art' target='_blank'>click here.</a>",
                       hintPosition: 'top-middle'
                   },
                   { // 7

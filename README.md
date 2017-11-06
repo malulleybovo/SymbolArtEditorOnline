@@ -22,7 +22,7 @@ Symbol Art Editor Online is a browser vector-based image editor used to produce 
 
 <div align="center">
 
-##### Tell me your ideas if you think about an extra feature I have not thought about already. Also, if you have knowledge about how *.sar* files are formatted, please enlighten me so I can add support for it.
+### Support for .SAR File Format Coming Soon
 
 </div>
 
