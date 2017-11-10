@@ -554,7 +554,7 @@ function initUI() {
     UI.landing.version = $('<div class="landing-app-version no-panning">');
     UI.landing.version.text(APP_VER);
 
-    UI.landing.help = $('<div class="landing-help">');
+    UI.landing.help = $('<div class="landing-help shake-elem">');
     UI.landing.help.append('<i class="fa fa-question">');
     UI.landing.help.click(function () {
         var win = window.open('https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1-Usage', '_blank');
