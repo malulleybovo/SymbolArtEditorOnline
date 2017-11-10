@@ -37,10 +37,11 @@ The application supports *.sar* (Symbol Art files) and *.saml* (Art project file
 - Click File->Save and Save Your Work in *.sar* Format Into *path/to/directory/SEGA/PHANTASYSTARONLINE2/symbolarts/user/* YOUR_USER_ID_FOLDER/
 - Login Into the Game, Go to Symbol Arts Menu, Select the *Import* Tab, and Import Your Artwork Into the Game
 
-### [Features](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/4-Features):
+### [Features](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/3-Features):
 - Touch Screen Support ! ! !
 - Saving Your Creation to *.saml* Format by Clicking the Download Button on the Toolbar at the Bottom of the Editor
-- Loading *.saml* Saved from this Application or from the lacking [Symbol Art Editor](http://www.pso-world.com/forums/showthread.php?215777-Symbol-Art-Editor-EN-Version) available in www.pso-world.com
+- Loading *.sar* Symbol Art Files Saved in PSO2 or the lacking [Symbol Art Editor](http://www.pso-world.com/forums/showthread.php?215777-Symbol-Art-Editor-EN-Version) available in www.pso-world.com
+- Loading *.saml* Project Files Saved in this Application or from the lacking [Symbol Art Editor](http://www.pso-world.com/forums/showthread.php?215777-Symbol-Art-Editor-EN-Version) available in www.pso-world.com
 - *note:* I have not managed to understand how *.sar* files are formatted (binary file? encrypted?), so no *.sar* support until then unfortunately
 - Undo / Redo Changes Made (Add, Rename, Move, or Remove Layer/Group; Any Sort of Symbol Reshaping; Changes in Symbol Color)
 - Layer Manager to Organize and Facilitate Your Workflow
@@ -71,7 +72,7 @@ The application supports *.sar* (Symbol Art files) and *.saml* (Art project file
 - Upload an Image to Serve as Overlay to Guide You in Making Art
 - Save Creation as Image File (PNG).
 
-### [Acknowledgement](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/5-Acknowledgement):
+### [Acknowledgement](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/4-Acknowledgement):
 - [PixiJS](http://www.pixijs.com/): For the amazing WebGL renderer that tremendously reduced the amount of work needed to make this application.
 - [jQuery](https://jquery.com/): For allowing easy and quick DOM manipulation.
 - [jQuery contextMenu Plugin](http://swisnl.github.io/jQuery-contextMenu/index.html): For providing a browser version of the right click context menu of native apps.
@@ -87,7 +88,7 @@ The application supports *.sar* (Symbol Art files) and *.saml* (Art project file
 - [canvas-toBlob.js](https://github.com/eligrey/canvas-toBlob.js): For providing cross-browser canvas.toBlob() implementation used for saving Symbol Art as image file.
 - [Blob.js](https://github.com/eligrey/Blob.js): For providing cross-browser Blob implementation used for saving Symbol Art as image file.
 
-### [Disclaimer](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/6-Disclaimer)
+### [Disclaimer](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/5-Disclaimer)
 - Symbol Art Editor is a proprietary editor developed and owned by [SEGA](http://www.sega.com/). I do not own the idea of a Symbol Art Editor. This is purely a fan-made application inspired by SEGA's editor developed to let other fans and any curious artist have fun crafting symbol artwork outside of the game Phantasy Star Online 2 in a dedicated user-friendly editor engineered to be quick to use and that minimizes effort and repetition required to create quality symbol art. The only profit I expect from this application is people's happiness.
 
 <div align="center">
