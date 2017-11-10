@@ -565,6 +565,16 @@ function initUI() {
         }
     });
 
+    UI.landing.anim = $(
+        `<div class ='special-div'>
+            <h2 class ='special1'>
+                <span class ='special-span'>.SAR</span>
+            </h1>
+            <h2 class ='special2'>
+                <span class='special-span'>.SAML</span>
+            </h1>
+         </div>`);
+
     UI.landing.menu = $('<div class="landing-menu">');
 
     let landingOnKeyPressCallback = function (e) {
@@ -767,6 +777,7 @@ function initUI() {
 
     UI.fileHandler = $('<input type="file" accept=".sar,.saml" class="hidden">');
     UI.fileHandler.change(function (e) {
+        $('.special-div').remove();
         $('.landing-img').addClass('loading');
         var file = e.target.files[0];
         if (/.+\.sar$/.test(file.name)) {
@@ -826,6 +837,7 @@ function initUI() {
     UI.landing.demoButton = $('<div class="landing-sample no-panning">TRY SAMPLE</div>');
     UI.landing.demoButton.click(
         function (e) {
+            $('.special-div').remove();
             $('.landing-img').addClass('loading');
             $.ajax({
                 url: 'samples/demo0.saml',
@@ -859,6 +871,7 @@ function initUI() {
     UI.landing.append(UI.landing.version);
     UI.landing.append(UI.landing.help);
     UI.landing.append(UI.landing.demoButton);
+    UI.landing.append(UI.landing.anim);
 
     UI.landing.append(UI.landing.menu);
     setInterval(function () {
