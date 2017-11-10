@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /***********************/
-var APP_VER = '1.2.4';
+var APP_VER = '1.3.0';
 /***********************/
 
 var imgWidth = 176;
@@ -765,31 +765,62 @@ function initUI() {
     });
     UI.landing.menu.append(UI.landing.menu.loadAppButton);
 
-    UI.fileHandler = $('<input type="file" accept=".saml" class="hidden">');
+    UI.fileHandler = $('<input type="file" accept=".sar,.saml" class="hidden">');
     UI.fileHandler.change(function (e) {
         $('.landing-img').addClass('loading');
         var file = e.target.files[0];
-        setTimeout(function () {
-            var reader = new FileReader();
-            reader.onload = function (evt) {
-                list.setReady(true); // Ready the Layer Manager
-                $(document).unbind('keypress', landingOnKeyPressCallback);
-                var text = evt.target.result;
-                samlLoader.load(text);
-                historyManager.clear();
-                editorToolbar.disableTool('undo');
-                UI.landing.animate({
-                    opacity: 0
-                }, "slow", "linear", function () {
-                    UI.landing.remove();
-                });
-            }
-            reader.readAsText(file);
-            reader.onerror = function (evt) {
-                alert("Error reading file.");
-                $('.landing-img').removeClass('loading');
-            }
-        }, 1000);
+        if (/.+\.sar$/.test(file.name)) {
+            setTimeout(function () {
+                var reader = new FileReader();
+                reader.onloadend = function (evt) {
+                    list.setReady(true); // Ready the Layer Manager
+                    $(document).unbind('keypress', landingOnKeyPressCallback);
+
+                    /* Start parsing .sar file */
+                    let buffer = evt.target.result;
+                    let parseResult = loadSAR(buffer);
+
+                    historyManager.clear();
+                    editorToolbar.disableTool('undo');
+                    UI.landing.animate({
+                        opacity: 0
+                    }, "slow", "linear", function () {
+                        UI.landing.remove();
+                    });
+                }
+                reader.readAsArrayBuffer(file);
+                reader.onerror = function (evt) {
+                    alert("Error reading .sar file.");
+                    $('.landing-img').removeClass('loading');
+                }
+            }, 1000);
+        }
+        else if (/.+\.saml$/.test(file.name)) {
+            setTimeout(function () {
+                var reader = new FileReader();
+                reader.onload = function (evt) {
+                    list.setReady(true); // Ready the Layer Manager
+                    $(document).unbind('keypress', landingOnKeyPressCallback);
+
+                    /* Start parsing .saml file */
+                    var text = evt.target.result;
+                    samlLoader.load(text);
+
+                    historyManager.clear();
+                    editorToolbar.disableTool('undo');
+                    UI.landing.animate({
+                        opacity: 0
+                    }, "slow", "linear", function () {
+                        UI.landing.remove();
+                    });
+                }
+                reader.readAsText(file);
+                reader.onerror = function (evt) {
+                    alert("Error reading .saml file.");
+                    $('.landing-img').removeClass('loading');
+                }
+            }, 1000);
+        }
     });
 
     UI.landing.demoButton = $('<div class="landing-sample no-panning">TRY SAMPLE</div>');

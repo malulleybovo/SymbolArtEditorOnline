@@ -1,7 +1,7 @@
 <div align="center">
 
 # Symbol Art Editor Online
-#### Version 1.2.4
+#### Version 1.3.0
 
 ## [*Play with it Here*](https://malulleybovo.github.io/SymbolArtEditorOnline/)
 
@@ -9,6 +9,7 @@
 
 Inspired by the in-game editor from [Phantasy Star Online 2](http://pso2.jp/) (SEGA), 
 Symbol Art Editor Online is a browser vector-based image editor used to produce digital art made of symbols.
+The application supports *.sar* (Symbol Art files) and *.saml* (Art project files).
 
 <img src="https://github.com/malulleybovo/SymbolArtEditorOnline/blob/master/res/walkthrough/welcome.gif" width="200" height="358" />
 
@@ -22,18 +23,14 @@ Symbol Art Editor Online is a browser vector-based image editor used to produce 
 
 <div align="center">
 
-### Support for .SAR File Format Coming Soon
+### *New on v1.3.0: Support for .SAR File Format is Here !*
 
 </div>
 
 ----
-### [Importing Symbol Art in *.sar* Format](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/2-Importing-Symbol-Art):
-- Download the Third-Party Application [Symbol Art Editor](http://www.pso-world.com/forums/showthread.php?215777-Symbol-Art-Editor-EN-Version) available in www.pso-world.com
-- Launch the Application, Click *File->Open*, and Select a Valid *.sar* File
-- Upon Loading the Symbol Art, Click *File->Save As*, and Save the Symbol Art in *.saml* Format this Time
-- Launch [Symbol Art Editor Online](https://malulleybovo.github.io/SymbolArtEditorOnline/) and Load the *.saml* File by Clicking the Upload Button at the Landing Screen and Choosing the File in your Device
 
-### [Exporting Symbol Art Into Phantasy Star Online 2](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/3-Exporting-Symbol-Art):
+### [Importing Symbol Art Into Phantasy Star Online 2](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/2-Importing-Symbol-Art):
+#### Required until **Save to .sar** is made available.
 - Save Your Work Within Symbol Art Editor Online Using the Download Button in the Toolbar
 - Open the Third Party [Symbol Art Editor](http://www.pso-world.com/forums/showthread.php?215777-Symbol-Art-Editor-EN-Version) available in www.pso-world.com
 - Click File->Open and Select the File Just Downloaded.
