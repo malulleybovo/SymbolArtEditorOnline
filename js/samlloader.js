@@ -215,11 +215,6 @@ var SAMLLoader = Class({
                     if (type == 'layer') {
                         value = value.match(/([0-9|a-f|A-F]{3,6})/)[0];
                         var color = hexToRgb(value);
-                        color = {
-                            r: pseudoCubicSplineColor(color.r),
-                            g: pseudoCubicSplineColor(color.g),
-                            b: pseudoCubicSplineColor(color.b),
-                        }
                         value = parseInt('0x' + rgbToHex(color));
                         if (value === undefined) {
                             // Invalid Input

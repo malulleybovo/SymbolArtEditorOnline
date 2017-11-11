@@ -161,11 +161,11 @@ var OverlayImage = Class({
         if (bool === undefined)
             bool = ($ctrller.css('opacity') == 0);
         if (bool) {
-            $ctrller.css('opacity', 1);
+            $ctrller.css('opacity', 1).css('visibility', '');
             this.plane.interactive = true;
         }
         else {
-            $ctrller.css('opacity', 0);
+            $ctrller.css('opacity', 0).css('visibility', 'hidden');
             this.plane.interactive = false;
         }
     },

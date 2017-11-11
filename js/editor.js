@@ -41,6 +41,34 @@ var Editor = Class({
 
         //Create a container object called the `this.stage`
         this.stage = new PIXI.Container();
+        let editorFilter = new PIXI.Filter(null, `
+            precision mediump float;
+            varying vec2 vTextureCoord;
+            uniform sampler2D uSampler;
+            // Brightness-Saturation-Contrast Filter
+            vec3 applyBSC(vec4 color, float brightness, float saturation, float contrast)
+            {
+	            vec3 color_B  = color.rgb * (1.0 +color.a * (brightness -1.0));
+	            vec3 intensity = vec3(dot(color_B, vec3(0.2125, 0.7154, 0.0721)));
+	            vec3 color_BS  = mix(intensity, color_B, 1.0 + color.a * (saturation -1.0));
+	            vec3 color_BSC  = mix(vec3(0.5, 0.5, 0.5), color_BS, 1.0 + color.a * (contrast - 1.0));
+	            return color_BSC;
+            }
+            void main(void)
+            {
+                float x = vTextureCoord.x;
+                float y = vTextureCoord.y;
+                vec4 pixel = texture2D(uSampler, vTextureCoord.xy);
+                if (x < 0.285 || x > 0.655 || y < 0.102 || y > 0.842) {
+                    gl_FragColor = pixel;
+                }
+                else {
+	                vec3 color = applyBSC(pixel, 0.7, 0.9, 2.12);
+	                gl_FragColor = vec4(color, pixel.a);
+                }
+            }`
+            );
+        this.stage.filters = [editorFilter];
         this.layers = [];
         this.parts = [];
 

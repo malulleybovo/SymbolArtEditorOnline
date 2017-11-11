@@ -87,11 +87,6 @@ var Layer = Class({
     toSAML: function (numTabs) { // numTabs not used
         var absVtx = this.getAbsVertices();
         var color = hexToRgb(Math.round(this.color).toString(16));
-        color = {
-            r: revertPseudoCubicSplineColor(color.r),
-            g: revertPseudoCubicSplineColor(color.g),
-            b: revertPseudoCubicSplineColor(color.b),
-        }
         // Convert alpha so it is compatible with the third-party
         // .NET Symbol Art Editor desktop application (refer to README)
         var alphaVal = 1 + 32 * (7 - this.alpha);

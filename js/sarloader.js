@@ -48,6 +48,24 @@ function loadSAR(/* ArrayBuffer */ buffer) {
     return parseResult;
 }
 
+function saveSAR() {
+    // Pack Symbol Art running on application
+    let packedData = getPackedData();
+    // Compact Symbol Art data
+    let uint8arr = compact(packedData);
+    // Blowfish encryption of Symbol Art data
+    let keyBuffer = Uint8Array.of(0x09, 0x07, 0xc1, 0x2b).buffer;
+    let ctx = new BlowfishContext(keyBuffer);
+    ctx.encrypt(uint8arr.buffer);
+    // Get .sar file identifier ('sar' + char 0x04)
+    let identifier = new Uint8Array(4);
+    identifier[0] = 0x73; identifier[1] = 0x61; identifier[2] = 0x72;
+    identifier[3] = 0x04;
+    // Save encrypted .sar file
+    var blob = new Blob([identifier,uint8arr]);
+    saveAs(blob, list.mainGroup.name + ".sar");
+}
+
 function parseSAR(/* ArrayBuffer */ buffer) {
     let u8view = new Uint8Array(buffer);
     let flag = u8view[3];
@@ -144,9 +162,9 @@ function setupApplication(parsedInput) {
 
         /* Setup layer symbol color */
         let color = {
-            r: pseudoCubicSplineColor(layer.props.colorR * 4), // Multiply because .sar stores
-            g: pseudoCubicSplineColor(layer.props.colorG * 4), // each color parameter as 
-            b: pseudoCubicSplineColor(layer.props.colorB * 4), // 6 bit instead of 8 bit
+            r: (layer.props.colorR * 4), // Multiply because .sar stores
+            g: (layer.props.colorG * 4), // each color parameter as 
+            b: (layer.props.colorB * 4), // 6 bit instead of 8 bit
         }
         let value = parseInt('0x' + rgbToHex(color));
         if (value !== undefined) {
@@ -284,6 +302,241 @@ const baseRegistry = {
     'f32le': cursor => cursor.readFloat32(true),
     'f64le': cursor => cursor.readFloat64(true),
 };
+
+/**
+ * Packs Symbol Art in app into an object
+ * 
+ * Return:
+ * {Object} packedData = {
+ *     playerID: (uint32b)
+ *     layerCount: (uint8b)
+ *     height: (uint8b)
+ *     width: (uint8b)
+ *     sound: (uint8b)
+ *     layers: [
+ *         ("packedData.layerCount" times the schema below)
+ *         {
+ *             topLeft: {
+ *                 x: (int8b)
+ *                 y: (int8b)
+ *             }
+ *             bottomLeft: {
+ *                 x: (int8b)
+ *                 y: (int8b)
+ *             }
+ *             topRight: {
+ *                 x: (int8b)
+ *                 y: (int8b)
+ *             }
+ *             bottomRight: {
+ *                 x: (int8b)
+ *                 y: (int8b)
+ *             }
+ *             visible: 
+ *             textureIndex: 
+ *             transparency: 
+ *             colorR: (uint6b)
+ *             colorG: (uint6b)
+ *             colorB: (uint6b)
+ *             colorX: (uint6b)
+ *             colorY: (uint6b)
+ *             colorZ: (uint6b)
+ *         }
+ *     ]
+ *     name: (string)
+ * }
+ */
+function getPackedData() {
+    // Get editor reference
+    let editor = $('canvas')[0];
+    if (editor === undefined
+        || editor.editor === undefined) {
+        console.warn(
+            '%cSAR Loader (%O):%c Could not pack data. '
+            + 'Canvas editot was not found (%O).',
+            'color: #a6cd94', this, 'color: #d5d5d5', $('canvas'));
+        return null;
+    }
+    editor = editor.editor;
+    // Get sound effect from player
+    let sound = $('#player')[0];
+    if (sound === undefined
+        || sound.manager === undefined
+        || sound.manager.currBGE === undefined) {
+        console.warn(
+            '%cSAR Loader (%O):%c Could not pack data. '
+            + 'Sound Effect Player was not found (%O).',
+            'color: #a6cd94', this, 'color: #d5d5d5', $('#player'));
+        return null;
+    }
+    sound = sound.manager.currBGE;
+    // Make sure editor has current info
+    editor.refreshDisplay();
+    // Get Symbol Art name
+    if (list === undefined
+        || list.mainGroup === undefined
+        || list.mainGroup.name === undefined
+        || typeof list.mainGroup.name !== 'string') {
+        console.warn(
+            '%cSAR Loader (%O):%c Could not pack data. '
+            + 'Symbol Art name was not found (%O).',
+            'color: #a6cd94', this, 'color: #d5d5d5', 
+            (list.mainGroup) ? list.mainGroup : list);
+        return null;
+    }
+    let name = list.mainGroup.name;
+
+    var packedData = {
+        playerID: SAConfig.authorID & 0xFFFFFFFF,
+        layerCount: editor.layers.length & 0xFF,
+        height: 128,
+        width: 193,
+        sound: sound & 0xFF,
+        layers: getLayersPacked(),
+        name: name
+    }
+
+    return packedData;
+
+    function getLayersPacked() {
+        var packedLayers = [];
+        for (var i = 0; i < editor.layers.length; i++) {
+            let curr = editor.layers[i];
+            let layer = curr.layer;
+            if (layer === undefined
+                || typeof layer !== 'object') {
+                console.warn(
+                    '%cSAR Loader (%O):%c Could not pack data. '
+                    + 'Invalid layer data was found in editor (%O).',
+                    'color: #a6cd94', this, 'color: #d5d5d5', curr);
+                return null;
+            }
+            let startX = layer.x - EDITOR_SIZE.x / 2;
+            let startY = layer.y - EDITOR_SIZE.y / 2;
+            packedLayers.push({
+                topLeft: {
+                    x: (roundPosition(layer.vertices[0] + startX) / 3 - BOUNDING_BOX_RAW.maxNegVal) & 0xFF,
+                    y: (roundPosition(layer.vertices[1] + startY) / 3 - BOUNDING_BOX_RAW.maxNegVal) & 0xFF
+                },
+                bottomLeft: {
+                    x: (roundPosition(layer.vertices[4] + startX) / 3 - BOUNDING_BOX_RAW.maxNegVal) & 0xFF,
+                    y: (roundPosition(layer.vertices[5] + startY) / 3 - BOUNDING_BOX_RAW.maxNegVal) & 0xFF
+                },
+                topRight: {
+                    x: (roundPosition(layer.vertices[2] + startX) / 3 - BOUNDING_BOX_RAW.maxNegVal) & 0xFF,
+                    y: (roundPosition(layer.vertices[3] + startY) / 3 - BOUNDING_BOX_RAW.maxNegVal) & 0xFF
+                },
+                bottomRight: {
+                    x: (roundPosition(layer.vertices[6] + startX) / 3 - BOUNDING_BOX_RAW.maxNegVal) & 0xFF,
+                    y: (roundPosition(layer.vertices[7] + startY) / 3 - BOUNDING_BOX_RAW.maxNegVal) & 0xFF
+                },
+                visible: (layer.visible === true) ? 0 : 1,
+                textureIndex: (parseInt(partsInfo.dataArray[layer.part], 10) - 1) & 0x3FF,
+                transparency: layer.alpha & 0x7,
+                colorR: ((layer.color >> 16) & 0xFC) >> 2, // Color precision is decreased from 8 bit 
+                colorG: ((layer.color >> 8) & 0xFC) >> 2, // precision down to 6 bit precision
+                colorB: (layer.color & 0xFC) >> 2,
+                colorX: 0, // TODO: Discover why xyz is necessary
+                colorY: 0, // and how to use them
+                colorZ: 0
+            });
+        }
+        return packedLayers;
+    }
+}
+
+/**
+ * Compacts the input packedData into a uint8Array, formatted
+ * to be ready for encryption.
+ * Arguments:
+ * {Object} packedData - the SA data in app formatted into an object
+ * Return:
+ * {uint8Array} uint8arr - the SA data in app formatted for encryption
+ */
+function compact(packedData) {
+    // Validate input
+    if (packedData === undefined
+        || packedData.playerID === undefined
+        || packedData.layerCount === undefined
+        || packedData.height === undefined
+        || packedData.width === undefined
+        || packedData.sound === undefined
+        || packedData.layers === undefined
+        || packedData.name === undefined
+        || typeof packedData.playerID !== 'number'
+        || typeof packedData.layerCount !== 'number'
+        || typeof packedData.height !== 'number'
+        || typeof packedData.width !== 'number'
+        || typeof packedData.sound !== 'number'
+        || typeof packedData.layers !== 'object'
+        || typeof packedData.name !== 'string'
+        || packedData.layers.length === undefined
+        || packedData.layers.length !== packedData.layerCount) {
+        console.warn(
+            '%cSAR Loader (%O):%c Failed to compact into .sar format. '
+            + 'Input %O contains inconsistent information.',
+            'color: #a6cd94', this, 'color: #d5d5d5', packedData);
+        return null;
+    }
+
+    var uint8arr = new Uint8Array(
+        8 + (16 * packedData.layerCount) + (2 * packedData.name.length) // In Bytes
+        );
+    let pos = 0;
+    // Write playerID
+    uint8arr[pos++] = packedData.playerID & 0xFF;
+    uint8arr[pos++] = (packedData.playerID >> 8) & 0xFF;
+    uint8arr[pos++] = (packedData.playerID >> 16) & 0xFF;
+    uint8arr[pos++] = (packedData.playerID >> 24) & 0xFF;
+    // Write Symbol Art layer count
+    uint8arr[pos++] = packedData.layerCount & 0xFF;
+    // Write Symbol Art height
+    uint8arr[pos++] = packedData.height & 0xFF;
+    // Write Symbol Art width
+    uint8arr[pos++] = packedData.width & 0xFF;
+    // Write Symbol Art sound effect
+    uint8arr[pos++] = packedData.sound & 0xFF;
+    // Write layers
+    for (var i = 0; i < packedData.layers.length; i++) {
+        let curr = packedData.layers[i];
+        // Write layer vertex topLeft X
+        uint8arr[pos++] = curr.topLeft.x & 0xFF;
+        // Write layer vertex topLeft Y
+        uint8arr[pos++] = curr.topLeft.y & 0xFF;
+        // Write layer vertex bottomLeft X
+        uint8arr[pos++] = curr.bottomLeft.x & 0xFF;
+        // Write layer vertex bottomLeft Y
+        uint8arr[pos++] = curr.bottomLeft.y & 0xFF;
+        // Write layer vertex topRight X
+        uint8arr[pos++] = curr.topRight.x & 0xFF;
+        // Write layer vertex topRight Y
+        uint8arr[pos++] = curr.topRight.y & 0xFF;
+        // Write layer vertex bottomRight X
+        uint8arr[pos++] = curr.bottomRight.x & 0xFF;
+        // Write layer vertex bottomRight Y
+        uint8arr[pos++] = curr.bottomRight.y & 0xFF;
+        // Write condensed 32 bit layer properties
+        uint8arr[pos++] = ((curr.colorG & 0x3) << 6) | curr.colorR;
+        uint8arr[pos++] = ((curr.colorB & 0xF) << 4) | ((curr.colorG >> 2) & 0xF);
+        uint8arr[pos++] = ((curr.textureIndex & 0x7) << 5) | (curr.transparency << 2) | ((curr.colorB >> 4) & 0x3);
+        uint8arr[pos++] = (curr.visible << 7) | ((curr.textureIndex >> 3) & 0x7F);
+        // Write condensed 32 bit color X, Y, Z
+        uint8arr[pos++] = ((curr.colorY & 0x3) << 6) | curr.colorX;
+        uint8arr[pos++] = ((curr.colorZ & 0xF) << 4) | ((curr.colorY >> 2) & 0xF);
+        uint8arr[pos++] = ((curr.colorZ >> 4) & 0x3);
+        uint8arr[pos++] = 0;
+    }
+    // Write Symbol Art name
+    for (var i = 0; i < packedData.name.length; i++) {
+        let charCode = packedData.name.charCodeAt(i);
+        // Write lowerByte
+        uint8arr[pos++] = charCode & 0xFF;
+        // Write upperByte
+        uint8arr[pos++] = (charCode >> 8) & 0xFF;
+    }
+
+    return uint8arr;
+}
 
 /**
  * 
@@ -808,7 +1061,9 @@ schema = function (cursor, registry) {
     }
 
     let name = [];
-    for (let i = 0; i < 13; i++) {
+    // Read rest of buffer into Symbol Art name
+    let startPos = cursor.pos;
+    for (let i = 0; i < (cursor.dataView.byteLength - startPos) / 2; i++) {
         try {
             let c = parseWithCursor(cursor, 'u16le', registry);
             name.push(c);
