@@ -30,12 +30,10 @@ The application supports *.sar* (Symbol Art files) and *.saml* (Art project file
 ----
 
 ### [Importing Symbol Art Into Phantasy Star Online 2](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/2-Importing-Symbol-Art):
-#### Required until **Save to .sar** is made available.
-- Save Your Work Within Symbol Art Editor Online Using the Download Button in the Toolbar
-- Open the Third Party [Symbol Art Editor](http://www.pso-world.com/forums/showthread.php?215777-Symbol-Art-Editor-EN-Version) available in www.pso-world.com
-- Click File->Open and Select the File Just Downloaded.
-- Click File->Save and Save Your Work in *.sar* Format Into *path/to/directory/SEGA/PHANTASYSTARONLINE2/symbolarts/user/* YOUR_USER_ID_FOLDER/
-- Login Into the Game, Go to Symbol Arts Menu, Select the *Import* Tab, and Import Your Artwork Into the Game
+- Save Your Work Within Symbol Art Editor Online Using the Download Button in the Toolbar. This Will Display the Save Options.
+- Select the Option Saying "SAR" to Save Your Work in *.sar* Format. Save it Into the Folder path/to/directory/**SEGA/PHANTASYSTARONLINE2/symbolarts/user/import/**
+(path/to/directory/ is usually user/Documents/)
+- Login Into the Game, Go to Symbol Arts Menu, Select the *Import* Tab, and Click the Item Saying "import." The Game Will Load the Symbol Arts in the **import/** Folder and You Can Then Save Your Artwork Into Your Account.
 
 ### [Features](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/3-Features):
 - Touch Screen Support ! ! !
