@@ -153,6 +153,71 @@ var LayerCtrl = Class({
                     v[2 * i] *= scale[0]; v[2 * i + 1] *= scale[1];
                 }
             },
+            rot90degClockwise: function () {
+                let layer = this.object.layerCtrl.activeLayer;
+                let origVals = {
+                    vtces: layer.vertices.slice(0),
+                    x: layer.x,
+                    y: layer.y
+                };
+                this.object.rot90deg(0, layer.vertices);
+                this.object.update(this.object.layerCtrl);
+                historyManager.pushUndoAction('symbol_reshape', {
+                    layer: layer,
+                    origVals: origVals,
+                    newVals: {
+                        vtces: layer.vertices.slice(0),
+                        x: layer.x,
+                        y: layer.y
+                    }
+                });
+                console.log('%cRotated Clockwise Symbol%c of layer "%s" in group "%s" at position "%i".',
+                    'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                    layer.parent.elems.indexOf(layer));
+            },
+            rot90degAntiClockwise: function () {
+                let layer = this.object.layerCtrl.activeLayer;
+                let origVals = {
+                    vtces: layer.vertices.slice(0),
+                    x: layer.x,
+                    y: layer.y
+                };
+                this.object.rot90deg(1, layer.vertices);
+                this.object.update(this.object.layerCtrl);
+                historyManager.pushUndoAction('symbol_reshape', {
+                    layer: layer,
+                    origVals: origVals,
+                    newVals: {
+                        vtces: layer.vertices.slice(0),
+                        x: layer.x,
+                        y: layer.y
+                    }
+                });
+                console.log('%cVertically Anti-clockwise Symbol%c of layer "%s" in group "%s" at position "%i".',
+                    'color: #2fa1d6', 'color: #f3f3f3', layer.name, layer.parent.name,
+                    layer.parent.elems.indexOf(layer));
+            },
+            rot90deg: function (typeNum, v) {
+                var scale;
+                switch (typeNum) {
+                    case 0: // Clockwise
+                        for (var i = 0; i < 4; i++) {
+                            let x = v[2 * i];
+                            v[2 * i] = v[2 * i + 1];
+                            v[2 * i + 1] = -x;
+                        }
+                        break;
+                    case 1: // Anti-clockwise
+                        for (var i = 0; i < 4; i++) {
+                            let x = v[2 * i];
+                            v[2 * i] = -v[2 * i + 1];
+                            v[2 * i + 1] = x;
+                        }
+                        break;
+                    default:
+                        return;
+                }
+            },
             update: function (layerCtrl) {
                 let editor = layerCtrl.editor;
                 editor.updateLayer(layerCtrl.activeLayer);
@@ -268,6 +333,14 @@ var LayerCtrl = Class({
         this.horizFlip.layerCtrl = this;
         this.horizFlip = this.flipsFolder.add(this.functions, 'trigger')
             .name('vertical').onChange(this.functions.vertFlip);
+        this.horizFlip.layerCtrl = this;
+
+        this.rotFolder = this.gui.addFolder('rotate');
+        this.horizFlip = this.rotFolder.add(this.functions, 'trigger')
+            .name('clockwise').onChange(this.functions.rot90degClockwise);
+        this.horizFlip.layerCtrl = this;
+        this.horizFlip = this.rotFolder.add(this.functions, 'trigger')
+            .name('anti-clockwise').onChange(this.functions.rot90degAntiClockwise);
         this.horizFlip.layerCtrl = this;
 
         this.pos = this.gui.addFolder('move');
