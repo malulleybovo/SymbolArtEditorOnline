@@ -566,6 +566,25 @@ function initUI() {
             alertManager.pushAlert('Redid symbol transparency change');
         },
         ['layer', 'oldAlpha', 'newAlpha']);
+    let switchGroupAlphas = function (ctx) {
+        let editor = $('canvas')[0].editor;
+        for (var i = ctx.startIdx; i < ctx.endIdx; i++) {
+            if (!editor.layers[i]) continue;
+            let layer = editor.layers[i].layer;
+            let alpha = ctx.origAlphas[i - ctx.startIdx];
+            ctx.origAlphas[i - ctx.startIdx] = layer.alpha;
+            layer.alpha = alpha;
+            editor.updateLayer(layer);
+        }
+        editor.render();
+        editor.layerCtrl.update(editor.layerCtrl.activeLayer);
+        alertManager.pushAlert('Undid symbol group transparency change');
+    }
+    historyManager
+        .registerUndoAction('symbol_groupchangealpha',
+        switchGroupAlphas, // UNDO symbol_groupchangealpha
+        switchGroupAlphas, // REDO symbol_groupchangealpha
+        ['startIdx', 'endIdx', 'origAlphas']);
 
     samlLoader = new SAMLLoader(list);
 
@@ -657,6 +676,8 @@ function initUI() {
                     });
 
                     initWalkthrough();
+                    title = file.name;
+                    document.title = 'SA: ' + title;
                 }
                 reader.readAsArrayBuffer(file);
                 reader.onerror = function (evt) {

@@ -33,6 +33,58 @@ var GroupEditBox = Class({
             .css('top', (offset.top + editor.zoom * (this.group.maxYCoord + this.dy) - 12.5) + 'px');
     },
     setupController: function () {
+        if (GroupEditBox.ctrller === undefined) {
+            GroupEditBox.ctrller = new dat.GUI({ autoPlace: false });
+            GroupEditBox.ctrller.add({
+                transparency: 0,
+                isFirstChange: true
+            }, 'transparency').min(-7).step(1).max(7)
+                .onChange(function (val) {
+                    let editor = $('canvas')[0].editor;
+                    let groupMoving = editor.groupMoving;
+                    if (this.object.isFirstChange) {
+                        this.object.isFirstChange = false;
+                    }
+                    for (var i = groupMoving.firstIdx; i < groupMoving.lastIdx; i++) {
+                        let layer = editor.layers[i].layer;
+                        let newAlpha = val + groupMoving.origAlpha[i - groupMoving.firstIdx];
+                        if (newAlpha > 7) newAlpha = 7;
+                        else if (newAlpha < 0) newAlpha = 0;
+                        layer.alpha = newAlpha;
+                        editor.updateLayer(layer);
+                    }
+                    editor.render();
+                })
+                .onFinishChange(function (val) {
+                    this.object.isFirstChange = true;
+                    let editor = $('canvas')[0].editor;
+                    let groupMoving = editor.groupMoving;
+                    let shouldSave = false;
+                    for (var i = groupMoving.firstIdx; i < groupMoving.lastIdx; i++) {
+                        if (editor.layers[i].layer.alpha != editor.groupMoving.origAlpha[i]) {
+                            shouldSave = true;
+                            break;
+                        }
+                    }
+                    if (!shouldSave) return;
+                    // Save group recolor so it can be reverted later
+                    historyManager.pushUndoAction('symbol_groupchangealpha', {
+                        'startIdx': groupMoving.firstIdx,
+                        'endIdx': groupMoving.lastIdx,
+                        'origAlphas': groupMoving.origAlpha
+                    });
+                    // Update origColor with up to date colors from layers
+                    groupMoving.origAlpha = [];
+                    for (var i = groupMoving.firstIdx; i < groupMoving.lastIdx; i++) {
+                        layer = editor.layers[i].layer;
+                        groupMoving.origAlpha.push(layer.alpha);
+                    }
+                    this.object.transparency = 0;
+                    this.updateDisplay();
+                });
+            $(GroupEditBox.ctrller.domElement).addClass("top-right no-panning no-highlight fade");
+            $('body').append(GroupEditBox.ctrller.domElement);
+        }
         if (GroupEditBox.cPicker !== undefined) return;
         // Color Picker
         GroupEditBox.cPicker = $('<input type="text" id="colorSelector2" style="width:0; height:0; position:fixed; bottom:0; right:0;" />');
@@ -57,10 +109,14 @@ var GroupEditBox = Class({
                 let editor = $('canvas')[0].editor;
                 updateColor(color);
                 let groupMoving = editor.groupMoving;
-                var i = groupMoving.firstIdx;
-                if (editor.layers[i].layer.color == editor.groupMoving.origColor[i]) {
-                    return; // Do not save into history if nothing changed in the end
+                let shouldSave = false;
+                for (var i = groupMoving.firstIdx; i < groupMoving.lastIdx; i++) {
+                    if (editor.layers[i].layer.color != editor.groupMoving.origColor[i]) {
+                        shouldSave = true;
+                        break;
+                    }
                 }
+                if (!shouldSave) return;
                 // Save group recolor so it can be reverted later
                 historyManager.pushUndoAction('symbol_grouprecolor', {
                     'startIdx': groupMoving.firstIdx,
@@ -192,17 +248,20 @@ GroupEditBox.container
     .append(GroupEditBox.btns.botL)
     .append(GroupEditBox.btns.botR);
 GroupEditBox.cPicker;
+GroupEditBox.ctrller;
 /* Static Functions */
 GroupEditBox.show = function () {
     if ($('#groupEditBox')[0]) return; // Ignore if edit box is already displaying
     $('body').append(GroupEditBox.container);
     $('#colorSelector2').spectrum('set', '#bf4040');
     $('#groupColorPicker').removeClass('fadeOut');
+    $(GroupEditBox.ctrller.domElement).removeClass("fadeOut");
 }
 GroupEditBox.hide = function () {
     if (!$('#groupEditBox')[0]) return; // Ignore if edit box is not displaying
     GroupEditBox.container.detach();
     $('#groupColorPicker').addClass('fadeOut');
+    $(GroupEditBox.ctrller.domElement).addClass("fadeOut");
 }
 GroupEditBox.isVisible = function () {
     let box = $('#groupEditBox')[0];

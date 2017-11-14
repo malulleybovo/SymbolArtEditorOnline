@@ -1355,9 +1355,11 @@ var Editor = Class({
         let editor = canvas[0].editor;
         let groupMoving = editor.groupMoving;
         groupMoving.origColor = [];
+        groupMoving.origAlpha = [];
         for (var i = groupMoving.firstIdx; i < groupMoving.lastIdx; i++) {
             layer = editor.layers[i].layer;
             groupMoving.origColor.push(layer.color);
+            groupMoving.origAlpha.push(layer.alpha);
         }
 
         editor.groupEditBox = new GroupEditBox(this.groupMoving);
@@ -1510,7 +1512,6 @@ var Editor = Class({
         $('body')
             .unbind('vmouseup.saGroupMouseup')
             .bind('vmouseup.saGroupMouseup', function (e) {
-                e.stopPropagation();
                 $('canvas').trigger('vmouseup');
             });
     },
