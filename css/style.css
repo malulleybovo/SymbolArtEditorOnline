@@ -54,9 +54,20 @@ h1.ui-title {
     right: 0;
 }
 
+.group-picker-replacer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
+
 .sa-color-picker-container {
 
 }
+
+.group-picker-container {
+
+}
+
 img {
   -webkit-user-select: none;
   -khtml-user-select: none;

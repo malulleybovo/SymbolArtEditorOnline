@@ -198,7 +198,7 @@ var LayerCtrl = Class({
                 }
             }
         });
-        $('.sp-replacer').css('transition', '0.1s ease-in-out').addClass('no-panning');
+        $('.sa-color-picker-replacer').attr('id', 'layerColorPicker').css('transition', '0.1s ease-in-out').addClass('no-panning');
         $('.sp-container').addClass('no-panning');
         function updateColor(color) {
             let canvas = $('canvas')[0];
@@ -285,7 +285,7 @@ var LayerCtrl = Class({
         this.posYPlus.layerCtrl = this; this.posYPlus.motionType = 2;
 
         $(this.gui.domElement).addClass('fade');
-        $('.sp-replacer').addClass('fade fadeOut');
+        $('#layerColorPicker').addClass('fade fadeOut')
     },
     update: function (layer) {
         this.activeLayer = layer;
@@ -300,12 +300,12 @@ var LayerCtrl = Class({
     hide: function () {
         this.partselectmenu.hide();
         $(this.gui.domElement).addClass('fadeOut');
-        $('.sp-replacer').addClass('fadeOut');
+        $('#layerColorPicker').addClass('fadeOut');
     },
     show: function () {
         this.partselectmenu.show();
         $(this.gui.domElement).removeClass('fadeOut');
-        $('.sp-replacer').removeClass('fadeOut');
+        $('#layerColorPicker').removeClass('fadeOut');
     },
     forceClose: function () {
         let layerCtrlBtn = $('div .close-button');

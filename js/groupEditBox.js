@@ -5,6 +5,9 @@ var GroupEditBox = Class({
         this.group = group;
         this.dx = 0;
         this.dy = 0;
+        this.colorShift = '#bf4040';
+        this.setupController();
+
         GroupEditBox.show();
     },
     displace: function (dx, dy) {
@@ -28,6 +31,151 @@ var GroupEditBox = Class({
             .css('top', (offset.top + editor.zoom * (this.group.maxYCoord + this.dy) - 12.5) + 'px');
         GroupEditBox.btns.botR.css('left', (offset.left + editor.zoom * (this.group.maxXCoord + this.dx) - 11.3) + 'px')
             .css('top', (offset.top + editor.zoom * (this.group.maxYCoord + this.dy) - 12.5) + 'px');
+    },
+    setupController: function () {
+        if (GroupEditBox.cPicker !== undefined) return;
+        // Color Picker
+        GroupEditBox.cPicker = $('<input type="text" id="colorSelector2" style="width:0; height:0; position:fixed; bottom:0; right:0;" />');
+        $('body').append(GroupEditBox.cPicker);
+        GroupEditBox.cPicker.spectrum({
+            color: "#bf4040",
+            showInput: true,
+            showInitial: true,
+            localStorageKey: "spectrum.homepage",
+            showPalette: true,
+            palette: [],
+            replacerClassName: 'group-picker-replacer',
+            containerClassName: 'group-picker-container',
+            preferredFormat: "hex",
+            clickoutFiresChange: true,
+            beforeShow: function (color) {
+                let editor = $('canvas')[0].editor;
+            },
+            change: function (color) { updateColor(color); },
+            move: function (color) { updateColor(color); },
+            hide: function (color) {
+                let editor = $('canvas')[0].editor;
+                updateColor(color);
+                let groupMoving = editor.groupMoving;
+                var i = groupMoving.firstIdx;
+                if (editor.layers[i].layer.color == editor.groupMoving.origColor[i]) {
+                    return; // Do not save into history if nothing changed in the end
+                }
+                // Save group recolor so it can be reverted later
+                historyManager.pushUndoAction('symbol_grouprecolor', {
+                    'startIdx': groupMoving.firstIdx,
+                    'endIdx': groupMoving.lastIdx,
+                    'origColors': groupMoving.origColor
+                });
+                // Update origColor with up to date colors from layers
+                groupMoving.origColor = [];
+                for (i; i < groupMoving.lastIdx; i++) {
+                    layer = editor.layers[i].layer;
+                    groupMoving.origColor.push(layer.color);
+                }
+                // Reset picker color to the ZERO mark (0 hue, 100% saturation and luminance)
+                $('#colorSelector2').spectrum('set', '#bf4040');
+            }
+        });
+        $('.group-picker-replacer').attr('id', 'groupColorPicker');
+        $('#groupColorPicker').css('transition', '0.1s ease-in-out').addClass('no-panning fade fadeOut');
+        $('.sp-container').addClass('no-panning');
+        function updateColor(val) {
+            let editor = $('canvas')[0].editor;
+            let groupMoving = editor.groupMoving;
+            if (groupMoving === undefined) return;
+
+            this.tint = {
+                r: val._r,
+                g: val._g,
+                b: val._b
+            };
+            this.tint = rgbToHsl(this.tint);
+
+            for (var i = groupMoving.firstIdx; i < groupMoving.lastIdx; i++) {
+                layer = editor.layers[i].layer;
+                color = editor.groupMoving.origColor[i];
+                color = rgbToHsl({ r: (color >> 16) & 0xFF, g: (color >> 8) & 0xFF, b: color & 0xFF });
+                let h = (this.tint.h + color.h) % 1;
+                let s = (2 * this.tint.s * color.s);
+                let l = (2 * this.tint.l * color.l);
+                if (s > 1) s = 1;
+                if (s < 0) s = 0;
+                if (l > 1) l = 1;
+                if (l < 0) l = 0;
+                let newCol = hslToRgb({ h: h, s: s, l: l });
+                layer.color = (newCol.r << 16) | (newCol.g << 8) | (newCol.b);
+                editor.updateLayer(layer);
+            }
+
+            editor.render();
+
+            return val;
+
+            function rgbToHsl(col) {
+                col.r /= 255, col.g /= 255, col.b /= 255;
+
+                let max = Math.max(col.r, col.g, col.b),
+                    min = Math.min(col.r, col.g, col.b);
+                let h, s, l = (max + min) / 2;
+
+                if (max == min) {
+                    h = s = 0; // achromatic
+                } else {
+                    let d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+                    switch (max) {
+                        case col.r: h = (col.g - col.b) / d + (col.g < col.b ? 6 : 0); break;
+                        case col.g: h = (col.b - col.r) / d + 2; break;
+                        case col.b: h = (col.r - col.g) / d + 4; break;
+                    }
+
+                    h /= 6;
+                }
+
+                return {
+                    h: h,
+                    s: s,
+                    l: l
+                };
+            }
+            function hslToRgb(col) {
+                var r, g, b;
+
+                if (col.s == 0) {
+                    r = g = b = col.l * 255; // achromatic
+                } else {
+                    function hue2rgb(p, q, t) {
+                        if (t < 0) t += 1;
+                        if (t > 1) t -= 1;
+                        if (t < 1 / 6) return p + (q - p) * 6 * t;
+                        if (t < 1 / 2) return q;
+                        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                        return p;
+                    }
+
+                    var q = col.l < 0.5 ? col.l * (1 + col.s) : col.l + col.s - col.l * col.s;
+                    var p = 2 * col.l - q;
+
+                    r = Math.round(hue2rgb(p, q, col.h + 1 / 3) * 255);
+                    if (r > 255) r = 255;
+                    else if (r < 0) r = 0;
+                    g = Math.round(hue2rgb(p, q, col.h) * 255);
+                    if (g > 255) g = 255;
+                    else if (g < 0) g = 0;
+                    b = Math.round(hue2rgb(p, q, col.h - 1 / 3) * 255);
+                    if (b > 255) b = 255;
+                    else if (b < 0) b = 0;
+                }
+
+                return {
+                    r: r,
+                    g: g,
+                    b: b
+                };
+            }
+        }
     }
 });
 /* Static Fields */
@@ -36,7 +184,6 @@ GroupEditBox.btns = {
     topR: $('<i class="fa fa-circle-o fa-border edit-button no-highlight no-panning" ondragstart="return false;">'),
     botL: $('<i class="fa fa-circle-o fa-border edit-button no-highlight no-panning" ondragstart="return false;">'),
     botR: $('<i class="fa fa-circle-o fa-border edit-button no-highlight no-panning" ondragstart="return false;">')
-
 }
 GroupEditBox.container = $('<div id="groupEditBox">');
 GroupEditBox.container
@@ -44,14 +191,18 @@ GroupEditBox.container
     .append(GroupEditBox.btns.topR)
     .append(GroupEditBox.btns.botL)
     .append(GroupEditBox.btns.botR);
+GroupEditBox.cPicker;
 /* Static Functions */
 GroupEditBox.show = function () {
     if ($('#groupEditBox')[0]) return; // Ignore if edit box is already displaying
     $('body').append(GroupEditBox.container);
+    $('#colorSelector2').spectrum('set', '#bf4040');
+    $('#groupColorPicker').removeClass('fadeOut');
 }
 GroupEditBox.hide = function () {
     if (!$('#groupEditBox')[0]) return; // Ignore if edit box is not displaying
     GroupEditBox.container.detach();
+    $('#groupColorPicker').addClass('fadeOut');
 }
 GroupEditBox.isVisible = function () {
     let box = $('#groupEditBox')[0];

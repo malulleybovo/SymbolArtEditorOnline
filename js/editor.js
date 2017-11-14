@@ -1352,7 +1352,15 @@ var Editor = Class({
         if (this.groupMoving.firstIdx < 0) return; // Cancel if not found
         this.groupMoving.lastIdx = this.groupMoving.firstIdx + lisInGroup.length;
 
-        canvas[0].editor.groupEditBox = new GroupEditBox(this.groupMoving);
+        let editor = canvas[0].editor;
+        let groupMoving = editor.groupMoving;
+        groupMoving.origColor = [];
+        for (var i = groupMoving.firstIdx; i < groupMoving.lastIdx; i++) {
+            layer = editor.layers[i].layer;
+            groupMoving.origColor.push(layer.color);
+        }
+
+        editor.groupEditBox = new GroupEditBox(this.groupMoving);
         this.updateGroupEditBoxSize();
 
         // Handlers for mousemove-based group motion

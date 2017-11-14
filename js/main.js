@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /***********************/
-var APP_VER = '1.3.1';
+var APP_VER = '1.3.2';
 /***********************/
 
 var imgWidth = 176;
@@ -529,6 +529,24 @@ function initUI() {
             alertManager.pushAlert('Redid symbol recolor');
         },
         ['layer', 'oldColor', 'newColor']);
+    let switchGroupColors = function (ctx) {
+        let editor = $('canvas')[0].editor;
+        for (var i = ctx.startIdx; i < ctx.endIdx; i++) {
+            if (!editor.layers[i]) continue;
+            let layer = editor.layers[i].layer;
+            let color = ctx.origColors[i - ctx.startIdx];
+            ctx.origColors[i - ctx.startIdx] = layer.color;
+            layer.color = color;
+            editor.updateLayer(layer);
+        }
+        editor.render();
+        alertManager.pushAlert('Undid symbol group recolor');
+    }
+    historyManager
+        .registerUndoAction('symbol_grouprecolor',
+        switchGroupColors, // UNDO symbol_grouprecolor
+        switchGroupColors, // REDO symbol_grouprecolor
+        ['startIdx', 'endIdx', 'origColors']);
     historyManager
         .registerUndoAction('symbol_changealpha',
         function (ctx) { // UNDO symbol_changealpha
@@ -602,170 +620,7 @@ function initUI() {
                 UI.landing.remove();
             });
 
-            intro = introJs();
-            intro.setOptions({
-                hints: [
-                  { // 0
-                      element: $('body')[0],
-                      hint: (isMobile) ? "Use two fingers to pan and zoom."
-                          : "Click middle button and drag to pan. Mouse wheel to zoom.",
-                      hintPosition: 'middle-middle'
-                  },
-                  { // 1
-                      element: $('.toolbarbtn')[0],
-                      hint: (isMobile) ? "Undo and redo your actions."
-                          : "Undo and redo your actions. (Ctrl+Z/Ctrl+Y)",
-                      hintPosition: 'top-left'
-                  },
-                  { // 2
-                      element: $('.toolbarbtn')[2],
-                      hint: "Panned canvas off-screen? Click here to reset panning.",
-                      hintPosition: 'top-middle'
-                  },
-                  { // 3
-                      element: $('.toolbarbtn')[3],
-                      hint: "Click here to hide buttons showing on top of image.",
-                      hintPosition: 'top-middle'
-                  },
-                  { // 4
-                      element: $('.toolbarbtn')[4],
-                      hint: "Click here to see menu to pick a sound effect (list icon), or play the chosen sound effect (play icon).",
-                      hintPosition: 'top-middle'
-                  },
-                  { // 5
-                      element: $('.toolbarbtn')[5],
-                      hint: "Click here to add a helper overlay image or edit the positioning of the it.",
-                      hintPosition: 'top-middle'
-                  },
-                  { // 6
-                      element: $('.toolbarbtn')[6],
-                      hint: "Click here to save your work. You can save it in three different formats: SAR, SAML, and PNG. "
-                          + "Use SAR for importing Symbol Art into PSO2. Use SAML to save your project to load here later. "
-                          + "Use PNG to obtain the .png image. <a href='https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/2-Importing-Symbol-Art' target='_blank'>Check here.</a>"
-                          + " for how to import Symbol Art into PSO2.",
-                      hintPosition: 'top-middle'
-                  },
-                  { // 7
-                      element: $('.context-menu-symbol-art')[0],
-                      hint: (isMobile) ? "Swipe (or tap and hold) list items to edit symbols and groups."
-                          : "Right click list items to edit symbols and groups. Drag and drop list elements to move",
-                      hintPosition: 'top-middle'
-                  },
-                  { // 8
-                      element: $('div.ui-content')[0],
-                      hint: (isMobile) ? ("Symbol Art overlays symbols one on top of the other. This means the symbol at the top of the list will show "
-                          + "in front of all others in the image. Or right click list items and use \"Pick to Move\" and \"Move Selected Here\" "
-                          + "to change which symbol is in front of which.")
-                          : ("Symbol Art overlays symbols one on top of the other. This means the symbol at the top of the list will show "
-                          + "in front of all others in the image. Drag and drop list items to change which symbol is in front of which. "
-                          + "Or right click list items and use \"Pick to Move\" and \"Move Selected Here\"."),
-                      hintPosition: 'top-right'
-                  },
-                  { // 9
-                      element: $('body')[0],
-                      hint: (isMobile) ? "Drag the symbol around to move. Drag buttons around symbol to reshape it."
-                          : "Drag the symbol around to move. Drag buttons around symbol to reshape it. Press and hold SPACEBAR to highlight the symbol being edited.",
-                      hintPosition: 'middle-middle'
-                  },
-                  { // 10
-                      element: $('body')[0],
-                      hint: "Use the controller on top-right corner to change symbol type, transparency, flip the symbol, and move it step by step.",
-                      hintPosition: 'top-right'
-                  },
-                  { // 11
-                      element: $('div.sp-replacer')[0],
-                      hint: "Click here to change the symbol color.",
-                      hintPosition: 'top-left'
-                  },
-                  { // 12
-                      element: $('body')[0],
-                      hint: "<a href='https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.1-Features-Part-1' target='_blank'>Click here to see the full guide.</a>",
-                      hintPosition: 'top-middle'
-                  },
-                  { // 13
-                      element: $('body')[0],
-                      hint: "Don't know where to start? Click \"Got it\" and I'll give you a walkthrough. "
-                          + "<a href='https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.1-Features-Part-1' target='_blank'>Click here to see the GIF guide.</a>"
-                          + " If you are experienced, ignore this and it'll soon disappear.",
-                      hintPosition: 'top-middle'
-                  },
-                  { // 14
-                      element: $('body')[0],
-                      hint: (isMobile) ? "Drag image around to place it in the right spot for you."
-                          : "Drag image around to place it in the right spot for you. Press and hold \"i\"-key to compare Symbol Art to the overlay image.",
-                      hintPosition: 'middle-middle'
-                  },
-                  { // 15
-                      element: $('body')[0],
-                      hint: "Use the controller on top-right corner to change overlay image size, rotation, transparency, and apply an extra green screen on background.",
-                      hintPosition: 'top-right'
-                  }
-                ]
-            });
-            intro.addHints();
-            intro.hideHints();
-            setTimeout(function () {
-                intro.showHint(13);
-            }, 500);
-            setTimeout(function () {
-                intro.userDidNotRequestHelp = true;
-                intro.hideHint(13);
-            }, 60000);
-            intro.onhintclose(function (stepId) {
-                // Check which hint was closed and move to the next step
-                if (stepId < 6) intro.showHint(stepId + 1);
-                else if (stepId == 6) {
-                    // refresh hint positions when opening/closing layer manager
-                    $('#canvasctrlbutton').on('click.introRefresh', function () {
-                        setTimeout(function () { window.dispatchEvent(new Event('resize')); },
-                            500);
-                    });
-                    // Show hints in layer manager when user opens it
-                    if ($('#canvasctrl').css('left') != '0px') {
-                        $('#canvasctrlbutton').on('click.introducing', function () {
-                            $('#canvasctrlbutton').off('click.introducing');
-                            intro.showHint(7);
-                            intro.showHint(8);
-                        });
-                    }
-                    else {
-                        window.dispatchEvent(new Event('resize'));
-                        intro.showHint(7);
-                        intro.showHint(8);
-                    }
-                    // Show hints for symbol editing when user first adds a symbol
-                    $('li.context-menu-item.fa-picture-o').on('click.introducing', function () {
-                        $('li.context-menu-item.fa-picture-o').off('click.introducing');
-                        intro.showHint(9);
-                        intro.showHint(10);
-                        intro.showHint(11);
-                    });
-                }
-                else if (stepId == 7) {
-                    // Remove handler if its purpose has been fulfilled
-                    if (intro.closedHint9) {
-                        $('#canvasctrlbutton').off('click.introRefresh');
-                    }
-                    else {
-                        intro.closedHint8 = true;
-                    }
-                }
-                else if (stepId == 8) {
-                    // Remove handler if its purpose has been fulfilled
-                    if (intro.closedHint8) {
-                        $('#canvasctrlbutton').off('click.introRefresh');
-                    }
-                    else {
-                        intro.closedHint9 = true;
-                    }
-                }
-                else if (!intro.userDidNotRequestHelp && stepId == 13) {
-                    // Start the introduction for new users
-                    intro.startedWalkthrough = true;
-                    intro.showHint(0);
-                    intro.showHint(12);
-                }
-            });
+            initWalkthrough();
         });
     UI.landing.menu.append(UI.landing.menu.newAppButton);
 
@@ -794,11 +649,14 @@ function initUI() {
 
                     historyManager.clear();
                     editorToolbar.disableTool('undo');
+                    editorToolbar.toolList['hideUI'].click();
                     UI.landing.animate({
                         opacity: 0
                     }, "slow", "linear", function () {
                         UI.landing.remove();
                     });
+
+                    initWalkthrough();
                 }
                 reader.readAsArrayBuffer(file);
                 reader.onerror = function (evt) {
@@ -820,11 +678,14 @@ function initUI() {
 
                     historyManager.clear();
                     editorToolbar.disableTool('undo');
+                    editorToolbar.toolList['hideUI'].click();
                     UI.landing.animate({
                         opacity: 0
                     }, "slow", "linear", function () {
                         UI.landing.remove();
                     });
+
+                    initWalkthrough();
                 }
                 reader.readAsText(file);
                 reader.onerror = function (evt) {
@@ -928,4 +789,172 @@ function alertMessage(msg, time) {
     alertBox.timeout = setTimeout(function () {
         HTMLBody.removeChild(alertBox);
     }, time);
+}
+
+function initWalkthrough() {
+    intro = introJs();
+    intro.setOptions({
+        hints: [
+          { // 0
+              element: $('body')[0],
+              hint: (isMobile) ? "Use two fingers to pan and zoom."
+                  : "Click middle button and drag to pan. Mouse wheel to zoom.",
+              hintPosition: 'middle-middle'
+          },
+          { // 1
+              element: $('.toolbarbtn')[0],
+              hint: (isMobile) ? "Undo and redo your actions."
+                  : "Undo and redo your actions. (Ctrl+Z/Ctrl+Y)",
+              hintPosition: 'top-left'
+          },
+          { // 2
+              element: $('.toolbarbtn')[2],
+              hint: "Panned canvas off-screen? Click here to reset panning.",
+              hintPosition: 'top-middle'
+          },
+          { // 3
+              element: $('.toolbarbtn')[3],
+              hint: "Click here to hide buttons showing on top of image.",
+              hintPosition: 'top-middle'
+          },
+          { // 4
+              element: $('.toolbarbtn')[4],
+              hint: "Click here to see menu to pick a sound effect (list icon), or play the chosen sound effect (play icon).",
+              hintPosition: 'top-middle'
+          },
+          { // 5
+              element: $('.toolbarbtn')[5],
+              hint: "Click here to add a helper overlay image or edit the positioning of the it.",
+              hintPosition: 'top-middle'
+          },
+          { // 6
+              element: $('.toolbarbtn')[6],
+              hint: "Click here to save your work. You can save it in three different formats: SAR, SAML, and PNG. "
+                  + "Use SAR for importing Symbol Art into PSO2. Use SAML to save your project to load here later. "
+                  + "Use PNG to obtain the .png image. <a href='https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/2-Importing-Symbol-Art' target='_blank'>Check here.</a>"
+                  + " for how to import Symbol Art into PSO2.",
+              hintPosition: 'top-middle'
+          },
+          { // 7
+              element: $('.context-menu-symbol-art')[0],
+              hint: (isMobile) ? "Swipe (or tap and hold) list items to edit symbols and groups."
+                  : "Right click list items to edit symbols and groups. Drag and drop list elements to move",
+              hintPosition: 'top-middle'
+          },
+          { // 8
+              element: $('div.ui-content')[0],
+              hint: (isMobile) ? ("Symbol Art overlays symbols one on top of the other. This means the symbol at the top of the list will show "
+                  + "in front of all others in the image. Or right click list items and use \"Pick to Move\" and \"Move Selected Here\" "
+                  + "to change which symbol is in front of which.")
+                  : ("Symbol Art overlays symbols one on top of the other. This means the symbol at the top of the list will show "
+                  + "in front of all others in the image. Drag and drop list items to change which symbol is in front of which. "
+                  + "Or right click list items and use \"Pick to Move\" and \"Move Selected Here\"."),
+              hintPosition: 'top-right'
+          },
+          { // 9
+              element: $('body')[0],
+              hint: (isMobile) ? "Drag the symbol around to move. Drag buttons around symbol to reshape it."
+                  : "Drag the symbol around to move. Drag buttons around symbol to reshape it. Press and hold SPACEBAR to highlight the symbol being edited.",
+              hintPosition: 'middle-middle'
+          },
+          { // 10
+              element: $('body')[0],
+              hint: "Use the controller on top-right corner to change symbol type, transparency, flip the symbol, and move it step by step.",
+              hintPosition: 'top-right'
+          },
+          { // 11
+              element: $('#layerColorPicker')[0],
+              hint: "Click here to change the symbol color.",
+              hintPosition: 'top-left'
+          },
+          { // 12
+              element: $('body')[0],
+              hint: "<a href='https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.1-Features-Part-1' target='_blank'>Click here to see the full guide.</a>",
+              hintPosition: 'top-middle'
+          },
+          { // 13
+              element: $('body')[0],
+              hint: "Don't know where to start? Click \"Got it\" and I'll give you a walkthrough. "
+                  + "<a href='https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.1-Features-Part-1' target='_blank'>Click here to see the GIF guide.</a>"
+                  + " If you are experienced, ignore this and it'll soon disappear.",
+              hintPosition: 'top-middle'
+          },
+          { // 14
+              element: $('body')[0],
+              hint: (isMobile) ? "Drag image around to place it in the right spot for you."
+                  : "Drag image around to place it in the right spot for you. Press and hold \"i\"-key to compare Symbol Art to the overlay image.",
+              hintPosition: 'middle-middle'
+          },
+          { // 15
+              element: $('body')[0],
+              hint: "Use the controller on top-right corner to change overlay image size, rotation, transparency, and apply an extra green screen on background.",
+              hintPosition: 'top-right'
+          }
+        ]
+    });
+    intro.addHints();
+    intro.hideHints();
+    setTimeout(function () {
+        intro.showHint(13);
+    }, 500);
+    setTimeout(function () {
+        intro.userDidNotRequestHelp = true;
+        intro.hideHint(13);
+        intro = undefined;
+    }, 60000);
+    intro.onhintclose(function (stepId) {
+        // Check which hint was closed and move to the next step
+        if (stepId < 6) intro.showHint(stepId + 1);
+        else if (stepId == 6) {
+            // refresh hint positions when opening/closing layer manager
+            $('#canvasctrlbutton').on('click.introRefresh', function () {
+                setTimeout(function () { window.dispatchEvent(new Event('resize')); },
+                    500);
+            });
+            // Show hints in layer manager when user opens it
+            if ($('#canvasctrl').css('left') != '0px') {
+                $('#canvasctrlbutton').on('click.introducing', function () {
+                    $('#canvasctrlbutton').off('click.introducing');
+                    intro.showHint(7);
+                    intro.showHint(8);
+                });
+            }
+            else {
+                window.dispatchEvent(new Event('resize'));
+                intro.showHint(7);
+                intro.showHint(8);
+            }
+            // Show hints for symbol editing when user first adds a symbol
+            $('li.context-menu-item.fa-picture-o').on('click.introducing', function () {
+                $('li.context-menu-item.fa-picture-o').off('click.introducing');
+                intro.showHint(9);
+                intro.showHint(10);
+                intro.showHint(11);
+            });
+        }
+        else if (stepId == 7) {
+            // Remove handler if its purpose has been fulfilled
+            if (intro.closedHint9) {
+                $('#canvasctrlbutton').off('click.introRefresh');
+            }
+            else {
+                intro.closedHint8 = true;
+            }
+        }
+        else if (stepId == 8) {
+            // Remove handler if its purpose has been fulfilled
+            if (intro.closedHint8) {
+                $('#canvasctrlbutton').off('click.introRefresh');
+            }
+            else {
+                intro.closedHint9 = true;
+            }
+        }
+        else if (!intro.userDidNotRequestHelp && stepId == 13) {
+            // Start the introduction for new users
+            intro.startedWalkthrough = true;
+            intro.showHint(0);
+            intro.showHint(12);
+        }
+    });
 }

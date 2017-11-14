@@ -1,7 +1,7 @@
 <div align="center">
 
 # Symbol Art Editor Online
-#### Version 1.3.1
+#### Version 1.3.2
 
 ## [*Play with it Here*](https://malulleybovo.github.io/SymbolArtEditorOnline/)
 

@@ -100,7 +100,7 @@
         if (SelectMenu.activeMenu.isOpen) {
             container[0].style.width = SelectMenu.activeMenu.width;
             container.find('.closebtn')[0].style.transform = 'translate(0%, 0%)';
-            $('.sp-replacer').css('transform', 'translate(-' + SelectMenu.activeMenu.width + ', 0)')
+            $('#layerColorPicker').css('transform', 'translate(-' + SelectMenu.activeMenu.width + ', 0)')
                 .addClass('may-be-off-screen');
             $('.top-right').css('transform', 'translate(-' + SelectMenu.activeMenu.width + ', 0)')
                 .addClass('may-be-off-screen');
@@ -108,7 +108,7 @@
         else {
             container[0].style.width = "0px";
             container.find('.closebtn')[0].style.transform = 'translate(300%, 0%)';
-            $('.sp-replacer').css('transform', 'translate(0, 0)')
+            $('#layerColorPicker').css('transform', 'translate(0, 0)')
                 .removeClass('may-be-off-screen');
             $('.top-right').css('transform', 'translate(0, 0)')
                 .removeClass('may-be-off-screen');
