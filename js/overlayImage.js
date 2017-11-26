@@ -117,8 +117,7 @@ var OverlayImage = Class({
                     $('.canvas-box').css('background', '');
             });
         $('body').append(this.ctrller.domElement);
-        $(this.ctrller.domElement).css('opacity', 0);
-        $(this.ctrller.domElement).addClass("no-panning no-highlight fade");
+        $(this.ctrller.domElement).addClass("no-panning no-highlight fade fadeOut");
     },
     getImage: function () {
         return this.plane;
@@ -161,11 +160,11 @@ var OverlayImage = Class({
         if (bool === undefined)
             bool = ($ctrller.css('opacity') == 0);
         if (bool) {
-            $ctrller.css('opacity', 1).css('visibility', '');
+            $ctrller.removeClass('fadeOut');
             this.plane.interactive = true;
         }
         else {
-            $ctrller.css('opacity', 0).css('visibility', 'hidden');
+            $ctrller.addClass('fadeOut');
             this.plane.interactive = false;
         }
     },

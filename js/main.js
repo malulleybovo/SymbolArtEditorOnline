@@ -72,6 +72,65 @@ function initUI() {
 
     UI.landing = $('.landing');
 
+    UI.landing.image = $('<div class="landing-img">');
+    setInterval(function () {
+        UI.landing.image.css('opacity', 1);
+    }, 100);
+
+    UI.landing.version = $('<div class="landing-app-version no-panning">');
+    UI.landing.version.text(APP_VER);
+
+    UI.landing.help = $('<div class="landing-help shake-elem">');
+    UI.landing.help.append('<i class="fa fa-question">');
+    UI.landing.help.click(function () {
+        var win = window.open('https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1-Usage', '_blank');
+        if (win) {
+            win.focus();
+        } else {
+            alert('Please allow popups for this website to open help link.');
+        }
+    });
+
+    UI.landing.anim = $(
+        `<div class ='special-div'>
+            <h2 class ='special1'>
+                <span class ='special-span'>.SAR</span>
+            </h1>
+            <h2 class ='special2'>
+                <span class='special-span'>.SAML</span>
+            </h1>
+         </div>`);
+
+    UI.landing.menu = $('<div class="landing-menu">');
+
+    let landingOnKeyPressCallback = function (e) {
+        if (e.keyCode == 10 || e.keyCode == 13) {
+            if (e.ctrlKey) // Ctrl + Enter = Open Symbol Art
+                $(UI.landing.menu.loadAppButton).click();
+            else // Enter = New Symbol Art
+                $(UI.landing.menu.newAppButton).click();
+        }
+    }
+    UI.landing.menu.newAppButton = $('<div>');
+    UI.landing.menu.newAppButton.append($('<i class="fa fa-plus">'));
+    UI.landing.menu.append(UI.landing.menu.newAppButton);
+
+    UI.landing.menu.loadAppButton = $('<div>');
+    UI.landing.menu.loadAppButton.append($('<i class="fa fa-upload">'));
+    UI.landing.menu.append(UI.landing.menu.loadAppButton);
+
+    UI.fileHandler = $('<input type="file" accept=".sar,.saml" class="hidden">');
+
+    UI.landing.demoButton = $('<div class="landing-sample no-panning">TRY SAMPLE</div>');
+
+    UI.landing.append(UI.landing.image);
+    UI.landing.append(UI.landing.version);
+    UI.landing.append(UI.landing.help);
+    UI.landing.append(UI.landing.demoButton);
+    UI.landing.append(UI.landing.anim);
+
+    UI.landing.append(UI.landing.menu);
+
     addNode('Canvas Container', 'div', HTMLBody, 'button medium-text no-highlight cursor-pointer');
     UINodeList['Canvas Container'].id = 'canvascontainer';
     addNode('Canvas Box', 'div', UINodeList['Canvas Container'], 'canvas-box');
@@ -588,69 +647,6 @@ function initUI() {
 
     samlLoader = new SAMLLoader(list);
 
-    UI.landing.image = $('<div class="landing-img">');
-
-    UI.landing.version = $('<div class="landing-app-version no-panning">');
-    UI.landing.version.text(APP_VER);
-
-    UI.landing.help = $('<div class="landing-help shake-elem">');
-    UI.landing.help.append('<i class="fa fa-question">');
-    UI.landing.help.click(function () {
-        var win = window.open('https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1-Usage', '_blank');
-        if (win) {
-            win.focus();
-        } else {
-            alert('Please allow popups for this website to open help link.');
-        }
-    });
-
-    UI.landing.anim = $(
-        `<div class ='special-div'>
-            <h2 class ='special1'>
-                <span class ='special-span'>.SAR</span>
-            </h1>
-            <h2 class ='special2'>
-                <span class='special-span'>.SAML</span>
-            </h1>
-         </div>`);
-
-    UI.landing.menu = $('<div class="landing-menu">');
-
-    let landingOnKeyPressCallback = function (e) {
-        if (e.keyCode == 10 || e.keyCode == 13) {
-            if (e.ctrlKey) // Ctrl + Enter = Open Symbol Art
-                $(UI.landing.menu.loadAppButton).click();
-            else // Enter = New Symbol Art
-                $(UI.landing.menu.newAppButton).click();
-        }
-    }
-    $(document).bind('keypress', landingOnKeyPressCallback);
-    UI.landing.menu.newAppButton = $('<div>');
-    UI.landing.menu.newAppButton.append($('<i class="fa fa-plus">'));
-    UI.landing.menu.newAppButton.click(
-        {
-            landingOnKeyPressCallback: landingOnKeyPressCallback
-        }, function (e) {
-            list.setReady(true); // Ready the Layer Manager
-            $(document).unbind('keypress', landingOnKeyPressCallback);
-            UI.landing.animate({
-                opacity: 0
-            }, "slow", "linear", function () {
-                UI.landing.remove();
-            });
-
-            initWalkthrough();
-        });
-    UI.landing.menu.append(UI.landing.menu.newAppButton);
-
-    UI.landing.menu.loadAppButton = $('<div>');
-    UI.landing.menu.loadAppButton.append($('<i class="fa fa-upload">'));
-    UI.landing.menu.loadAppButton.click(function () {
-        UI.fileHandler.click();
-    });
-    UI.landing.menu.append(UI.landing.menu.loadAppButton);
-
-    UI.fileHandler = $('<input type="file" accept=".sar,.saml" class="hidden">');
     UI.fileHandler.change(function (e) {
         $('.special-div').remove();
         $('.landing-img').addClass('loading');
@@ -716,8 +712,24 @@ function initUI() {
             }, 1000);
         }
     });
+    $(document).bind('keypress', landingOnKeyPressCallback);
+    UI.landing.menu.newAppButton.click(
+        {
+            landingOnKeyPressCallback: landingOnKeyPressCallback
+        }, function (e) {
+            list.setReady(true); // Ready the Layer Manager
+            $(document).unbind('keypress', landingOnKeyPressCallback);
+            UI.landing.animate({
+                opacity: 0
+            }, "slow", "linear", function () {
+                UI.landing.remove();
+            });
 
-    UI.landing.demoButton = $('<div class="landing-sample no-panning">TRY SAMPLE</div>');
+            initWalkthrough();
+        });
+    UI.landing.menu.loadAppButton.click(function () {
+        UI.fileHandler.click();
+    });
     UI.landing.demoButton.click(
         function (e) {
             $('.special-div').remove();
@@ -743,21 +755,8 @@ function initUI() {
                 }
             });
         });
-
-    UI.landing.append(UI.landing.image);
-    setInterval(function () {
-        UI.landing.image.css('opacity', 1);
-    }, 100);
     setInterval(function () {
         UI.landing.image.addClass('landing-img-ready');
-    }, 1000);
-    UI.landing.append(UI.landing.version);
-    UI.landing.append(UI.landing.help);
-    UI.landing.append(UI.landing.demoButton);
-    UI.landing.append(UI.landing.anim);
-
-    UI.landing.append(UI.landing.menu);
-    setInterval(function () {
         UI.landing.menu.animate({
             opacity: 1
         });
