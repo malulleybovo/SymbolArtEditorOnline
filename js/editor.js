@@ -1060,8 +1060,8 @@ var Editor = Class({
         quad.on('mousedown', function (evtData) {
             let canvas = $('canvas')[0];
             if (canvas.editor.currBtnDown < 0) {
-                this.origClickX = evtData.data.originalEvent.offsetX;
-                this.origClickY = evtData.data.originalEvent.offsetY;
+                this.origClickX = evtData.data.global.x;
+                this.origClickY = evtData.data.global.y;
                 this.origX = this.x;
                 this.origY = this.y;
                 canvas.movingQuad = this;
@@ -1082,9 +1082,9 @@ var Editor = Class({
             }
         });
         quad.on('mousemove', function (evtData) {
-            if (this.isMoving && evtData.data.originalEvent.srcElement.tagName == 'CANVAS') {
-                let newX = this.origX + roundPosition(evtData.data.originalEvent.offsetX - this.origClickX);
-                let newY = this.origY + roundPosition(evtData.data.originalEvent.offsetY - this.origClickY);
+            if (this.isMoving && evtData.data.originalEvent.target.tagName == 'CANVAS') {
+                let newX = this.origX + roundPosition(evtData.data.global.x - this.origClickX);
+                let newY = this.origY + roundPosition(evtData.data.global.y - this.origClickY);
                 /* Check horizontal limits (bounding box) */
                 let maxNewX = (BOUNDING_BOX.maxPosVal) - ((this.width - EDITOR_SIZE.x) / 2);
                 if (newX > maxNewX) newX = maxNewX;
