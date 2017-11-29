@@ -23,6 +23,7 @@ The application supports *.sar* (Symbol Art files) and *.saml* (Art project file
 
 <div align="center">
 
+### *New on v1.3.3: Double Click to Edit Symbols !*
 ### *New on v1.3.0: Support for .SAR File Format is Here !*
 
 </div>
