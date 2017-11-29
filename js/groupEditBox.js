@@ -79,6 +79,11 @@ var GroupEditBox = Class({
                         layer = editor.layers[i].layer;
                         groupMoving.origAlpha.push(layer.alpha);
                     }
+                    console.log('%cChanged Group Transparency%c by %i. Symbols '
+                        + 'modified are %o. Original alpha values are %o.',
+                        'color: #2fa1d6', 'color: #f3f3f3', this.object.transparency,
+                        editor.layers.slice(groupMoving.firstIdx, groupMoving.lastIdx + 1),
+                        groupMoving.origAlpha);
                     this.object.transparency = 0;
                     this.updateDisplay();
                 });
@@ -123,6 +128,11 @@ var GroupEditBox = Class({
                     'endIdx': groupMoving.lastIdx,
                     'origColors': groupMoving.origColor
                 });
+                console.log('%cChanged Group Hue, Saturation, and Vibrance%c. Symbols '
+                    + 'modified are %o. Original colors are %o.',
+                    'color: #2fa1d6', 'color: #f3f3f3',
+                    editor.layers.slice(groupMoving.firstIdx, groupMoving.lastIdx + 1),
+                    groupMoving.origColor);
                 // Update origColor with up to date colors from layers
                 groupMoving.origColor = [];
                 for (i; i < groupMoving.lastIdx; i++) {
