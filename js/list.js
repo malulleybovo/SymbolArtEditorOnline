@@ -1,6 +1,6 @@
 var groupID = 0;
 var layerID = 0;
-var LAYER_NAME_REGEX = /([\w'" -]|[^\x00-\x7F])+/;
+var LAYER_NAME_REGEX = /^[!-~\u3001-\u303F\u3041-\u3096\u3099-\u30FF\u3400-\u4DB5\u4E00-\u9FE6\uFF01-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC\uFFE0-\uFFE6\uFFE8-\uFFEE][ -~\u3000-\u303F\u3041-\u3096\u3099-\u30FF\u3400-\u4DB5\u4E00-\u9FE6\uFF01-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC\uFFE0-\uFFE6\uFFE8-\uFFEE]*$/;
 var SAConfig = {
     version: 1, // Symbol Art Version (not application version)
     authorID: 0 // Player ID
@@ -12,17 +12,6 @@ var List = Class({
     initialize: function (headerName, groupName, editorContainer) {
         if (list !== undefined) return;
         list = this;
-        window.addEventListener("beforeunload", function (e) {
-            // Just unload if user has not touched the application
-            if (historyManager.undoList.length == 0
-                && historyManager.pushID == 0) return;
-            // Reassure if changes have been made
-            var confirmationMessage = 'Unsaved changes will be lost.'
-                                    + 'Are you sure you want to proceed?';
-
-            (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-            return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
-        });
         // Initialize Canvas Control
         this.page = $(document.getElementById('canvasctrl'));
         this.async = {
