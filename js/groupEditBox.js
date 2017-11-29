@@ -19,18 +19,21 @@ var GroupEditBox = Class({
     },
     updateUI: function () {
         if (this.group === undefined) return;
-        if (!$('#groupEditBox')[0]) return; // Ignore if edit box is not displaying
         let canvas = $('canvas');
         let editor = canvas[0].editor;
-        let offset = canvas.offset();
-        GroupEditBox.btns.topL.css('left', (offset.left + editor.zoom * (this.group.minXCoord + this.dx) - 11.3) + 'px')
-            .css('top', (offset.top + editor.zoom * (this.group.minYCoord + this.dy) - 12.5) + 'px');
-        GroupEditBox.btns.topR.css('left', (offset.left + editor.zoom * (this.group.maxXCoord + this.dx) - 11.3) + 'px')
-            .css('top', (offset.top + editor.zoom * (this.group.minYCoord + this.dy) - 12.5) + 'px');
-        GroupEditBox.btns.botL.css('left', (offset.left + editor.zoom * (this.group.minXCoord + this.dx) - 11.3) + 'px')
-            .css('top', (offset.top + editor.zoom * (this.group.maxYCoord + this.dy) - 12.5) + 'px');
-        GroupEditBox.btns.botR.css('left', (offset.left + editor.zoom * (this.group.maxXCoord + this.dx) - 11.3) + 'px')
-            .css('top', (offset.top + editor.zoom * (this.group.maxYCoord + this.dy) - 12.5) + 'px');
+        let inverseScale = 'scale(' + (1 / editor.zoom) + ',' + (1 / editor.zoom) + ')';
+        GroupEditBox.btns.topL.css('left', ((this.group.minXCoord + this.dx) - 11.3) + 'px')
+            .css('top', ((this.group.minYCoord + this.dy) - 12.5) + 'px')
+            .css('transform', inverseScale);
+        GroupEditBox.btns.topR.css('left', ((this.group.maxXCoord + this.dx) - 11.3) + 'px')
+            .css('top', ((this.group.minYCoord + this.dy) - 12.5) + 'px')
+            .css('transform', inverseScale);
+        GroupEditBox.btns.botL.css('left', ((this.group.minXCoord + this.dx) - 11.3) + 'px')
+            .css('top', ((this.group.maxYCoord + this.dy) - 12.5) + 'px')
+            .css('transform', inverseScale);
+        GroupEditBox.btns.botR.css('left', ((this.group.maxXCoord + this.dx) - 11.3) + 'px')
+            .css('top', ((this.group.maxYCoord + this.dy) - 12.5) + 'px')
+            .css('transform', inverseScale);
     },
     setupController: function () {
         if (GroupEditBox.ctrller === undefined) {
@@ -262,7 +265,7 @@ GroupEditBox.ctrller;
 /* Static Functions */
 GroupEditBox.show = function () {
     if ($('#groupEditBox')[0]) return; // Ignore if edit box is already displaying
-    $('body').append(GroupEditBox.container);
+    $('.canvas-box').append(GroupEditBox.container);
     $('#colorSelector2').spectrum('set', '#bf4040');
     $('#groupColorPicker').removeClass('fadeOut');
     $(GroupEditBox.ctrller.domElement).removeClass("fadeOut");

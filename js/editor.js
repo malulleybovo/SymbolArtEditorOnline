@@ -907,18 +907,18 @@ var Editor = Class({
         this.layerCtrl = new LayerCtrl(this);
         this.layerCtrl.hide();
 
-        $('body').append(this.editorBoxIcons.tl);
-        $('body').append(this.editorBoxIcons.tr);
-        $('body').append(this.editorBoxIcons.br);
-        $('body').append(this.editorBoxIcons.bl);
-        $('body').append(this.editorBoxIcons.left);
-        $('body').append(this.editorBoxIcons.up);
-        $('body').append(this.editorBoxIcons.right);
-        $('body').append(this.editorBoxIcons.down);
-        $('body').append(this.editorBoxIcons.rotation);
-        $('body').append(this.editorBoxIcons.resize);
-        $('body').append(this.editorBoxIcons.resizeX);
-        $('body').append(this.editorBoxIcons.resizeY);
+        $('.canvas-box').append(this.editorBoxIcons.tl)
+            .append(this.editorBoxIcons.tr)
+            .append(this.editorBoxIcons.br)
+            .append(this.editorBoxIcons.bl)
+            .append(this.editorBoxIcons.left)
+            .append(this.editorBoxIcons.up)
+            .append(this.editorBoxIcons.right)
+            .append(this.editorBoxIcons.down)
+            .append(this.editorBoxIcons.rotation)
+            .append(this.editorBoxIcons.resize)
+            .append(this.editorBoxIcons.resizeX)
+            .append(this.editorBoxIcons.resizeY);
         //Add the canvas to the HTML document
         parent.appendChild(this.renderer.view);
 
@@ -939,6 +939,7 @@ var Editor = Class({
             let editor = $('canvas')[0].editor;
             editor.zoom = scale;
             editor.refreshLayerEditBox();
+            editor.refreshLayerEditBoxScale();
             if (editor.groupEditBox) editor.groupEditBox.updateUI();
             $('canvas').trigger('vmouseup');
         }).on("panzoomstart", function (e, panzoom, event, touches) {
@@ -1628,27 +1629,26 @@ var Editor = Class({
         if (this.selectedLayer == null
             || this.selectedLayer.visible == false) return;
         if (this.editorBoxIcons.tl.is(':hidden')) return; // Ignore if UI is hidden
-        var offset = $('canvas').offset();
-        var basePosX = offset.left + this.zoom * this.selectedLayer.x;
-        var basePosY = offset.top + this.zoom * this.selectedLayer.y;
+        var basePosX = this.selectedLayer.x;
+        var basePosY = this.selectedLayer.y;
         var v = this.selectedLayer.vertices;
-        this.editorBoxIcons.tl.css('left', (basePosX + this.zoom * v[0] - 11.3) + 'px')
-            .css('top', (basePosY + this.zoom * v[1] - 12.5) + 'px');
-        this.editorBoxIcons.tr.css('left', (basePosX + this.zoom * v[2] - 11.3) + 'px')
-            .css('top', (basePosY + this.zoom * v[3] - 12.5) + 'px');
-        this.editorBoxIcons.bl.css('left', (basePosX + this.zoom * v[4] - 11.3) + 'px')
-            .css('top', (basePosY + this.zoom * v[5] - 12.5) + 'px');
-        this.editorBoxIcons.br.css('left', (basePosX + this.zoom * v[6] - 11.3) + 'px')
-            .css('top', (basePosY + this.zoom * v[7] - 12.5) + 'px');
+        this.editorBoxIcons.tl.css('left', (basePosX + v[0] - 11.3) + 'px')
+            .css('top', (basePosY + v[1] - 12.5) + 'px');
+        this.editorBoxIcons.tr.css('left', (basePosX + v[2] - 11.3) + 'px')
+            .css('top', (basePosY + v[3] - 12.5) + 'px');
+        this.editorBoxIcons.bl.css('left', (basePosX + v[4] - 11.3) + 'px')
+            .css('top', (basePosY + v[5] - 12.5) + 'px');
+        this.editorBoxIcons.br.css('left', (basePosX + v[6] - 11.3) + 'px')
+            .css('top', (basePosY + v[7] - 12.5) + 'px');
 
-        this.editorBoxIcons.left.css('left', (basePosX + (this.zoom * (v[0] + v[4])) / 2 - 11.3) + 'px')
-            .css('top', (basePosY + (this.zoom * (v[1] + v[5])) / 2 - 12.5) + 'px');
-        this.editorBoxIcons.up.css('left', (basePosX + (this.zoom * (v[0] + v[2])) / 2 - 11.3) + 'px')
-            .css('top', (basePosY + (this.zoom * (v[1] + v[3])) / 2 - 12.5) + 'px');
-        this.editorBoxIcons.right.css('left', (basePosX + (this.zoom * (v[2] + v[6])) / 2 - 11.3) + 'px')
-            .css('top', (basePosY + (this.zoom * (v[3] + v[7])) / 2 - 12.5) + 'px');
-        this.editorBoxIcons.down.css('left', (basePosX + (this.zoom * (v[4] + v[6])) / 2 - 11.3) + 'px')
-            .css('top', (basePosY + (this.zoom * (v[5] + v[7])) / 2 - 12.5) + 'px');
+        this.editorBoxIcons.left.css('left', (basePosX + ((v[0] + v[4])) / 2 - 11.3) + 'px')
+            .css('top', (basePosY + ((v[1] + v[5])) / 2 - 12.5) + 'px');
+        this.editorBoxIcons.up.css('left', (basePosX + ((v[0] + v[2])) / 2 - 11.3) + 'px')
+            .css('top', (basePosY + ((v[1] + v[3])) / 2 - 12.5) + 'px');
+        this.editorBoxIcons.right.css('left', (basePosX + ((v[2] + v[6])) / 2 - 11.3) + 'px')
+            .css('top', (basePosY + ((v[3] + v[7])) / 2 - 12.5) + 'px');
+        this.editorBoxIcons.down.css('left', (basePosX + ((v[4] + v[6])) / 2 - 11.3) + 'px')
+            .css('top', (basePosY + ((v[5] + v[7])) / 2 - 12.5) + 'px');
 
         this.editorBoxIcons.rotation.css('left', (basePosX - 11.3) + 'px')
             .css('top', (basePosY - 42.5) + 'px');
@@ -1658,6 +1658,24 @@ var Editor = Class({
             .css('top', (basePosY - 12.5) + 'px');
         this.editorBoxIcons.resizeY.css('left', (basePosX - 41.3) + 'px')
             .css('top', (basePosY - 12.5) + 'px');
+    },
+    refreshLayerEditBoxScale: function () {
+        let inverseScale = 'scale(' + (1 / this.zoom) + ',' + (1 / this.zoom) + ')';
+        let inverseMatrix = inverseScale + 'rotate(-45deg)';
+        this.editorBoxIcons.tl.css('transform', inverseMatrix);
+        this.editorBoxIcons.tr.css('transform', inverseMatrix);
+        this.editorBoxIcons.bl.css('transform', inverseMatrix);
+        this.editorBoxIcons.br.css('transform', inverseMatrix);
+
+        this.editorBoxIcons.left.css('transform', inverseScale);
+        this.editorBoxIcons.up.css('transform', inverseScale);
+        this.editorBoxIcons.right.css('transform', inverseScale);
+        this.editorBoxIcons.down.css('transform', inverseScale);
+
+        this.editorBoxIcons.rotation.css('transform', inverseScale);
+        this.editorBoxIcons.resize.css('transform', inverseScale);
+        this.editorBoxIcons.resizeX.css('transform', inverseScale);
+        this.editorBoxIcons.resizeY.css('transform', inverseScale);
     },
     refreshLayerEditBoxButton: function (index) {
         if (this.selectedLayer == null

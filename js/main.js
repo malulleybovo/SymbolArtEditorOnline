@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /***********************/
-var APP_VER = '1.3.2';
+var APP_VER = '1.3.3';
 /***********************/
 
 var imgWidth = 176;
@@ -647,6 +647,8 @@ function initUI() {
         ['startIdx', 'endIdx', 'origAlphas']);
 
     samlLoader = new SAMLLoader(list);
+
+    SymbolPicker();
 
     window.addEventListener("beforeunload", function (e) {
         // Just unload if user has not touched the application

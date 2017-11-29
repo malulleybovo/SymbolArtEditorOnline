@@ -1,4 +1,3 @@
-var layerCount = 0;
 
 var Layer = Class({
     initialize: function (name, part, color, x, y, scale, rotation, vertices, alpha, IDless) {
@@ -15,7 +14,7 @@ var Layer = Class({
         (vertices !== undefined) ? this.vertices = vertices : this.vertices = [-halfSize, -halfSize, halfSize, -halfSize, -halfSize, halfSize, halfSize, halfSize];
         (alpha !== undefined) ? this.alpha = alpha : this.alpha = 7;
         this.visible = true;
-        if (!IDless) this.ID = ++layerCount;
+        if (!IDless) this.ID = groupID;
     },
     update: function (quad) {
         this.color = quad.tint;

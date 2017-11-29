@@ -259,6 +259,7 @@ white { color: white; }
     color: #2fa1d6;
     background-color: #f3f3f3;
     border-radius: 14px;
+    font-size: 16px;
 }
 .edit-button.corner-arrow {
     transform: rotate(-45deg);

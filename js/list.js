@@ -64,17 +64,9 @@ var List = Class({
         this.toggleButton[0].hasScrolled = false;
         this.toggleButton[0].prevScrollPos = 0;
         this.toggleButton.click(function () {
-            let $layerMan = $("#canvasctrl");
             if (list.selectedElem && list.selectedElem != null
                 && $('#canvasctrl').css('left') != '0px') {
-                $layerMan.scrollTop(0);
-                list.selectedElem.scrollIntoView();
-                let newHeight = list.selectedElem.getBoundingClientRect().top;
-                let newScroll = $layerMan.scrollTop();
-                if (newHeight < window.innerHeight / 2)
-                    $layerMan.scrollTop(newScroll - window.innerHeight / 2);
-                else
-                    $layerMan.scrollTop(newScroll + window.innerHeight / 2);
+                list.scrollActiveIntoView();
             }
             $(".sidebar.left").trigger("sidebar:toggle");
         });
@@ -374,6 +366,17 @@ var List = Class({
     },
     setReady: function (val) {
         if (val === true || val === false) this.ready = val;
+    },
+    scrollActiveIntoView: function () {
+        let $layerMan = $("#canvasctrl");
+        $layerMan.scrollTop(0);
+        list.selectedElem.scrollIntoView();
+        let newHeight = list.selectedElem.getBoundingClientRect().top;
+        let newScroll = $layerMan.scrollTop();
+        if (newHeight < window.innerHeight / 2)
+            $layerMan.scrollTop(newScroll - window.innerHeight / 2);
+        else
+            $layerMan.scrollTop(newScroll + window.innerHeight / 2);
     },
     updateLayerCountDisplay: function () {
         let $cntHeader = $('#layerCountDisplay');
