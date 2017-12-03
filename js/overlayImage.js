@@ -162,6 +162,10 @@ var OverlayImage = Class({
         if (bool) {
             $ctrller.removeClass('fadeOut');
             this.plane.interactive = true;
+            let partmenu = $('canvas')[0].editor.layerCtrl.partselectmenu;
+            if (partmenu.isActive() && partmenu.isOpen()) {
+                partmenu.toggle();
+            }
         }
         else {
             $ctrller.addClass('fadeOut');

@@ -6,6 +6,7 @@
         // Initialize selectmenu
         this.selectmenu = new SelectMenu();
         this.selectmenu.setActiveMenu(0);
+        this.isMenuOpen = false;
 
         // Setup options
         for (var i in partsInfo.dataArray) {
@@ -50,12 +51,13 @@
     toggle: function () {
         this.selectmenu.setActiveMenu(0);
         setTimeout(this.selectmenu.toggle, 100);
+        this.isMenuOpen = !this.selectmenu.isOpen(0);
     },
     isActive: function () {
         return this.selectmenu.isMenuActive(0);
     },
     isOpen: function () {
-        return this.selectmenu.isOpen(0);
+        return this.isMenuOpen;
     },
     hide: function () {
         this.selectmenu.hide(0);

@@ -264,11 +264,16 @@ GroupEditBox.cPicker;
 GroupEditBox.ctrller;
 /* Static Functions */
 GroupEditBox.show = function () {
-    if ($('#groupEditBox')[0]) return; // Ignore if edit box is already displaying
-    $('.canvas-box').append(GroupEditBox.container);
-    $('#colorSelector2').spectrum('set', '#bf4040');
-    $('#groupColorPicker').removeClass('fadeOut');
-    $(GroupEditBox.ctrller.domElement).removeClass("fadeOut");
+    if (!$('#groupEditBox')[0]) { // Ignore if edit box is already displaying
+        $('.canvas-box').append(GroupEditBox.container);
+        $('#colorSelector2').spectrum('set', '#bf4040');
+        $('#groupColorPicker').removeClass('fadeOut');
+        $(GroupEditBox.ctrller.domElement).removeClass("fadeOut");
+    }
+    let partmenu = $('canvas')[0].editor.layerCtrl.partselectmenu;
+    if (partmenu.isActive() && partmenu.isOpen()) {
+        partmenu.toggle();
+    }
 }
 GroupEditBox.hide = function () {
     if (!$('#groupEditBox')[0]) return; // Ignore if edit box is not displaying

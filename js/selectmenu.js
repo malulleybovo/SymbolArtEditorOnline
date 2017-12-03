@@ -3,9 +3,9 @@
         var newMenu = {};
         newMenu.container = $('<div id="sidenav" class="no-highlight cursor-pointer no-panning fade">');
         newMenu.container[0].selectmenu = this;
-        newMenu.width = '170px';
+        newMenu.width = 170;
 
-        newMenu.container.list = $('<div class="menu" style="width: ' + newMenu.width + ';">');
+        newMenu.container.list = $('<div class="menu" style="width: ' + newMenu.width + 'px;">');
 
         newMenu.closeButton = $('<div class="closebtn">&times;</a>');
         newMenu.closeButton[0].selectmenu = this; // Attach refference to select menu
@@ -98,11 +98,12 @@
         SelectMenu.activeMenu.isOpen = !SelectMenu.activeMenu.isOpen;
         var container = $('#sidenav');
         if (SelectMenu.activeMenu.isOpen) {
-            container[0].style.width = SelectMenu.activeMenu.width;
+            let containerW = (SelectMenu.activeMenu.width + 12);
+            container[0].style.width = containerW + 'px';
             container.find('.closebtn')[0].style.transform = 'translate(0%, 0%)';
-            $('#layerColorPicker').css('transform', 'translate(-' + SelectMenu.activeMenu.width + ', 0)')
+            $('#layerColorPicker').css('transform', 'translate(-' + containerW + 'px, 0)')
                 .addClass('may-be-off-screen');
-            $('.top-right').css('transform', 'translate(-' + SelectMenu.activeMenu.width + ', 0)')
+            $('.top-right').css('transform', 'translate(-' + containerW + 'px, 0)')
                 .addClass('may-be-off-screen');
         }
         else {
