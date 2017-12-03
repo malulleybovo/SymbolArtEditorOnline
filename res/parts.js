@@ -5,7 +5,7 @@
  * <br>- imgType : image type of parts files (png, jpeg, etc.)</br>
  * <br>- dataArray : array with file names of all parts included in application</br></p>
  */
-var partsInfo = {
+const partsInfo = {
     path : './images/',
     imgType : '.png',
     dataArray: [
@@ -201,6 +201,10 @@ var partsInfo = {
         '579',
         '580',
         '581',
+        '582',
+        '583',
+        '584',
+        '585',
 
         '641',
         '642',
@@ -259,6 +263,14 @@ var partsInfo = {
         '695',
         '696',
         '697',
+        '698',
+        '699',
+        '700',
+        '701',
+        '702',
+        '703',
+        '704',
+        '705',
         
         '1',
         '2',
@@ -376,6 +388,28 @@ var partsInfo = {
         '753',
         '754',
 
-        '1000' // Blank image for error onload
+        '293' // Blank image for error onload symbol
     ]
 }
+
+/**
+ * Contains all images used in the editor.
+ * This includes every symbol image, the canvas box image,
+ * and the default overlay image.
+ * Components are accessed in the form of:
+ *     LoadedImageFiles["/path/to/fileName.ext"]
+ * where the file path, name, and extension are stored in partsInfo
+ */
+const LoadedImageFiles = {};
+
+for (var i = 0; i < partsInfo.dataArray.length; i++) {
+    let imgName = partsInfo.dataArray[i] + partsInfo.imgType;
+    LoadedImageFiles[imgName] = new Image();
+    LoadedImageFiles[imgName].src = partsInfo.path + imgName;
+}
+
+LoadedImageFiles["SABoxSprite.png"] = new Image();
+LoadedImageFiles["SABoxSprite.png"].src = "images/SABox.png";
+
+LoadedImageFiles['overlayImg'] = new Image();
+LoadedImageFiles['overlayImg'].src = "images/tile.png";
