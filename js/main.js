@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /***********************/
-var APP_VER = '1.3.3';
+var APP_VER = '1.3.4';
 /***********************/
 
 var imgWidth = 176;
@@ -828,6 +828,7 @@ function alertMessage(msg, time) {
     }, time);
 }
 
+var intro;
 function initWalkthrough() {
     intro = introJs();
     intro.setOptions({
@@ -861,7 +862,7 @@ function initWalkthrough() {
           },
           { // 5
               element: $('.toolbarbtn')[5],
-              hint: "Click here to add a helper overlay image or edit the positioning of the it.",
+              hint: "Click here to add a helper overlay image or edit its position to serve as a model for your work.",
               hintPosition: 'top-middle'
           },
           { // 6
@@ -911,38 +912,44 @@ function initWalkthrough() {
           },
           { // 13
               element: $('body')[0],
-              hint: "Don't know where to start? Click \"Got it\" and I'll give you a walkthrough. "
-                  + "<a href='https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1.1-Features-Part-1' target='_blank'>Click here to see the GIF guide.</a>"
-                  + " If you are experienced, ignore this and it'll soon disappear.",
-              hintPosition: 'top-middle'
+              hint: "Double click symbols in image to select and edit them. Double click again to select symbols behind others.",
+              hintPosition: 'middle-middle'
           },
           { // 14
               element: $('body')[0],
               hint: (isMobile) ? "Drag image around to place it in the right spot for you."
-                  : "Drag image around to place it in the right spot for you. Press and hold \"i\"-key to compare Symbol Art to the overlay image.",
+                  : "Drag image around to place it in the right spot for you. Press and hold \"i\" on keyboard to compare your Symbol Art to the model image.",
               hintPosition: 'middle-middle'
           },
           { // 15
               element: $('body')[0],
-              hint: "Use the controller on top-right corner to change overlay image size, rotation, transparency, and apply an extra green screen on background.",
+              hint: "Use the controller on top-right corner to change model image size, rotation, transparency, and apply an extra green screen on background.",
               hintPosition: 'top-right'
           }
         ]
     });
     intro.addHints();
     intro.hideHints();
+    var $helpBtn = $('<div class="tutorial-init no-highlight">HELP?</div>');
     setTimeout(function () {
-        intro.showHint(13);
-    }, 500);
-    setTimeout(function () {
-        intro.userDidNotRequestHelp = true;
-        intro.hideHint(13);
-        intro = undefined;
-    }, 60000);
+        $helpBtn.addClass("show-more");
+        setTimeout(function () {
+            $helpBtn.removeClass("show-more");
+        }, 10000);
+    }, 3000);
+    $helpBtn.click(function () {
+        if ($(".tutorial-init:hover").length <= 0) return;
+        intro.startedWalkthrough = true;
+        intro.showHint(0);
+        intro.showHint(12);
+        $helpBtn.remove();
+    });
+    $('body').prepend($helpBtn);
     intro.onhintclose(function (stepId) {
         // Check which hint was closed and move to the next step
         if (stepId < 6) intro.showHint(stepId + 1);
         else if (stepId == 6) {
+            intro.showHint(13);
             // refresh hint positions when opening/closing layer manager
             $('#canvasctrlbutton').on('click.introRefresh', function () {
                 setTimeout(function () { window.dispatchEvent(new Event('resize')); },
@@ -986,12 +993,6 @@ function initWalkthrough() {
             else {
                 intro.closedHint9 = true;
             }
-        }
-        else if (!intro.userDidNotRequestHelp && stepId == 13) {
-            // Start the introduction for new users
-            intro.startedWalkthrough = true;
-            intro.showHint(0);
-            intro.showHint(12);
         }
     });
 }
