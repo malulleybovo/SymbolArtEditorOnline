@@ -11,7 +11,7 @@ Inspired by the in-game editor from [Phantasy Star Online 2](http://pso2.jp/) (S
 Symbol Art Editor Online is a browser vector-based image editor used to produce digital art made of symbols.
 The application supports *.sar* (Symbol Art files) and *.saml* (Art project files).
 
-<img src="https://github.com/malulleybovo/SymbolArtEditorOnline/blob/master/res/walkthrough/welcome.gif" width="200" height="358" />
+<img src="https://github.com/malulleybovo/SymbolArtEditorOnline/raw/master/res/walkthrough/loadSAML.gif" width="200" height="358" />
 
 ### [Usage Visual Guide](https://github.com/malulleybovo/SymbolArtEditorOnline/wiki/1-Usage):
 #### GIFs explaining how to use the editor:
