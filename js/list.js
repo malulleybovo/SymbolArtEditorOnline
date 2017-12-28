@@ -361,6 +361,7 @@ var List = Class({
         this.mainFolder = this.setupGroupAsMain(this.mainGroup);
         this.container.append(this.mainFolder);
         this.container.trigger('create');
+        setupLayerManKeyNavigator();
 
         this.ready = false;
     },
