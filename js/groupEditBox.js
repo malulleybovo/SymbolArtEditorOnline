@@ -90,6 +90,59 @@ var GroupEditBox = Class({
                     this.object.transparency = 0;
                     this.updateDisplay();
                 });
+            let flipFolder = GroupEditBox.ctrller.addFolder('flip');
+            flipFolder.add({
+                horizontal: function () {
+                    let editor = $('canvas')[0].editor;
+                    let groupMoving = editor.groupMoving;
+                    editor.updateGroupEditBoxSize();
+                    let groupXpos_x2 = (groupMoving.maxXCoord + groupMoving.minXCoord);
+                    for (var i = groupMoving.firstIdx; i < groupMoving.lastIdx; i++) {
+                        let layer = editor.layers[i].layer;
+                        layer.x = groupXpos_x2 - layer.x;
+                        for (var j = 0; j < 4; j++) {
+                            layer.vertices[2 * j] *= -1;
+                        }
+                        editor.updateLayer(layer);
+                    }
+                    editor.render();
+                    // Save group flip so it can be reverted later
+                    historyManager.pushUndoAction('symbol_grouphorizontalflip', {
+                        'groupXpos_x2': groupXpos_x2,
+                        'firstIdx': groupMoving.firstIdx,
+                        'lastIdx': groupMoving.lastIdx
+                    });
+                    console.log('%cHorizontally Flipped%c Symbol Group %o.',
+                        'color: #2fa1d6', 'color: #f3f3f3',
+                        editor.layers.slice(groupMoving.firstIdx, groupMoving.lastIdx + 1));
+                }
+            }, 'horizontal');
+            flipFolder.add({
+                vertical: function () {
+                    let editor = $('canvas')[0].editor;
+                    let groupMoving = editor.groupMoving;
+                    editor.updateGroupEditBoxSize();
+                    let groupYpos_x2 = (groupMoving.maxYCoord + groupMoving.minYCoord);
+                    for (var i = groupMoving.firstIdx; i < groupMoving.lastIdx; i++) {
+                        let layer = editor.layers[i].layer;
+                        layer.y = groupYpos_x2 - layer.y;
+                        for (var j = 0; j < 4; j++) {
+                            layer.vertices[2 * j + 1] *= -1;
+                        }
+                        editor.updateLayer(layer);
+                    }
+                    editor.render();
+                    // Save group flip so it can be reverted later
+                    historyManager.pushUndoAction('symbol_groupverticalflip', {
+                        'groupYpos_x2': groupYpos_x2,
+                        'firstIdx': groupMoving.firstIdx,
+                        'lastIdx': groupMoving.lastIdx
+                    });
+                    console.log('%cVertically Flipped%c Symbol Group %o.',
+                        'color: #2fa1d6', 'color: #f3f3f3',
+                        editor.layers.slice(groupMoving.firstIdx, groupMoving.lastIdx + 1));
+                }
+            }, 'vertical');
             $(GroupEditBox.ctrller.domElement).addClass("top-right no-panning no-highlight fade");
             $('body').append(GroupEditBox.ctrller.domElement);
         }

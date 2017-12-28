@@ -30,6 +30,7 @@ body {
     padding: 5px 10px;
     height: 20px !important;
     position: fixed !important;
+    z-index: 999999999999999;
 }
 
 div.ui-content {

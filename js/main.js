@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /***********************/
-var APP_VER = '1.3.4';
+var APP_VER = '1.3.5';
 /***********************/
 
 var imgWidth = 176;
@@ -568,6 +568,64 @@ function initUI() {
             alertManager.pushAlert('Redid symbol reshape');
         },
         ['layer', 'origVals', 'newVals']);
+    historyManager
+        .registerUndoAction('symbol_grouphorizontalflip',
+        function (ctx) { // UNDO symbol_grouphorizontalflip
+            let editor = $('canvas')[0].editor;
+            for (var i = ctx.firstIdx; i < ctx.lastIdx; i++) {
+                let layer = editor.layers[i].layer;
+                layer.x = ctx.groupXpos_x2 - layer.x;
+                for (var j = 0; j < 4; j++) {
+                    layer.vertices[2 * j] *= -1;
+                }
+                editor.updateLayer(layer);
+            }
+            editor.render();
+            alertManager.pushAlert('Undid symbol group horizontal flip');
+        },
+        function (ctx) { // REDO symbol_grouphorizontalflip
+            let editor = $('canvas')[0].editor;
+            for (var i = ctx.firstIdx; i < ctx.lastIdx; i++) {
+                let layer = editor.layers[i].layer;
+                layer.x = ctx.groupXpos_x2 - layer.x;
+                for (var j = 0; j < 4; j++) {
+                    layer.vertices[2 * j] *= -1;
+                }
+                editor.updateLayer(layer);
+            }
+            editor.render();
+            alertManager.pushAlert('Redid symbol group horizontal flip');
+        },
+        ['groupXpos_x2', 'firstIdx', 'lastIdx']);
+    historyManager
+        .registerUndoAction('symbol_groupverticalflip',
+        function (ctx) { // UNDO symbol_groupverticalflip
+            let editor = $('canvas')[0].editor;
+            for (var i = ctx.firstIdx; i < ctx.lastIdx; i++) {
+                let layer = editor.layers[i].layer;
+                layer.y = ctx.groupYpos_x2 - layer.y;
+                for (var j = 0; j < 4; j++) {
+                    layer.vertices[2 * j + 1] *= -1;
+                }
+                editor.updateLayer(layer);
+            }
+            editor.render();
+            alertManager.pushAlert('Undid symbol group vertical flip');
+        },
+        function (ctx) { // REDO symbol_groupverticalflip
+            let editor = $('canvas')[0].editor;
+            for (var i = ctx.firstIdx; i < ctx.lastIdx; i++) {
+                let layer = editor.layers[i].layer;
+                layer.y = ctx.groupYpos_x2 - layer.y;
+                for (var j = 0; j < 4; j++) {
+                    layer.vertices[2 * j + 1] *= -1;
+                }
+                editor.updateLayer(layer);
+            }
+            editor.render();
+            alertManager.pushAlert('Redid symbol group vertical flip');
+        },
+        ['groupYpos_x2', 'firstIdx', 'lastIdx']);
     historyManager
         .registerUndoAction('symbol_recolor',
         function (ctx) { // UNDO symbol_recolor
