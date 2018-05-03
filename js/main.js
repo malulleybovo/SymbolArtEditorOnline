@@ -102,7 +102,18 @@ function initUI() {
             </h1>
          </div>`);
 
-    UI.landing.menu = $('<div class="landing-menu">');
+    UI.landing.menu = $(
+        `<div class="landing-menu">
+            <div id="loadPreview" style="
+                display: block;
+                font-size: 22px;
+                text-align:  center;
+                margin:  0;
+                opacity: 0;
+            ">
+                <span id="numLoaded">0</span><span>/</span><span id="numToLoad">0</span>
+            </div>
+        </div>`);
 
     let landingOnKeyPressCallback = function (e) {
         if (e.keyCode == 10 || e.keyCode == 13) {
@@ -112,11 +123,11 @@ function initUI() {
                 $(UI.landing.menu.newAppButton).click();
         }
     }
-    UI.landing.menu.newAppButton = $('<div>');
+    UI.landing.menu.newAppButton = $('<div class="menubtn">');
     UI.landing.menu.newAppButton.append($('<i class="fa fa-plus">'));
     UI.landing.menu.append(UI.landing.menu.newAppButton);
 
-    UI.landing.menu.loadAppButton = $('<div>');
+    UI.landing.menu.loadAppButton = $('<div class="menubtn">');
     UI.landing.menu.loadAppButton.append($('<i class="fa fa-upload">'));
     UI.landing.menu.append(UI.landing.menu.loadAppButton);
 
@@ -735,19 +746,26 @@ function initUI() {
                     let buffer = evt.target.result;
                     let parseResult = loadSAR(buffer);
 
-                    historyManager.clear();
-                    editorToolbar.disableTool('undo');
-                    editorToolbar.toolList['hideUI'].click();
-                    UI.landing.animate({
-                        opacity: 0
-                    }, "slow", "linear", function () {
-                        UI.landing.remove();
-                    });
+                    afterLoad();
+                    function afterLoad() {
+                        if (isLoadingSAR) {
+                            setTimeout(afterLoad, 100);
+                            return;
+                        }
+                        historyManager.clear();
+                        editorToolbar.disableTool('undo');
+                        editorToolbar.toolList['hideUI'].click();
+                        UI.landing.animate({
+                            opacity: 0
+                        }, "slow", "linear", function () {
+                            UI.landing.remove();
+                        });
 
-                    initWalkthrough();
-                    title = file.name;
-                    document.title = 'SA: ' + title;
-                    hasLoadedContent = true;
+                        initWalkthrough();
+                        title = file.name;
+                        document.title = 'SA: ' + title;
+                        hasLoadedContent = true;
+                    }
                 }
                 reader.readAsArrayBuffer(file);
                 reader.onerror = function (evt) {
@@ -767,17 +785,24 @@ function initUI() {
                     var text = evt.target.result;
                     samlLoader.load(text);
 
-                    historyManager.clear();
-                    editorToolbar.disableTool('undo');
-                    editorToolbar.toolList['hideUI'].click();
-                    UI.landing.animate({
-                        opacity: 0
-                    }, "slow", "linear", function () {
-                        UI.landing.remove();
-                    });
+                    afterLoad();
+                    function afterLoad() {
+                        if (isLoadingSAML) {
+                            setTimeout(afterLoad, 100);
+                            return;
+                        }
+                        historyManager.clear();
+                        editorToolbar.disableTool('undo');
+                        editorToolbar.toolList['hideUI'].click();
+                        UI.landing.animate({
+                            opacity: 0
+                        }, "slow", "linear", function () {
+                            UI.landing.remove();
+                        });
 
-                    initWalkthrough();
-                    hasLoadedContent = true;
+                        initWalkthrough();
+                        hasLoadedContent = true;
+                    }
                 }
                 reader.readAsText(file);
                 reader.onerror = function (evt) {

@@ -72,7 +72,7 @@
     transition: 0.3s;
 }
 
-.landing-menu div:hover {
+.landing-menu .menubtn:hover {
     transform: scale(2);
 }
 

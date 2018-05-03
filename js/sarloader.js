@@ -21,6 +21,8 @@
  * - If flag byte is 0x84, XORed output is then decompressed using PRS decompression.
  */
 
+var isLoadingSAR = false;
+
 function loadSAR(/* ArrayBuffer */ buffer) {
     // Parse input
     let parseResult = parseSAR(buffer);
@@ -28,20 +30,10 @@ function loadSAR(/* ArrayBuffer */ buffer) {
     if (parseResult === undefined
         || parseResult == null) return null;
     // Disable Logging during load to hide what is happening during the process
-    let savedLogFunct = console.log;
+    savedLogFunct = console.log;
     console.log = function () { };
     // Setup the application
-    try {
-        setupApplication(parseResult.parsed);
-    }
-    catch (e) {
-        // Restore Logging on failure
-        console.log = savedLogFunct;
-        console.error(
-            '%cSAR Loader (%O):%c Failed to load .sar file.\nError: %s\n%s',
-            'color: #a6cd94', this, 'color: #d5d5d5', e.message, e.stack);
-        return;
-    }
+    setupApplication(parseResult.parsed);
     // Restore Logging on success
     console.log = savedLogFunct;
 
@@ -134,107 +126,143 @@ function setupApplication(parsedInput) {
     let layerCnt = parsedInput.layerCount;
     let layers = parsedInput.layers;
     let editor = $('canvas')[0].editor;
-    for (var i = 0; i < layers.length; i++) {
-        let layer = layers[i];
-        contextMenuCallback('insert layer', null, null, $(mainFolder.firstChild));
-        let node = mainFolder.lastChild.firstChild.lastChild;
+    $('#numToLoad').text(layers.length);
+    $('#loadPreview').css('opacity', 1);
+    $('.landing-menu').css('pointer-events', 'none');
+    let i = 0;
+    isLoadingSAR = true;
+    loadNextTag();
+    var that = this;
+    function loadNextTag() {
+        try {
+            if (i >= layers.length) {
+                finishLoading();
+                return;
+            }
+            console.log = function () { };
+            $('#numLoaded').text(i);
+            let layer = layers[i];
+            contextMenuCallback('insert layer', null, null, $(mainFolder.firstChild));
+            let node = mainFolder.lastChild.firstChild.lastChild;
 
-        /* Setup layer visibility */
-        list.changeElemVisibility(layer.props.visible, node);
+            /* Setup layer visibility */
+            list.changeElemVisibility(layer.props.visible, node);
 
-        /* Setup layer transparency */
-        node.elem.alpha = layer.props.transparency;
+            /* Setup layer transparency */
+            node.elem.alpha = layer.props.transparency;
 
-        /* Setup layer symbol type */
-        let partIdx = partsInfo.dataArray.indexOf((layer.props.textureIndex + 1).toString());
-        if (layer.props.textureIndex === undefined || !editor.parts[partIdx]) {
-            // Invalid Input
-            console.warn(
-                '%cSAR Loader (%O):%c Layer/group element %O uses an invalid symbol number "%i".'
-                + ' Using default symbol (symbol number 293).',
-                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, layer.props.textureIndex);
-            // Set default blank image
-            partIdx = partsInfo.dataArray.indexOf((293).toString());
+            /* Setup layer symbol type */
+            let partIdx = partsInfo.dataArray.indexOf((layer.props.textureIndex + 1).toString());
+            if (layer.props.textureIndex === undefined || !editor.parts[partIdx]) {
+                // Invalid Input
+                console.warn(
+                    '%cSAR Loader (%O):%c Layer/group element %O uses an invalid symbol number "%i".'
+                    + ' Using default symbol (symbol number 293).',
+                    'color: #a6cd94', that, 'color: #d5d5d5', node.elem, layer.props.textureIndex);
+                // Set default blank image
+                partIdx = partsInfo.dataArray.indexOf((293).toString());
+            }
+            node.elem.part = partIdx;
+            $(node).find('img')[0].src = partsInfo.path
+                + partsInfo.dataArray[partIdx] + partsInfo.imgType;
+
+            /* Setup layer symbol color */
+            let color = {
+                r: (layer.props.colorR * 4), // Multiply because .sar stores
+                g: (layer.props.colorG * 4), // each color parameter as 
+                b: (layer.props.colorB * 4), // 6 bit instead of 8 bit
+            }
+            let value = parseInt('0x' + rgbToHex(color));
+            if (value !== undefined) {
+                node.elem.color = value;
+            }
+
+            /* Setup layer position */
+            let ltx = (layer.points.topLeft.x + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
+            let lty = (layer.points.topLeft.y + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
+            let lbx = (layer.points.bottomLeft.x + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
+            let lby = (layer.points.bottomLeft.y + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
+            let rtx = (layer.points.topRight.x + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
+            let rty = (layer.points.topRight.y + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
+            let rbx = (layer.points.bottomRight.x + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
+            let rby = (layer.points.bottomRight.y + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
+            let startX = Math.min(ltx, lbx, rtx, rbx);
+            let startY = Math.min(lty, lby, rty, rby);
+            let endX = Math.max(ltx, lbx, rtx, rbx);
+            let endY = Math.max(lty, lby, rty, rby);
+            node.elem.x = roundPosition(EDITOR_SIZE.x + endX + startX) / 2;
+            node.elem.y = roundPosition(EDITOR_SIZE.y + endY + startY) / 2;
+
+            /* Setup layer vertices */
+            let origX = (endX + startX) / 2;
+            let origY = (endY + startY) / 2;
+            node.elem.vertices[0] = ltx - origX;
+            node.elem.vertices[1] = lty - origY;
+            node.elem.vertices[2] = rtx - origX;
+            node.elem.vertices[3] = rty - origY;
+            node.elem.vertices[4] = lbx - origX;
+            node.elem.vertices[5] = lby - origY;
+            node.elem.vertices[6] = rbx - origX;
+            node.elem.vertices[7] = rby - origY;
+            // Validate symbol properties
+            if (!isQuadAParallelogram(node.elem.vertices)) {
+                console.warn(
+                    '%cSAR Loader (%O):%c Layer/group element %O has an invalid shape (%O)'
+                    + ' because it is not a parallelogram. '
+                    + 'Top/bottom sides OR left/right sides are not equal in length. '
+                    + 'Attempting to fix it . . .',
+                    'color: #a6cd94', that, 'color: #d5d5d5', node.elem, layer.points);/*
+                    node.elem.vertices[4] = node.elem.vertices[0] + node.elem.vertices[6] - node.elem.vertices[2];
+                    node.elem.vertices[5] = node.elem.vertices[1] + node.elem.vertices[7] - node.elem.vertices[3];*/
+            }
+            let invalidLens = hasQuadInvalidSideLengths(node.elem.vertices);
+            if (invalidLens != null) {
+                console.warn(
+                    '%cSAR Loader (%O):%c Layer/group element %O has one or more invalid '
+                    + 'symbol side lengths (vertices: %O, lengths: %O). '
+                    + 'One or more sides exceed the max of %i. (all values scaled by %i)',
+                    'color: #a6cd94', that, 'color: #d5d5d5', node.elem, layer.points,
+                    invalidLens, MAX_SYMBOL_SIDE_LEN, CANVAS_PIXEL_SCALE);
+            }
+
+            /* Update layer in the editor */
+            editor.updateLayer(node.elem);
+            editor.disableInteraction(node.elem);
+
+            i++;
+            setTimeout(loadNextTag, 1);
         }
-        node.elem.part = partIdx;
-        $(node).find('img')[0].src = partsInfo.path
-            + partsInfo.dataArray[partIdx] + partsInfo.imgType;
-
-        /* Setup layer symbol color */
-        let color = {
-            r: (layer.props.colorR * 4), // Multiply because .sar stores
-            g: (layer.props.colorG * 4), // each color parameter as 
-            b: (layer.props.colorB * 4), // 6 bit instead of 8 bit
+        catch (e) {
+            $('.landing-menu').css('pointer-events', 'auto');
+            // Restore Logging on failure
+            console.log = savedLogFunct;
+            savedLogFunct = undefined;
+            console.error(
+                '%cSAR Loader (%O):%c Failed to load .sar file.\nError: %s\n%s',
+                'color: #a6cd94', that, 'color: #d5d5d5', e.message, e.stack);
+            return;
         }
-        let value = parseInt('0x' + rgbToHex(color));
-        if (value !== undefined) {
-            node.elem.color = value;
-        }
-
-        /* Setup layer position */
-        let ltx = (layer.points.topLeft.x + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
-        let lty = (layer.points.topLeft.y + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
-        let lbx = (layer.points.bottomLeft.x + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
-        let lby = (layer.points.bottomLeft.y + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
-        let rtx = (layer.points.topRight.x + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
-        let rty = (layer.points.topRight.y + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
-        let rbx = (layer.points.bottomRight.x + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
-        let rby = (layer.points.bottomRight.y + BOUNDING_BOX_RAW.maxNegVal) * CANVAS_PIXEL_SCALE;
-        let startX = Math.min(ltx, lbx, rtx, rbx);
-        let startY = Math.min(lty, lby, rty, rby);
-        let endX = Math.max(ltx, lbx, rtx, rbx);
-        let endY = Math.max(lty, lby, rty, rby);
-        node.elem.x = roundPosition(EDITOR_SIZE.x + endX + startX) / 2;
-        node.elem.y = roundPosition(EDITOR_SIZE.y + endY + startY) / 2;
-
-        /* Setup layer vertices */
-        let origX = (endX + startX) / 2;
-        let origY = (endY + startY) / 2;
-        node.elem.vertices[0] = ltx - origX;
-        node.elem.vertices[1] = lty - origY;
-        node.elem.vertices[2] = rtx - origX;
-        node.elem.vertices[3] = rty - origY;
-        node.elem.vertices[4] = lbx - origX;
-        node.elem.vertices[5] = lby - origY;
-        node.elem.vertices[6] = rbx - origX;
-        node.elem.vertices[7] = rby - origY;
-        // Validate symbol properties
-        if (!isQuadAParallelogram(node.elem.vertices)) {
-            console.warn(
-                '%cSAR Loader (%O):%c Layer/group element %O has an invalid shape (%O)'
-                + ' because it is not a parallelogram. '
-                + 'Top/bottom sides OR left/right sides are not equal in length. '
-                + 'Attempting to fix it . . .',
-                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, layer.points);/*
-                node.elem.vertices[4] = node.elem.vertices[0] + node.elem.vertices[6] - node.elem.vertices[2];
-                node.elem.vertices[5] = node.elem.vertices[1] + node.elem.vertices[7] - node.elem.vertices[3];*/
-        }
-        let invalidLens = hasQuadInvalidSideLengths(node.elem.vertices);
-        if (invalidLens != null) {
-            console.warn(
-                '%cSAR Loader (%O):%c Layer/group element %O has one or more invalid '
-                + 'symbol side lengths (vertices: %O, lengths: %O). '
-                + 'One or more sides exceed the max of %i. (all values scaled by %i)',
-                'color: #a6cd94', this, 'color: #d5d5d5', node.elem, layer.points,
-                invalidLens, MAX_SYMBOL_SIDE_LEN, CANVAS_PIXEL_SCALE);
-        }
-
-        /* Update layer in the editor */
-        editor.updateLayer(node.elem);
-        editor.disableInteraction(node.elem);
     }
 
-    /* Setup Symbol Art sound effect */
-    let bgeMan = $('#player')[0].manager.bgeselect;
-    bgeMan.setActiveBGE(parsedInput.soundEffect);
-    bgeMan.selectmenu.setSelectedOption(parsedInput.soundEffect, 1);
+    function finishLoading() {
+        $('.landing-menu').css('pointer-events', 'auto');
+        /* Setup Symbol Art sound effect */
+        let bgeMan = $('#player')[0].manager.bgeselect;
+        bgeMan.setActiveBGE(parsedInput.soundEffect);
+        bgeMan.selectmenu.setSelectedOption(parsedInput.soundEffect, 1);
 
-    editor.render();
-    editor.hideInterface();
-    //this.editor.overlayImg.toggleController(false);
-    list.updateDOMGroupVisibility(list.mainFolder[0]);
+        editor.render();
+        editor.hideInterface();
+        //that.editor.overlayImg.toggleController(false);
+        list.updateDOMGroupVisibility(list.mainFolder[0]);
 
-    $(mainFolder).children(':first').click();
+        $(mainFolder).children(':first').click();
+
+        isLoadingSAR = false;
+        // Restore Logging on success
+        console.log = savedLogFunct;
+        savedLogFunct = undefined;
+    }
 
     function rgbToHex(color) {
         return componentToHex(color.r) + componentToHex(color.g) + componentToHex(color.b);

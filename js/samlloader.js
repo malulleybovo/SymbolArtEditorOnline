@@ -24,6 +24,7 @@ var SAMLLoader = Class({
         console.log = function () { }
         isLoadingSAML = true;
         onLoadNumWarnings = 0;
+        bgeNumToBe = -1;
 
         // TODO
         try {
@@ -53,55 +54,88 @@ var SAMLLoader = Class({
             }
             var nestingLvl = 0;
             var isValid = false;
-            for (var i = 0; i < tags.length; i++) {
-                var tag = tags[i];
-                if (isValid && /<layer>|<layer [^\n|<]*>/.test(tag)) { // if <layer>
-                    if (this.editor.isFull()) {
-                        console.warn(
-                            '%cSAML Loader (%O):%c Layer info (%s) could not be loaded.'
-                            + ' Editor has reached its layer capacity (%i).',
-                            'color: #a6cd94', this, 'color: #d5d5d5', tag, MAX_NUM_LAYERS);
-                        onLoadNumWarnings++;
+            $('#numToLoad').text(tags.length);
+            $('#loadPreview').css('opacity', 1);
+            $('.landing-menu').css('pointer-events', 'none');
+            let i = 0;
+            loadNextTag();
+            var that = this;
+            function loadNextTag() {
+                try {
+                    if (i >= tags.length) {
+                        finishLoading();
+                        return;
                     }
-                    else {
-                        contextMenuCallback('insert layer', null, null, $(currFolder.firstChild));
-                        var newLayerNode = currFolder.lastChild.firstChild.lastChild;
-                        this.setupElem(newLayerNode, tag, 'layer');
-                    }
-                }
-                else if (isValid && /<g>|<g [^\n|<]*>/.test(tag)) { // if <g>
-                    contextMenuCallback('insert group', null, null, $(currFolder.firstChild));
-                    currFolder = currFolder.lastChild.firstChild.lastChild;
-                    this.setupElem(currFolder, tag, 'g');
-                    nestingLvl++;
-                }
-                else if (isValid && /<\/([a-z|A-Z]+[0-9]?)>/.test(tag)) {
-                    if (/<\/g>/.test(tag)) { // if </g>
-                        if (nestingLvl > 0) {
-                            currFolder = currFolder.parentNode.parentNode.parentNode;
-                            nestingLvl--;
+                    console.log = function () { };
+                    $('#numLoaded').text(i);
+                    var tag = tags[i];
+                    if (isValid && /<layer>|<layer [^\n|<]*>/.test(tag)) { // if <layer>
+                        if (that.editor.isFull()) {
+                            console.warn(
+                                '%cSAML Loader (%O):%c Layer info (%s) could not be loaded.'
+                                + ' Editor has reached its layer capacity (%i).',
+                                'color: #a6cd94', that, 'color: #d5d5d5', tag, MAX_NUM_LAYERS);
+                            onLoadNumWarnings++;
+                        }
+                        else {
+                            contextMenuCallback('insert layer', null, null, $(currFolder.firstChild));
+                            var newLayerNode = currFolder.lastChild.firstChild.lastChild;
+                            that.setupElem(newLayerNode, tag, 'layer');
                         }
                     }
-                    else if (/<\/sa>/.test(tag)) { // if </sa>
-                        break;
+                    else if (isValid && /<g>|<g [^\n|<]*>/.test(tag)) { // if <g>
+                        contextMenuCallback('insert group', null, null, $(currFolder.firstChild));
+                        currFolder = currFolder.lastChild.firstChild.lastChild;
+                        that.setupElem(currFolder, tag, 'g');
+                        nestingLvl++;
                     }
+                    else if (isValid && /<\/([a-z|A-Z]+[0-9]?)>/.test(tag)) {
+                        if (/<\/g>/.test(tag)) { // if </g>
+                            if (nestingLvl > 0) {
+                                currFolder = currFolder.parentNode.parentNode.parentNode;
+                                nestingLvl--;
+                            }
+                        }
+                        else if (/<\/sa>/.test(tag)) { // if </sa>
+                            finishLoading();
+                            return;
+                        }
+                    }
+                    else if (/<sa>|<sa [^\n|<]*>/.test(tag)) {
+                        that.setupElem(mainFolder, tag, 'sa');
+                        isValid = true;
+                    }
+
+                    i++;
+                    setTimeout(loadNextTag, 1);
                 }
-                else if (/<sa>|<sa [^\n|<]*>/.test(tag)) {
-                    this.setupElem(mainFolder, tag, 'sa');
-                    isValid = true;
+                catch (e) {
+                    $('.landing-menu').css('pointer-events', 'auto');
+                    // Restore normal logging functionality
+                    console.log = savedConsoleLogCallback;
+                    throw e;
                 }
             }
 
-            if (!isValid || nestingLvl > 0) alert('Loaded file is malformed, it may not be compatible.');
+            function finishLoading() {
+                $('.landing-menu').css('pointer-events', 'auto');
+                if (!isValid || nestingLvl > 0) alert('Loaded file is malformed, it may not be compatible.');
 
-            this.editor.render();
-            this.editor.hideInterface();
-            //this.editor.overlayImg.toggleController(false);
-            list.updateDOMGroupVisibility(list.mainFolder[0]);
+                that.editor.render();
+                that.editor.hideInterface();
+                //this.editor.overlayImg.toggleController(false);
+                list.updateDOMGroupVisibility(list.mainFolder[0]);
 
-            $(mainFolder).children(':first').click();
+                $(mainFolder).children(':first').click();
 
-            isLoadingSAML = false;
+                let bgeMan = $('#player')[0].manager.bgeselect;
+                bgeMan.setActiveBGE(bgeNumToBe);
+                bgeMan.selectmenu.setSelectedOption(bgeNumToBe, 1);
+
+                isLoadingSAML = false;
+
+                console.log = savedConsoleLogCallback;
+            }
         }
         catch (e) {
             // Restore normal logging functionality
@@ -186,9 +220,7 @@ var SAMLLoader = Class({
                             onLoadNumWarnings++;
                             value = 0;
                         }
-                        let bgeMan = $('#player')[0].manager.bgeselect;
-                        bgeMan.setActiveBGE(value);
-                        bgeMan.selectmenu.setSelectedOption(value, 1);
+                        bgeNumToBe = value;
                     }
                     break;
                 case 'type':
