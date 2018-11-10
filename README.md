@@ -4,6 +4,7 @@
 #### Version 1.3.5
 
 ## [*Play with it Here*](https://malulleybovo.github.io/SymbolArtEditorOnline/)
+#### [Like it? Check out my Affixing Assistant as well here!](https://www.github.com/malulleybovo/PSO2AffixingAssistant/)
 
 <img height="25%" width="25%" src="https://raw.githubusercontent.com/malulleybovo/SymbolArtEditorOnline/master/css/images/arks_logo.png">
 
