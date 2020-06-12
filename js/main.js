@@ -37,7 +37,52 @@ window.onload = function () {
     initConsts();
     initDocument();
     initGlobalVars();
-    initUI();
+    if (meetsRequirements()) {
+        initUI();
+    } else {
+        var guidance = null;
+        var isIE = isIE || null;
+        // Opera 8.0+
+        if ((!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0) {
+            guidance = "Settings->Advanced->System->Use hardware acceleration when available";
+        // Firefox 1.0+
+        } else if (typeof InstallTrigger !== 'undefined') {
+            guidance = "Options->General->Performance->Use recommended performance settings (Use hardware acceleration when available)";
+        // Chrome 1 - 79
+        } else if (!!window.chrome) {
+            guidance = "Settings->Advanced->System->Use hardware acceleration when available";
+        // Edge 20+
+        } else if (!isIE && !!window.StyleMedia) {
+            guidance = "Settings->System->Use hardware acceleration when available";
+        }
+        $('.landing').append(
+            `<div class="missing-req"><div>
+                <div class="req-title"><span>WARNING</span></div>
+                <div><span>Your browser does not seem to have Hardware Acceleration enabled. Some functionalities may not work correctly without this (such as transparency and coloring).<p>Please enable it in </span><span${guidance !== null ? (` style="color: white"><b>` + guidance + `</b>`) : `>your browser settings`}</span><span>, and restart your browser.</span></div>
+                <div class="req-btn" onclick="initUI();">Accept the risk and continue anyway</div>
+            </div></div>`
+        )
+    }
+}
+
+/**
+ * Checks if the system meets the requirements
+ * to run this application:
+ * - Hardware Acceleration enabled.
+ * @returns true if system meets all requirements.
+ */
+function meetsRequirements() {
+    // Checks for Hardware Acceleration enabled.
+    let canvas = document.createElement('canvas');
+    let attributes = Object.create({
+        antialias: false,
+        alpha: true,
+        stencil: true,
+        depth: true,
+        failIfMajorPerformanceCaveat: true
+    })
+    let ctx = canvas.getContext('webgl', attributes) || canvas.getContext('experimental-webgl', attributes);
+    return ctx !== undefined && ctx !== null;
 }
 
 function initDocument() {
@@ -65,6 +110,9 @@ function initGlobalVars() {
 }
 
 function initUI() {
+    if ($('.missing-req').length > 0) {
+        $('.missing-req').remove();
+    }
     document.onwheel = function (e) {
         e.preventDefault();
     }

@@ -7,6 +7,41 @@
     color: #2fa1d6;
 }
 
+.missing-req {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.missing-req > div {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.missing-req .req-title {
+    font-size: 32px;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.missing-req .req-btn {
+    margin-top: 16px;
+    display: inline-block;
+    border-radius: 4px;
+    padding: 10px 20px;
+    color: white;
+    background-color: #2fa1d6;
+    cursor: pointer;
+}
+
+.missing-req .req-btn:hover {
+    background-color: #59b4de;
+}
+
 .landing-img {
     position: fixed;
     width: 100%;
