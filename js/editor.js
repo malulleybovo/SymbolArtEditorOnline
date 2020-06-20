@@ -4,9 +4,9 @@ var Editor = Class({
         CANVAS_SIZE = { x: 192, y: 96 };
         CANVAS_PIXEL_SCALE = 3;
         BOUNDING_BOX_RAW = {
-            size: 253,
+            size: 254,
             maxNegVal: -127,
-            maxPosVal: 126
+            maxPosVal: 127
         };
         BOUNDING_BOX = {
             size: CANVAS_PIXEL_SCALE * BOUNDING_BOX_RAW.size,
