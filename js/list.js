@@ -405,6 +405,7 @@ var List = Class({
                     var elem = $(this);
                     var parent = elem.parent().parent();
                     if (parent[0].textbox) {
+                        e.stopImmediatePropagation();
                         if (e.keyCode == 13) { // Enter Key
                             let newName = elem.val().trim();
                             if (LAYER_NAME_REGEX.test(newName)
