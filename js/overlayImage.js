@@ -1,4 +1,4 @@
-﻿
+
 var OverlayImage = Class({
     initialize: function () {
         this.src = LoadedImageFiles['overlayImg'].src;
@@ -51,7 +51,7 @@ var OverlayImage = Class({
                 })
             .bind('keyup.overlay',
                 function (e) {
-                    if (e.key == 'i') {
+                    if (e.key == 'i' && this.overlayRealAlpha !== undefined) {
                         let editor = $('canvas')[0].editor;
                         editor.overlayImg.plane.alpha = this.overlayRealAlpha;
                         this.overlayRealAlpha = undefined;
