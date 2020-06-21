@@ -450,6 +450,10 @@ var List = Class({
                         }
                     }
                 });
+                // Present renaming keys from triggering side events.
+                input.keyup((e) => {
+                    e.stopImmediatePropagation();
+                });
                 input.blur(function (e) { // Abort changes on layer/group
                     e.stopPropagation();
                     var elem = $(this);

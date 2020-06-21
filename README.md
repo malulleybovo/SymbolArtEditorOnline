@@ -1,7 +1,7 @@
 <div align="center">
 
 # Symbol Art Editor Online
-#### Version 1.3.8
+#### Version 1.4.0
 
 ## [*Play with it Here*](https://malulleybovo.github.io/SymbolArtEditorOnline/)
 #### [Like it? Check out my Affixing Assistant as well here!](https://www.github.com/malulleybovo/PSO2AffixingAssistant/)
@@ -24,6 +24,7 @@ The application supports *.sar* (Symbol Art files) and *.saml* (Art project file
 
 <div align="center">
 
+### *New on v1.4.0: Use Keyboard Key T to Toggle Between Overlay and Underlay Image !*
 ### *New on v1.3.5: Use Arrow Keys to Navigate Through Layers !*
 ### *New on v1.3.3: Double Click to Edit Symbols !*
 ### *New on v1.3.0: Support for .SAR File Format is Here !*

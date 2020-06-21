@@ -38,13 +38,15 @@ var Editor = Class({
             transparent: true,
             preserveDrawingBuffer: true
         });
-        
-        this.staticStage = new PIXI.Container();
+
+        this.backStaticStage = new PIXI.Container();
+        this.frontStaticStage = new PIXI.Container();
         //Create a container object called the `this.stage`
         this.stage = new PIXI.Container();
         this.mainStage = new PIXI.Container();
+        this.mainStage.addChild(this.backStaticStage);
         this.mainStage.addChild(this.stage);
-        this.mainStage.addChild(this.staticStage);
+        this.mainStage.addChild(this.frontStaticStage);
         let editorFilter = new PIXI.Filter(null, `
             precision mediump float;
             varying vec2 vTextureCoord;
@@ -78,12 +80,12 @@ var Editor = Class({
         }
 
         this.overlayImg = new OverlayImage();
-        this.staticStage.addChild(this.overlayImg.getImage());
+        this.frontStaticStage.addChild(this.overlayImg.getImage());
 
         this.SABox = new PIXI.mesh.NineSlicePlane(new PIXI.Texture(new PIXI.BaseTexture(LoadedImageFiles["SABoxSprite.png"])), 2, 2, 2, 2);
         this.SABox.height = 960;
         this.SABox.width = 1920;
-        this.staticStage.addChild(this.SABox);
+        this.frontStaticStage.addChild(this.SABox);
 
         // Buttons
         this.currBtnDown = -1;

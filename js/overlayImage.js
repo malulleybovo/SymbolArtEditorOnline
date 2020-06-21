@@ -41,7 +41,7 @@ var OverlayImage = Class({
 
         $(document)
             .bind('keydown.overlay',
-                function (e) {
+                (e) => {
                     if (e.key == 'i' && this.overlayRealAlpha === undefined) {
                         let editor = $('canvas')[0].editor;
                         this.overlayRealAlpha = editor.overlayImg.plane.alpha;
@@ -50,18 +50,21 @@ var OverlayImage = Class({
                     }
                 })
             .bind('keyup.overlay',
-                function (e) {
+                (e) => {
                     if (e.key == 'i' && this.overlayRealAlpha !== undefined) {
                         let editor = $('canvas')[0].editor;
                         editor.overlayImg.plane.alpha = this.overlayRealAlpha;
                         this.overlayRealAlpha = undefined;
                         editor.render();
+                    } else if (e.key == 't') { // Shortcut for toggling front/back
+                        this.toggleFrontBack();
                     }
                 })
 
         this.ctrller = new dat.GUI({ autoPlace: false });
         this.ctrller.domElement.id = 'overlayController';
         var overlayInfo = { size: 1, fineSize: 0, rot: 0, fineRot: 0, alpha: 0.5, overlayImg: this };
+        this.ctrller.add(this, 'toggleFrontBack').name('Toggle front/back');
         this.ctrller.add(overlayInfo, 'size').min(0.2).step(0.01).max(5).listen()
             .name('size (rough)')
             .onChange(function (value) {
@@ -170,6 +173,24 @@ var OverlayImage = Class({
         else {
             $ctrller.addClass('fadeOut');
             this.plane.interactive = false;
+        }
+    },
+    /**
+     * Toggles the placement of the image between
+     * the front and the back of the Symbol Art.
+     */
+    toggleFrontBack: function () {
+        let editor = $('canvas')[0].editor;
+        if (!editor) { return }
+        let overlay = editor.overlayImg.getImage();
+        if (editor.frontStaticStage.children.includes(overlay)) {
+            editor.frontStaticStage.removeChild(overlay);
+            editor.backStaticStage.addChild(overlay);
+            editor.render();
+        } else if (editor.backStaticStage.children.includes(overlay)) {
+            editor.backStaticStage.removeChild(overlay);
+            editor.frontStaticStage.addChildAt(overlay, 0);
+            editor.render();
         }
     },
     center: function () {
