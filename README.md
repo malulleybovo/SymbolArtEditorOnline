@@ -1,7 +1,7 @@
 <div align="center">
 
 # Symbol Art Editor Online
-#### Version 1.3.6
+#### Version 1.3.7
 
 ## [*Play with it Here*](https://malulleybovo.github.io/SymbolArtEditorOnline/)
 #### [Like it? Check out my Affixing Assistant as well here!](https://www.github.com/malulleybovo/PSO2AffixingAssistant/)

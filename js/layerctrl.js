@@ -274,6 +274,24 @@ var LayerCtrl = Class({
                 let editor = canvas.editor;
                 if (editor.selectedLayer !== undefined) {
                     if (editor.selectedLayer != null) {
+                        // Get the color that will result in the color chosen
+                        // after going through the editor's fragment shader
+                        // to give the illusion that the color is the same
+                        // (due to the game's intrinsic rendering filter,
+                        // the SA colors displayed in game are not in sRGB
+                        // so the editor mimics that to help users pick the
+                        // the 'visually accurate' colors).
+                        let scale = 255
+                        let invColor = editor.applyInverseBSCFilter({
+                            r: color._r / scale,
+                            g: color._g / scale,
+                            b: color._b / scale,
+                            a: color._a
+                        }, 0.7, 0.9, 2.12, true);
+                        color._r = invColor.r * scale;
+                        color._g = invColor.g * scale;
+                        color._b = invColor.b * scale;
+                        color._a = invColor.a;
                         newColor = Math.round(parseInt('0x' + color.toHex()));
                         editor.selectedLayer.color = newColor;
                         editor.updateLayer(editor.selectedLayer);

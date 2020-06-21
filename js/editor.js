@@ -38,9 +38,13 @@ var Editor = Class({
             transparent: true,
             preserveDrawingBuffer: true
         });
-
+        
+        this.staticStage = new PIXI.Container();
         //Create a container object called the `this.stage`
         this.stage = new PIXI.Container();
+        this.mainStage = new PIXI.Container();
+        this.mainStage.addChild(this.stage);
+        this.mainStage.addChild(this.staticStage);
         let editorFilter = new PIXI.Filter(null, `
             precision mediump float;
             varying vec2 vTextureCoord;
@@ -48,7 +52,7 @@ var Editor = Class({
             // Brightness-Saturation-Contrast Filter
             vec3 applyBSC(vec4 color, float brightness, float saturation, float contrast)
             {
-	            vec3 color_B  = color.rgb * (1.0 +color.a * (brightness -1.0));
+	            vec3 color_B  = color.rgb * (1.0 + color.a * (brightness -1.0));
 	            vec3 intensity = vec3(dot(color_B, vec3(0.2125, 0.7154, 0.0721)));
 	            vec3 color_BS  = mix(intensity, color_B, 1.0 + color.a * (saturation -1.0));
 	            vec3 color_BSC  = mix(vec3(0.5, 0.5, 0.5), color_BS, 1.0 + color.a * (contrast - 1.0));
@@ -59,13 +63,8 @@ var Editor = Class({
                 float x = vTextureCoord.x;
                 float y = vTextureCoord.y;
                 vec4 pixel = texture2D(uSampler, vTextureCoord.xy);
-                if (x < 0.285 || x > 0.655 || y < 0.102 || y > 0.842) {
-                    gl_FragColor = pixel;
-                }
-                else {
-	                vec3 color = applyBSC(pixel, 0.7, 0.9, 2.12);
-	                gl_FragColor = vec4(color, pixel.a);
-                }
+                vec3 color = applyBSC(pixel, 0.7, 0.9, 2.12);
+                gl_FragColor = vec4(color, pixel.a);
             }`
             );
         this.stage.filters = [editorFilter];
@@ -79,12 +78,12 @@ var Editor = Class({
         }
 
         this.overlayImg = new OverlayImage();
-        this.stage.addChild(this.overlayImg.getImage());
+        this.staticStage.addChild(this.overlayImg.getImage());
 
         this.SABox = new PIXI.mesh.NineSlicePlane(new PIXI.Texture(new PIXI.BaseTexture(LoadedImageFiles["SABoxSprite.png"])), 2, 2, 2, 2);
         this.SABox.height = 960;
         this.SABox.width = 1920;
-        this.stage.addChild(this.SABox);
+        this.staticStage.addChild(this.SABox);
 
         // Buttons
         this.currBtnDown = -1;
@@ -961,8 +960,84 @@ var Editor = Class({
         this.renderer.resize(w, h);
     },
     render: function () {
-        //Tell the `this.renderer` to `render` the `this.stage`
-        this.renderer.render(this.stage);
+        //Tell the `this.renderer` to `render` the `this.mainStage`
+        this.renderer.render(this.mainStage);
+    },
+    /**
+     * Filters color passed using a brightness-saturation-contrast filter.
+     * @param {Object} param0 Color containing 'r', 'g', 'b', and 'a' ranging from 0 to 1 (inclusive).
+     * @param {Number} brightness Brightness to apply to the color.
+     * @param {Number} saturation Saturation to apply to the color.
+     * @param {Number} contrast Contrast to apply to the color.
+     * @param {Boolean} limitsRange If filtered color must not escape the 0-1 range.
+     * @returns {Object} Filtered color (containing 'r', 'g', 'b', 'a').
+     */
+    applyBSCFilter: function({ r, g, b, a }, brightness, saturation, contrast, limitsRange) {
+        let factorB = 1 + a * (brightness - 1);
+        let r1 = r * factorB;
+        let g1 = g * factorB;
+        let b1 = b * factorB;
+        let intensity = 0.2125 * r1 + 0.7154 * g1 + 0.0721 * b1;
+        let factorS = 1 + a * (saturation - 1);
+        let r2 = intensity * (1 - factorS) + r1 * factorS;
+        let g2 = intensity * (1 - factorS) + g1 * factorS;
+        let b2 = intensity * (1 - factorS) + b1 * factorS;
+        let factorC = 1 + a * (contrast - 1);
+        let r3 = 0.5 * (1 - factorC) + r2 * factorC;
+        let g3 = 0.5 * (1 - factorC) + g2 * factorC;
+        let b3 = 0.5 * (1 - factorC) + b2 * factorC;
+        let numDecimals = 16;
+        let scale = Math.pow(10, numDecimals);
+        let color = {
+            r: Math.round(r3 * scale) / scale,
+            g: Math.round(g3 * scale) / scale,
+            b: Math.round(b3 * scale) / scale,
+            a: a
+        };
+        if (limitsRange) return color;
+        return {
+            r: (color.r < 0) ? 0 : color.r,
+            g: (color.g < 0) ? 0 : color.g,
+            b: (color.b < 0) ? 0 : color.b,
+            a: a
+        };
+    },
+    /**
+     * Gets the color that results in the parameter color passed
+     * after going through a specific brightness-saturation-contrast filter.
+     * @param {Object} param0 Color containing 'r', 'g', 'b', and 'a' ranging from 0 to 1 (inclusive).
+     * @param {Number} brightness Brightness that will be applied to the result color.
+     * @param {Number} saturation Saturation that will be applied to the result color.
+     * @param {Number} contrast Contrast that will be applied to the result color.
+     * @param {Boolean} limitsRange If filtered color must not escape the 0-1 range.
+     * @returns {Object} Color that results in the first parameter
+     * after being filtered (containing 'r', 'g', 'b', 'a').
+     */
+    applyInverseBSCFilter: function({ r, g, b, a }, brightness, saturation, contrast, limitsRange) {
+        let factorB = 1 + a * (brightness - 1);
+        let factorS = 1 + a * (saturation - 1);
+        let factorC = 1 + a * (contrast - 1);
+        let alpha = -(0.5 * (1 - factorC));
+        let beta = ((0.7154 * (r - g)) + (0.0721 * (r - b))) * (1 - factorS) / factorS;
+        let gamma = factorB * factorC
+        let invR = (r + alpha + beta) / gamma;
+        let invG = invR + (g - r) / (factorB * factorS * factorC);
+        let invB = invR + (b - r) / (factorB * factorS * factorC);
+        let numDecimals = 16;
+        let scale = Math.pow(10, numDecimals);
+        let color = {
+            r: Math.round(invR * scale) / scale,
+            g: Math.round(invG * scale) / scale,
+            b: Math.round(invB * scale) / scale,
+            a: a
+        };
+        if (limitsRange) return color;
+        return {
+            r: (color.r < 0) ? 0 : (color.r > 1) ? 1 : color.r,
+            g: (color.g < 0) ? 0 : (color.g > 1) ? 1 : color.g,
+            b: (color.b < 0) ? 0 : (color.b > 1) ? 1 : color.b,
+            a: a
+        };
     },
     updateSize: function () {
         $('#canvascontainer').panzoom("zoom", this.zoom);
@@ -1029,8 +1104,8 @@ var Editor = Class({
             'color: #a6cd94', 'color: #d5d5d5', this.layers.length, MAX_NUM_LAYERS);
             return null;
         }
-        // Check if valid index (there are length-2 layers in editor + SA Box and Overlay)
-        if (index < 0 || index > this.stage.children.length - 2) {
+        // Check if valid index
+        if (index < 0 || index > this.stage.children.length) {
             console.error(
                 '%cEditor (%O):%c Could not add layer %O to editor because'
                 + 'provided index (%i) is invalid.',
@@ -1040,17 +1115,15 @@ var Editor = Class({
         var quad = this.createLayer(layer);
         var layerData = { layer: layer, quad: quad };
         // Check if layer is at the bottom
-        if (index === undefined || index == this.stage.children.length - 2) {
+        if (index === undefined || index == this.stage.children.length) {
             // Add quad to bottom
             this.stage.addChildAt(quad, 0);
             // save layer data in top-down order (last index is the bottom)
             this.layers.push(layerData);
         }
         else {
-            // Add quad to specified position (index [length-3] = top, index [0] = bottom)
-            // (index [length-1] = SA Box) => should never change
-            // (index [length-2] = Overlay Image) => should never change
-            this.stage.addChildAt(quad, this.stage.children.length - 2 - index);
+            // Add quad to specified position (index [length-1] = top, index [0] = bottom)
+            this.stage.addChildAt(quad, this.stage.children.length - index);
             // save layer data in top-down order (index 0 is the topmost)
             this.layers.splice(index, 0, layerData);
         }
@@ -1198,7 +1271,7 @@ var Editor = Class({
             return null;
         }
 
-        this.stage.removeChildAt(this.stage.children.length - 3 - index);
+        this.stage.removeChildAt(this.stage.children.length - 1 - index);
         var layerData = this.layers[index];
         this.layers.splice(index, 1);
 
@@ -1225,8 +1298,7 @@ var Editor = Class({
             return null;
         }
         // Remove top layer in editor
-        // (index = length-2 because SA Box, the topmost layer, is at length-1)
-        this.stage.removeChildAt(this.stage.children.length - 3);
+        this.stage.removeChildAt(this.stage.children.length);
         // Remove top layer data (at index 0 due to top-down ordering)
         var layerData = this.layers[0];
         this.layers.splice(0, 1);
@@ -1716,9 +1788,6 @@ var Editor = Class({
         this.stage.removeChildren();
         this.layers = [];
 
-        // Add control layers on top
-        this.stage.addChild(this.overlayImg.getImage());
-        this.stage.addChild(this.SABox);
         // Then add existing symbols below it
         refreshGroupDisplay(this.mainGroup, this);
 
