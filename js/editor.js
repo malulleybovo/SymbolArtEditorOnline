@@ -994,7 +994,7 @@ var Editor = Class({
             b: Math.round(b3 * scale) / scale,
             a: a
         };
-        if (limitsRange) return color;
+        if (!limitsRange) return color;
         return {
             r: (color.r < 0) ? 0 : color.r,
             g: (color.g < 0) ? 0 : color.g,
@@ -1031,7 +1031,7 @@ var Editor = Class({
             b: Math.round(invB * scale) / scale,
             a: a
         };
-        if (limitsRange) return color;
+        if (!limitsRange) return color;
         return {
             r: (color.r < 0) ? 0 : (color.r > 1) ? 1 : color.r,
             g: (color.g < 0) ? 0 : (color.g > 1) ? 1 : color.g,
