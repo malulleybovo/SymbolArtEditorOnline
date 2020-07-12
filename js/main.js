@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /***********************/
-var APP_VER = '1.4.0';
+var APP_VER = '1.5.0';
 /***********************/
 
 var imgWidth = 176;
@@ -706,24 +706,55 @@ function initUI() {
             alertManager.pushAlert('Redid symbol recolor');
         },
         ['layer', 'oldColor', 'newColor']);
-    let switchGroupColors = function (ctx) {
-        let editor = $('canvas')[0].editor;
-        for (var i = ctx.startIdx; i < ctx.endIdx; i++) {
-            if (!editor.layers[i]) continue;
-            let layer = editor.layers[i].layer;
-            let color = ctx.origColors[i - ctx.startIdx];
-            ctx.origColors[i - ctx.startIdx] = layer.color;
-            layer.color = color;
-            editor.updateLayer(layer);
-        }
-        editor.render();
-        alertManager.pushAlert('Undid symbol group recolor');
-    }
     historyManager
         .registerUndoAction('symbol_grouprecolor',
-        switchGroupColors, // UNDO symbol_grouprecolor
-        switchGroupColors, // REDO symbol_grouprecolor
-        ['startIdx', 'endIdx', 'origColors']);
+        function (ctx) { // UNDO symbol_grouprecolor
+            let editor = $('canvas')[0].editor;
+            for (var i = ctx.startIdx; i < ctx.endIdx; i++) {
+                if (!editor.layers[i]) continue;
+                let layer = editor.layers[i].layer;
+                let color = ctx.origColors[i - ctx.startIdx];
+                layer.color = color;
+                editor.updateLayer(layer);
+            }
+            if (editor.groupMoving) {
+                editor.groupMoving.origColor = ctx.origColors.slice(0);
+            }
+            GroupEditBox.lockColorChanges = true;
+            GroupEditBox.hueCtrl.setValue(0);
+            GroupEditBox.satCtrl.setValue(0);
+            GroupEditBox.lightCtrl.setValue(0);
+            GroupEditBox.redCtrl.setValue(0);
+            GroupEditBox.greenCtrl.setValue(0);
+            GroupEditBox.blueCtrl.setValue(0);
+            GroupEditBox.lockColorChanges = false;
+            editor.render();
+            alertManager.pushAlert('Undid symbol group recolor');
+        },
+        function (ctx) { // REDO symbol_grouprecolor
+            let editor = $('canvas')[0].editor;
+            for (var i = ctx.startIdx; i < ctx.endIdx; i++) {
+                if (!editor.layers[i]) continue;
+                let layer = editor.layers[i].layer;
+                let color = ctx.newColors[i - ctx.startIdx];
+                layer.color = color;
+                editor.updateLayer(layer);
+            }
+            if (editor.groupMoving) {
+                editor.groupMoving.origColor = ctx.newColors.slice(0);
+            }
+            GroupEditBox.lockColorChanges = true;
+            GroupEditBox.hueCtrl.setValue(0);
+            GroupEditBox.satCtrl.setValue(0);
+            GroupEditBox.lightCtrl.setValue(0);
+            GroupEditBox.redCtrl.setValue(0);
+            GroupEditBox.greenCtrl.setValue(0);
+            GroupEditBox.blueCtrl.setValue(0);
+            GroupEditBox.lockColorChanges = false;
+            editor.render();
+            alertManager.pushAlert('Redid symbol group recolor');
+        },
+        ['startIdx', 'endIdx', 'origColors', 'newColors']);
     historyManager
         .registerUndoAction('symbol_changealpha',
         function (ctx) { // UNDO symbol_changealpha

@@ -77,7 +77,7 @@ img {
   user-select: none;
 }
 
-.has-slider input{
+.has-slider input:not(.shows-value) {
     visibility: hidden;
     width: 0 !important;
 }
