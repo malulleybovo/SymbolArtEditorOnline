@@ -160,8 +160,6 @@ class SARFileUtils {
             symbol.isHidden = !properties.visible;
             if (UIApplication.shared.supports({ asset: symbol.asset })) {
                 symbolArt.root.add({ sublayer: symbol });
-            } else {
-                console.log('test')
             }
         }
         return symbolArt;

@@ -114,7 +114,6 @@ class Symbol3D extends Layer3D {
             if (!Symbol3D._unfocusedMaterials[this._materialKey]) {
                 let clone = this._shape.material.clone();
                 clone.opacity /= 4;
-                console.log(7)
                 Symbol3D._unfocusedMaterials[this._materialKey] = {
                     references: [this],
                     material: clone
