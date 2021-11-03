@@ -1,85 +1,137 @@
+﻿<!--
+/**
+ *
+ * @licstart  The following is the entire license notice for the
+ *  JavaScript code in this page.
+ *
+ * Copyright (C) 2021  Arthur Malulley B. de O.
+ *
+ *
+ * The JavaScript code in this page is free software: you can
+ * redistribute it and/or modify it under the terms of the GNU
+ * General Public License (GNU GPL) as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option)
+ * any later version.  The code is distributed WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+ *
+ * As additional permission under GNU GPL version 3 section 7, you
+ * may distribute non-source (e.g., minimized or compacted) forms of
+ * that code without the copy of the GNU GPL normally required by
+ * section 4, provided you include this license notice and a URL
+ * through which recipients can access the Corresponding Source.
+ *
+ * @licend  The above is the entire license notice
+ * for the JavaScript code in this page.
+ *
+ */
+-->
+<!doctype html>
 <html>
-    <head>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-108907121-1"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
+<head>
+    <title>Symbol Art Editor</title>
+    <meta charset="utf-8">
+    <meta name="author" content="malulleybovo @GitHub (since 2021)" />
+    <meta name="description" content="Pseudo-vector image creator inspired in the image editor from PSO2. Craft images made out of symbols with fluidity and agility." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="res/stylesheets/main.css"/>
 
-            gtag('config', 'UA-108907121-1');
-        </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="dist/main.js"></script>
 
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-        <link rel="stylesheet" href="css/themes/sa-layer-manager-theme.min.css" />
-        <link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
-        <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
-        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" type="text/javascript"></script>
-        <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-        <script src="lib/pixi.js"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WY5E04PHNM"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-        <link href="lib/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+        gtag('config', 'G-WY5E04PHNM');
+    </script>
 
-        <script src="lib/contextMenu/dist/jquery.contextMenu.min.js" type="text/javascript"></script>
-        <link href="lib/contextMenu/dist/jquery.contextMenu.min.css" rel="stylesheet" type="text/css" />
-        <script src="lib/contextMenu/dist/jquery.ui.position.min.js" type="text/javascript"></script>
+    <script src="src/model/UUID.js"></script>
+    <script src="src/model/Identifiable.js"></script>
+    <script src="src/model/UIGestureRecognizer.js"></script>
+    <script src="src/model/UITapGestureRecognizer.js"></script>
+    <script src="src/model/ViewMode.js"></script>
+    <script src="src/model/TriggerType.js"></script>
+    <script src="src/model/InteractionType.js"></script>
+    <script src="src/model/ApplicationState.js"></script>
+    <script src="src/model/HistoryState.js"></script>
+    <script src="src/model/Color.js"></script>
+    <script src="src/model/Point.js"></script>
+    <script src="src/model/Origin.js"></script>
+    <script src="src/model/Size.js"></script>
+    <script src="src/model/Layer.js"></script>
+    <script src="src/model/Asset.js"></script>
+    <script src="src/model/Opacity.js"></script>
+    <script src="src/model/SymbolArtType.js"></script>
+    <script src="src/model/SoundOption.js"></script>
+    <script src="src/model/Parallelogram.js"></script>
+    <script src="src/model/Container.js"></script>
+    <script src="src/model/Symbol.js"></script>
+    <script src="src/model/SymbolArt.js"></script>
+    <script src="src/model/Object3DType.js"></script>
+    <script src="src/model/HelperImage.js"></script>
 
-        <script src="lib/jillix-jQuery-sidebar/src/jquery.sidebar.min.js"></script>
+    <script src="src/utils/BlowfishCrypto.js"></script>
+    <script src="src/utils/FileUtils.js"></script>
+    <script src="src/utils/PRSFileCompressor.js"></script>
+    <script src="src/utils/SARFileUtils.js"></script>
+    <script src="src/utils/SAMLFileUtils.js"></script>
 
-        <script src="lib/perfect-scrollbar/js/perfect-scrollbar.jquery.js" type="text/javascript"></script>
-        <script src="lib/perfect-scrollbar/js/perfect-scrollbar.js" type="text/javascript"></script>
-        <link href="lib/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" type="text/css" />
-        <script src="lib/perfect-scrollbar/js/font/context-menu-icons.eot" type="text/javascript"></script>
+    <script src="src/components/InputDevice.js"></script>
 
-        <script src='lib/spectrum-master/spectrum.js'></script>
-        <link rel='stylesheet' href='lib/spectrum-master/spectrum.css' />
+    <script src="src/components/engine/Text3D.js"></script>
+    <script src="src/components/engine/Button3D.js"></script>
+    <script src="src/components/engine/SymbolControls3D.js"></script>
+    <script src="src/components/engine/Layer3D.js"></script>
+    <script src="src/components/engine/Symbol3D.js"></script>
+    <script src="src/components/engine/ContainerControls3D.js"></script>
+    <script src="src/components/engine/Container3D.js"></script>
+    <script src="src/components/engine/Animation3D.js"></script>
+    <script src="src/components/engine/SelectionRectangle3D.js"></script>
+    <script src="src/components/engine/Frame3D.js"></script>
+    <script src="src/components/engine/HelperImageControls3D.js"></script>
+    <script src="src/components/engine/HelperImage3D.js"></script>
 
-        <script type="text/javascript" src="lib/dat.gui.min.js"></script>
+    <script src="src/components/ui/UIView.js"></script>
+    <script src="src/components/ui/UIHint.js"></script>
+    <script src="src/components/ui/UIModalTextField.js"></script>
+    <script src="src/components/ui/UITextFieldHelper.js"></script>
+    <script src="src/components/ui/UICollapsibleMenu.js"></script>
+    <script src="src/components/ui/UIMenu.js"></script>
+    <script src="src/components/ui/UIColorPreview.js"></script>
+    <script src="src/components/ui/UIColorPicker.js"></script>
+    <script src="src/components/ui/UIContainer.js"></script>
+    <script src="src/components/ui/UIContainerPicker.js"></script>
+    <script src="src/components/ui/UICopyrightView.js"></script>
+    <script src="src/components/ui/UIAsset.js"></script>
+    <script src="src/components/ui/UIAssetPicker.js"></script>
+    <script src="src/components/ui/UIHelperImageSettings.js"></script>
+    <script src="src/components/ui/UIActionBar.js"></script>
 
-        <script src="lib/paulkinzett-toolbar/jquery.toolbar.js"></script>
-        <link href="lib/paulkinzett-toolbar/jquery.toolbar.css" rel="stylesheet" />
+    <script src="src/view/UIOptionsView.js"></script>
+    <script src="src/view/UISoundOptionsView.js"></script>
+    <script src="src/view/UIHelperImageOptionsView.js"></script>
+    <script src="src/UIApplication.js"></script>
+    <script src="src/view/renderer/Renderer.js"></script>
+    <script src="src/view/renderer/RendererPresenter.js"></script>
+    <script src="src/view/SymbolArtPreviewView.js"></script>
 
-        <script src="lib/Blob.js-master/Blob.js"></script>
-        <script src="lib/canvas-toBlob.js-master/canvas-toBlob.js"></script>
-        <script src="lib/jquery.panzoom-master/dist/jquery.panzoom.js"></script>
-        <script src="lib/FileSaver.js-master/FileSaver.js"></script>
-
-        <script src="lib/intro.js-2.7.0/minified/intro.min.js"></script>
-        <link href="lib/intro.js-2.7.0/minified/introjs.min.css" rel="stylesheet">
-        <link href="lib/intro.js-2.7.0/themes/introjs-modern.css" rel="stylesheet">
-
-        <link rel="stylesheet" href="css/style.css" />
-        <link rel="stylesheet" href="css/SAIcons.css" />
-
-        <script src="res/parts.js"></script>
-        <script src="js/class.js"></script>
-        <script src="js/alertManager.js"></script>
-        <script src="js/vector.js"></script>
-        <script src="js/layer.js"></script>
-        <script src="js/group.js"></script>
-        <script src="js/overlayImage.js"></script>
-        <script src="js/sarloader.js"></script>
-        <script src="js/samlloader.js"></script>
-        <script src="js/toolbar.js"></script>
-        <script src="js/selectmenu.js"></script>
-        <script src="js/partselectmenu.js"></script>
-        <script src="js/bgeselectmenu.js"></script>
-        <script src="js/bgemanager.js"></script>
-        <script src="js/contextMenus.js"></script>
-        <script src="js/historyManager.js"></script>
-        <script src="js/groupEditBox.js"></script>
-        <script src="js/symbolPicker.js"></script>
-        <script src="js/layermankeynav.js"></script>
-        <script src="js/list.js"></script>
-        <script src="js/layerctrl.js"></script>
-        <script src="js/editor.js"></script>
-        <script src="js/main.js"></script>
-
-        <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
-    </head>
-
-    <body style="touch-action: none;">
-        <div class="landing no-highlight no-panning"></div>
-        <div data-role="page" data-theme="a" id="canvasctrl" class="sidebar left layer2 no-panning" style="touch-action: none;"></div>
-    </body>
+    <script src="src/utils/SupportChecker.js"></script>
+</head>
+<body class="disable-select" style="margin: 0;touch-action: none;overflow: hidden;font-family: Verdana;color: white;background: #3c3c3c;" oncontextmenu="return false;">
+    <noscript>
+        <p class="disable-select" style="margin: 20px;text-align: center;">Oops, it seems JavaScript is disabled for this website. Make sure JavaScript is enabled and try again.</p>
+    </noscript>
+    <div id="landing" style="z-index: 1000;position: absolute;left: 0;right: 0;top: 0;bottom: 0;background: #3c3c3c;transition: 0.2s;opacity: 0;">
+        <div style="position: absolute;left: 50%;top: 50%;transform: translate(-50%, -50%);text-align: center;font-weight: bold;">
+            <span style="font-size: 32px;">SYMBOL ART EDITOR</span>
+            <div style="margin-top: 75px;height: 10px;border-radius: 6px;overflow: hidden;background: #5d5d5d;">
+                <div id="progressindicator" style="position: absolute;background: white;border-radius: 5px;border: 1px solid #5d5d5d;height: 8px;left: 0;bottom: 0;right: 100%;transition: 0.4s;min-width: 8px;opacity: 0;"></div>
+            </div>
+        </div>
+    </div>
+</body>
 </html>

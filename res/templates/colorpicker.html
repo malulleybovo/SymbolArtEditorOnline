@@ -1,0 +1,68 @@
+<div class="disable-select" style="height: 106pt;width: 281pt;position: fixed;display: inline-block;bottom: 5pt;left: -282pt;transition: all 0.1s ease-in-out 0s;">
+
+    <div style="background: #4d4d4d;opacity: 0.95;width: 100%;height: 100%;border-radius: 12pt;"></div>
+
+    <div style="position: absolute;top: 10pt;left: 10pt;">
+        <i id="backbutton" style="font-size: 24pt;" class="gradient-text fas fa-arrow-left fa-fw"></i>
+    </div>
+
+    <div style="position: absolute;bottom: 45pt;left: 15pt;">
+        <i id="coloreyedropper" style="font-size: 16pt;cursor: pointer;" class="fas fa-swatchbook fa-fw"></i>
+    </div>
+
+    <div style="position: absolute;bottom: 10pt;left: 10pt;">
+        <i id="colorpreview" style="font-size: 24pt;cursor: pointer;" class="fas fa-square fa-fw"></i>
+        <i id="copyhexindicator" style="pointer-events: none;font-size: 12pt;position: absolute;top: 8px;left: 10px;opacity: 0.75;transition: 0.1s;" class="far fa-clone fa-fw"></i>
+    </div>
+
+    <div id="colorpickercontent" style="position: absolute;top: 0;left: 40pt;right: 0;bottom: 0;">
+
+        <div id="colorwheelcontainer" style="position: absolute;left: 0pt;top: 0pt;height: 106pt;width: 106pt;">
+            <img class="disable-select" id="colorwheel" style="pointer-events: none;position: absolute;left: 10pt;top: 10pt;height: 86pt;width: 86pt;" src="res/colorwheel.png">
+            <div id="colorwheelcrosshair" style="pointer-events: none;position: absolute;top: 49pt;left: 49pt;width: 8px;height: 8px;border-radius: 8px;background: #3c3c3c;border: white 2px solid;"></div>
+        </div>
+
+        <div style="position: absolute;top: 12pt;left: 110pt;">
+            <i style="font-size: 18pt;" class="gradient-text fas fa-hashtag fa-fw"></i>
+        </div>
+        <div style="position: absolute;top: 13pt;left: 145pt;height: 15pt;width: 80pt;border: #fff 1pt solid;border-radius: 12pt;">
+            <input id="colorhextextfield" type="text" class="gradient-text" style="padding: 0;width: 100%;height: 100%;border: none;text-align: center;position: absolute;top: 0pt;left: 0pt;color: white;outline: none;font-family: Verdana;font-weight: bold;font-size: 11pt;">
+        </div>
+
+        <div style="position: absolute;top: 43pt;left: 110pt;">
+            <i style="font-size: 18pt;" class="gradient-text fas fa-paint-brush fa-fw"></i>
+        </div>
+        <div id="colorvaluecontainer" style="position: absolute;top: 44pt;left: 135pt;height: 17pt;width: 102pt;">
+            <div id="colorvalueslider" style="pointer-events: none;position: absolute;top: 0pt;left: 10pt;height: 15pt;width: 80pt;border: #fff 1pt solid;border-radius: 12pt;overflow: hidden;">
+                <div id="colorvaluesliderbar" style="pointer-events: none;height: 100%;width: 65%;background: white;background-image: linear-gradient(to right, black, #aa4000);"></div>
+            </div>
+        </div>
+
+        <div style="position: absolute;bottom: 12pt;left: 110pt;">
+            <i style="font-size: 18pt;" class="gradient-text fas fa-adjust fa-fw"></i>
+        </div>
+        <div id="alphaslidercontainer" style="position: absolute;bottom: 13pt;left: 135pt;height: 15pt;width: 102pt;">
+            <div id="alphaslider" style="pointer-events: none;position: absolute;bottom: 0pt;left: 10pt;height: 15pt;width: 80pt;border: #fff 1pt solid;border-radius: 12pt;overflow: hidden;">
+                <div id="alphasliderbar" style="pointer-events: none;height: 100%;width: 80%;background: white;background-image: linear-gradient(to right, #3c3c3c, #ccc);"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="colorpalettelist" style="visibility: hidden;position: absolute;top: 8pt;left: 50pt;bottom: 8pt;right: 10pt;overflow-x: hidden;overflow-y: scroll;scrollbar-width: thin;scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0);">
+        
+    </div>
+
+    <div id="coloreyedropperlist" style="visibility: hidden;position: absolute;top: 8pt;left: 50pt;bottom: 8pt;right: 10pt;overflow-x: hidden;overflow-y: scroll;scrollbar-width: thin;scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0);">
+
+    </div>
+
+    <div id="colorswapicon" style="visibility: hidden;position: absolute;height: 25pt;bottom: 10pt;left: 12pt;width: 26pt;">
+        <div style="position: absolute;top: 0pt;left: 0pt;width: 16pt;height: 16pt;border-radius: 3pt;background: #ff9e2c;">
+        </div><div style="position: absolute;bottom: 0pt;right: 0pt;width: 12pt;height: 12pt;border-radius: 3pt;border: 2pt solid #ff9e2c;"></div>
+        <div style="position: absolute;top: 6pt;left: 5pt;">
+            <i style="font-size: 12pt;display: block;" class="gradient-text fas fa-retweet fa-fw"></i>
+        </div>
+    </div>
+
+</div>
