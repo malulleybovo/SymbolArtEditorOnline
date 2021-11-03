@@ -33,7 +33,7 @@ class SAMLFileUtils {
     
     static async parseIntoSymbolArt({ fileDataArrayBuffer }) {
         try {
-            let rawFileContent = String.fromCharCode.apply(String, new Uint8Array(fileDataArrayBuffer));
+            let rawFileContent = (new Uint8Array(fileDataArrayBuffer)).reduce((a, b) => a + String.fromCharCode(b), '');
             rawFileContent = rawFileContent.replace(/[\u0080-\uffff]/g, '');
             let rawHelperImageContent = /<overlay-img [^>]*>/.exec(rawFileContent);
             rawHelperImageContent = rawHelperImageContent === null ? null : rawHelperImageContent[0];
@@ -153,7 +153,7 @@ class SAMLFileUtils {
                 }
             }
             try {
-                let utf8 = atob(rawSource);
+                let utf8 = atob(rawSource.replace(/^data:.*;base64,/, ''));
                 if (!(/[^\x00-\x7f]/.test(utf8))) throw new Error();
                 await symbolArt.helperImage.setImage({ fromBase64EncodedString: rawSource });
                 symbolArt.helperImage.positionX = positionX;
