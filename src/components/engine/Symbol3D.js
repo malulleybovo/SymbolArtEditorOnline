@@ -68,7 +68,7 @@ class Symbol3D extends Layer3D {
     _shapeOutline = null;
 
     _copyButton = (() => {
-        let mesh = new Button3D({ textureLocation: '../res/clone.png', backgroundColor: new Color({ hexValue: 0x808080 }) });
+        let mesh = new Button3D({ textureLocation: 'res/clone.png', backgroundColor: new Color({ hexValue: 0x808080 }) });
         mesh.position.x = -0.5 * mesh.size.width;
         mesh.position.y = -0.5 * SymbolArt.usableDimensions.height - 0.5 * mesh.size.height - 10;
         mesh.position.z = -0.5 * mesh.size.width - 5;
@@ -78,8 +78,8 @@ class Symbol3D extends Layer3D {
     get copyButton() { return this._copyButton }
 
     _hideShowButton = (() => {
-        let mesh = new Button3D({ textureLocation: '../res/eyeOpen.png', backgroundColor: new Color({ hexValue: 0x808080 }) });
-        mesh.setTexture({ atLocation: '../res/eyeClosed.png', backgroundColor: new Color({ hexValue: 0xCA3433 }), forState: Button3D.State.selected });
+        let mesh = new Button3D({ textureLocation: 'res/eyeOpen.png', backgroundColor: new Color({ hexValue: 0x808080 }) });
+        mesh.setTexture({ atLocation: 'res/eyeClosed.png', backgroundColor: new Color({ hexValue: 0xCA3433 }), forState: Button3D.State.selected });
         mesh.position.x = -0.5 * mesh.size.width;
         mesh.position.y = -0.5 * SymbolArt.usableDimensions.height - 0.5 * mesh.size.height - 10;
         mesh.position.z = 0.5 * mesh.size.width + 5;

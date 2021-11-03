@@ -53,26 +53,26 @@ class SymbolControls3D extends THREE.Group {
 
     _shapeAttached = null;
 
-    _rotateControl = new Button3D({ textureLocation: '../res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
+    _rotateControl = new Button3D({ textureLocation: 'res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
     get rotationControlPosition() { return this._rotateControl.position }
 
-    _resizeControl = new Button3D({ textureLocation: '../res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
+    _resizeControl = new Button3D({ textureLocation: 'res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
 
-    _topLeftControl = new Button3D({ textureLocation: '../res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
+    _topLeftControl = new Button3D({ textureLocation: 'res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
 
-    _topControl = new Button3D({ textureLocation: '../res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
+    _topControl = new Button3D({ textureLocation: 'res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
 
-    _topRightControl = new Button3D({ textureLocation: '../res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
+    _topRightControl = new Button3D({ textureLocation: 'res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
 
-    _rightControl = new Button3D({ textureLocation: '../res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
+    _rightControl = new Button3D({ textureLocation: 'res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
 
-    _bottomRightControl = new Button3D({ textureLocation: '../res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
+    _bottomRightControl = new Button3D({ textureLocation: 'res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
 
-    _bottomControl = new Button3D({ textureLocation: '../res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
+    _bottomControl = new Button3D({ textureLocation: 'res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
 
-    _bottomLeftControl = new Button3D({ textureLocation: '../res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
+    _bottomLeftControl = new Button3D({ textureLocation: 'res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
 
-    _leftControl = new Button3D({ textureLocation: '../res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
+    _leftControl = new Button3D({ textureLocation: 'res/dot.png', backgroundColor: new Color({ hexValue: 0xf2f2f2 }), depthTest: false });
 
     get controls() {
         let controls = [

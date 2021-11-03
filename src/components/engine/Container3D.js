@@ -59,7 +59,7 @@ class Container3D extends Layer3D {
     get nameText() { return this._nameText }
 
     _copyButton = (() => {
-        let mesh = new Button3D({ textureLocation: '../res/clone.png', backgroundColor: new Color({ hexValue: 0x808080 }) });
+        let mesh = new Button3D({ textureLocation: 'res/clone.png', backgroundColor: new Color({ hexValue: 0x808080 }) });
         mesh.position.x = -0.5 * mesh.size.width;
         mesh.position.y = -2.5 - 0.5 * mesh.size.height;
         return mesh;
@@ -67,8 +67,8 @@ class Container3D extends Layer3D {
     get copyButton() { return this._copyButton }
 
     _hideShowButton = (() => {
-        let hideButtonMesh = new Button3D({ textureLocation: '../res/eyeOpen.png', backgroundColor: new Color({ hexValue: 0x808080 }) });
-        hideButtonMesh.setTexture({ atLocation: '../res/eyeClosed.png', backgroundColor: new Color({ hexValue: 0xCA3433 }), forState: Button3D.State.selected });
+        let hideButtonMesh = new Button3D({ textureLocation: 'res/eyeOpen.png', backgroundColor: new Color({ hexValue: 0x808080 }) });
+        hideButtonMesh.setTexture({ atLocation: 'res/eyeClosed.png', backgroundColor: new Color({ hexValue: 0xCA3433 }), forState: Button3D.State.selected });
         hideButtonMesh.position.x = -0.5 * hideButtonMesh.size.width;
         hideButtonMesh.position.y = -2.5 - 0.5 * hideButtonMesh.size.height;
         return hideButtonMesh;
