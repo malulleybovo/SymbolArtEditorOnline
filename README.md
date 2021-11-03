@@ -3,7 +3,7 @@
   # Symbol Art Editor
   Pseudo-vector image creator.
 
-  ## [Launch Application](https://https://malulleybovo.github.io/SymbolArtEditorOnline/)
+  ## [Launch Application](https://malulleybovo.github.io/SymbolArtEditorOnline/)
   #### Version 2.0.0
 
   ### Quickly get down to business and make art with fluidity and agility.
