@@ -53,7 +53,8 @@ class UIOptionsView extends UIView {
                 targetHtmlElement: this._symbolArtTypeButton[0], onTap: () => {
                     if (UIApplication.shared.symbolArt.type === SymbolArtType.symbolArt)
                         return;
-                    UIApplication.shared.symbolArt = new SymbolArt({ type: SymbolArtType.symbolArt });
+                    UIApplication.shared.symbolArt.type = SymbolArtType.symbolArt;
+                    UIApplication.shared.symbolArt = UIApplication.shared.symbolArt; // Trigger update
                     HistoryState.shared.pushHistory({ data: UIApplication.shared.symbolArt.clone() });
                 }
             });
@@ -68,7 +69,8 @@ class UIOptionsView extends UIView {
                 targetHtmlElement: this._allianceFlagTypeButton[0], onTap: () => {
                     if (UIApplication.shared.symbolArt.type === SymbolArtType.allianceFlag)
                         return;
-                    UIApplication.shared.symbolArt = new SymbolArt({ type: SymbolArtType.allianceFlag });
+                    UIApplication.shared.symbolArt.type = SymbolArtType.allianceFlag;
+                    UIApplication.shared.symbolArt = UIApplication.shared.symbolArt; // Trigger update
                     HistoryState.shared.pushHistory({ data: UIApplication.shared.symbolArt.clone() });
                 }
             });

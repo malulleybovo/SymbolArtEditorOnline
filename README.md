@@ -4,7 +4,7 @@
   Pseudo-vector image creator.
 
   ## [Launch Application](https://malulleybovo.github.io/SymbolArtEditorOnline/)
-  #### Version 2.0.0
+  #### Version 2.0.1
 
   ### Quickly get down to business and make art with fluidity and agility.
   <br>Symbol Art Editor was designed based on three pillars: simplicity, ease of use, and agility.

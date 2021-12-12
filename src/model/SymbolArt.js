@@ -57,14 +57,10 @@ class SymbolArt {
                 case SymbolArtType.symbolArt:
                     shouldUpdateDimensions = SymbolArt.viewableDimensions.width !== 191 * SymbolArt.scaling;
                     SymbolArt.viewableDimensions = new Size({ width: 191 * SymbolArt.scaling, height: 95 * SymbolArt.scaling });
-                    SymbolArt.maximumNumberOfSymbols = 225;
-                    SymbolArt.maximumNumberOfContainers = 100;
                     break;
                 case SymbolArtType.allianceFlag:
                     shouldUpdateDimensions = SymbolArt.viewableDimensions.width !== 31 * SymbolArt.scaling;
                     SymbolArt.viewableDimensions = new Size({ width: 31 * SymbolArt.scaling, height: 31 * SymbolArt.scaling });
-                    SymbolArt.maximumNumberOfSymbols = 25;
-                    SymbolArt.maximumNumberOfContainers = 25;
                     break;
             }
             if (shouldUpdateDimensions && this._onTypeChanged) {
