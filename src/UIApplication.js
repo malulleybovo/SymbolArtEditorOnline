@@ -67,6 +67,9 @@ class UIApplication {
             } else if (originalColorInContainer) {
                 this._renderer.presenter.setColorForSelectedContainer({ originalColorInContainer: originalColorInContainer, hexValue: hexValue, opacity: opacity, updatesHistory: lastInteraction });
             }
+            if (lastInteraction) {
+                this._layerPicker.updateWith({ container: this._symbolArt.root });
+            }
         },
         requestedEyeDropperColors: _ => {
             this._symbolArt.helperImage.imageColors().then(colors => {
@@ -88,15 +91,55 @@ class UIApplication {
         },
         onAssetChange: (selectedAsset) => {
             this._renderer.presenter.setAssetForSelectedSymbol({ asset: selectedAsset });
+            this._layerPicker.updateWith({ container: this._symbolArt.root });
         }
     });
-    _containerPicker = new UIContainerPicker({
-        onContainerSelected: (containerUuid) => {
-            let container3D = Layer3D.layersInUse[containerUuid];
-            if (container3D instanceof Container3D) {
-                this._renderer.setSelection({ layer3D: container3D });
+    _layerPicker = new UILayerPicker({
+        onLayerSelected: (layerUuid) => {
+            let layer3D = Layer3D.layersInUse[layerUuid];
+            if (layer3D instanceof Layer3D) {
+                this._renderer.setSelection({ layer3D: layer3D });
                 this._renderer.panToSelection();
+                SymbolControls3D.shared.attach({ toSymbol3D: this._renderer.selectionGroup });
+                ContainerControls3D.shared.attach({ toContainer3D: this._renderer.selectionGroup });
+                HelperImageControls3D.shared.attach({ toHelperImage: null });
             }
+        },
+        onRenameTapped: layerUuid => {
+            let layerToRename = null;
+            this._symbolArt.root.depthFirstIterator(layer => {
+                if (layer.uuid === layerUuid) {
+                    layerToRename = layer;
+                    return true;
+                }
+            });
+            if (!(layerToRename instanceof Layer)) return;
+            new UIModalTextField({
+                title: 'Rename layer:', initialText: layerToRename.name,
+                onInput: text => { },
+                onResult: text => {
+                    if (layerToRename.name == text) return;
+                    layerToRename.name = text;
+                    this._renderer.updateWith({ symbolArt: this._symbolArt });
+                    HistoryState.shared.pushHistory({ data: this._symbolArt.clone() });
+                }
+            });
+        },
+        onDeleteTapped: layerUuid => {
+            let layerToDelete = null;
+            this._symbolArt.root.depthFirstIterator(layer => {
+                if (layer.uuid === layerUuid) {
+                    layerToDelete = layer;
+                    return true;
+                }
+            });
+            if (!(layerToDelete instanceof Layer) && layerToDelete.parent) return;
+            layerToDelete.parent.remove({ sublayer: layerToDelete });
+            this._renderer.updateWith({ symbolArt: this._symbolArt });
+            HistoryState.shared.pushHistory({ data: this._symbolArt.clone() });
+            SymbolControls3D.shared.attach({ toSymbol3D: this._renderer.selectionGroup });
+            ContainerControls3D.shared.attach({ toContainer3D: this._renderer.selectionGroup });
+            HelperImageControls3D.shared.attach({ toHelperImage: null });
         }
     });
     _helperImageSettings = new UIHelperImageSettings({
@@ -139,7 +182,10 @@ class UIApplication {
     _renderer = (() => {
         let renderer = new Renderer();
         renderer.onSymbolArtChanged = () => {
-            this._containerPicker.updateWith({ containers: this._symbolArt.root.containers });
+            this._layerPicker.updateWith({ container: this._symbolArt.root });
+            setTimeout(_ => {
+                this._layerPicker.select({ layerWithUuid: this._renderer.selectionUuid });
+            }, 10);
         };
         renderer.onSelectionChanged = (selectionUuid) => {
             let selectionLayer = this._symbolArt.findLayer({ withUuidString: selectionUuid });
@@ -149,6 +195,7 @@ class UIApplication {
             this._actionBar.setNorthEastButton({ enabled: selectedLayer, forViewMode: ViewMode.symbolEditorMode });
             this._actionBar.setEastButton({ enabled: selectedLayer, forViewMode: ViewMode.symbolEditorMode });
             this._assetPicker.assetSelectionEnabled = selectedSymbol;
+            this._layerPicker.select({ layerWithUuid: selectionUuid });
             if (!selectedLayer) return;
             if (selectedSymbol) {
                 this._assetPicker.update({
@@ -246,7 +293,7 @@ class UIApplication {
         if (!this.loaded) return;
         let $body = $('body');
         this._copyrightView.append({ to: $body });
-        this._containerPicker.append({ to: $body });
+        this._layerPicker.append({ to: $body });
         this._menu.append({ to: $body });
         this._actionBar.append({ to: $body });
         this._colorPicker.append({ to: $body });

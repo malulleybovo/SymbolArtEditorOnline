@@ -123,12 +123,51 @@ class RendererPresenter extends InputDevice {
                     ApplicationState.shared.trigger = TriggerType.none;
                     this._renderer.helperImage.greenScreenEnabled = !this._renderer.helperImage.greenScreenEnabled;
                 }
+            },
+            onChangeInteractionListener: _ => {
+                if (ApplicationState.shared.interaction === InteractionType.enablingTapHoldFeature) {
+                    ApplicationState.shared.interaction = InteractionType.none;
+                    this.longTouchesWithoutDelay = false;
+                }
+                if (ApplicationState.shared.interaction === InteractionType.disablingTapHoldFeature) {
+                    ApplicationState.shared.interaction = InteractionType.none;
+                    this.longTouchesWithoutDelay = true;
+                }
             }
         });
     }
-
+    
     tapped(event) {
-        if (ApplicationState.shared.interaction !== InteractionType.none) return;
+        if (ApplicationState.shared.viewMode === ViewMode.symbolEditorMode
+            && ApplicationState.shared.interaction === InteractionType.willCloneCurrentSelection) {
+            let layerToClone = UIApplication.shared.symbolArt.findLayer({ withUuidString: this._renderer.selectionUuid });
+            let worldPosition = this.worldVector(event);
+            let newLayer = null;
+            if (layerToClone instanceof Layer && layerToClone.parent instanceof Container) {
+                newLayer = layerToClone.clone({ retainUuid: false });
+                let container = layerToClone.parent;
+                let index = container.indexOf({ sublayer: layerToClone }) + 1;
+                container.add({ sublayer: newLayer, atIndex: index });
+            } else {
+                newLayer = new Symbol();
+                let container = UIApplication.shared.symbolArt.root;
+                container.add({ sublayer: newLayer });
+            }
+            if (newLayer instanceof Symbol) {
+                let x = newLayer.frame.origin.x + SymbolArt.scaling * Math.round((worldPosition.x - newLayer.frame.origin.x) / SymbolArt.scaling);
+                let y = newLayer.frame.origin.y + SymbolArt.scaling * Math.round((worldPosition.y - newLayer.frame.origin.y) / SymbolArt.scaling);
+                newLayer.frame.origin = new Origin({ x: x, y: y });
+            } else if (newLayer instanceof Container) {
+                newLayer.origin = new Origin({ x: worldPosition.x, y: worldPosition.y });
+            }
+            ApplicationState.shared.interaction = InteractionType.none;
+            this._renderer.updateWith({ symbolArt: UIApplication.shared.symbolArt });
+            this._renderer.setSelection({ layer3D: Object.values(Layer3D.layersInUse).filter(a => a.layerUuid === newLayer.uuid)[0] });
+            SymbolControls3D.shared.attach({ toSymbol3D: this._renderer.selectionGroup });
+            ContainerControls3D.shared.attach({ toContainer3D: this._renderer.selectionGroup });
+            HelperImageControls3D.shared.attach({ toHelperImage: null });
+            HistoryState.shared.pushHistory({ data: UIApplication.shared.symbolArt.clone() });
+        } else if (ApplicationState.shared.interaction !== InteractionType.none) return;
         if (ApplicationState.shared.viewMode === ViewMode.layerEditorMode) {
             this._renderer.touched({ screenPosition: this.normalizedVector(event), hitsLayers: true, hitsControls: false });
             if (this._renderer.selectionUuid) {
@@ -141,7 +180,7 @@ class RendererPresenter extends InputDevice {
             this._updateSymbolColorGuess();
         }
     }
-
+    
     touchBegan(event, count) {
         if (count > 1) return;
         this._initialEvent = event;
@@ -912,10 +951,24 @@ class RendererPresenter extends InputDevice {
         } else if ((event.ctrlKey || event.metaKey) && (event.code === 'Minus' || event.keyCode === 189)) {
             event.preventDefault();
             this._renderer.zoom *= 0.95;
+        } else {
+            if (!this.longTouchesWithoutDelay && (event.key === "Shift" || event.keyCode === 16)) {
+                ApplicationState.shared.interaction = InteractionType.disablingTapHoldFeature;
+            } else if (ApplicationState.shared.viewMode === ViewMode.symbolEditorMode && (event.key === "Control" || event.keyCode === 17) && ApplicationState.shared.interaction !== InteractionType.willCloneCurrentSelection) {
+                ApplicationState.shared.interaction = InteractionType.willCloneCurrentSelection;
+            } else if (ApplicationState.shared.interaction === InteractionType.willCloneCurrentSelection && !(event.key === "Control" || event.keyCode === 17)) {
+                ApplicationState.shared.interaction = InteractionType.none;
+            }
         }
     }
 
     pressedKey(event) {
+        if (ApplicationState.shared.interaction === InteractionType.willCloneCurrentSelection) {
+            ApplicationState.shared.interaction = InteractionType.none;
+        }
+        if (this.longTouchesWithoutDelay && (event.key === "Shift" || event.keyCode === 16)) {
+            ApplicationState.shared.interaction = InteractionType.enablingTapHoldFeature;
+        }
         if (!event || ApplicationState.shared.interaction !== InteractionType.none || this._renderer.hasOngoingAnimations) return;
         if (event.code === 'Space' || event.keyCode === 32) {
             ApplicationState.shared.trigger = TriggerType.none;
@@ -934,6 +987,10 @@ class RendererPresenter extends InputDevice {
         } else if (((event.ctrlKey || event.metaKey) && (event.code === 'KeyY' || event.keyCode === 89))
             || ((event.ctrlKey || event.metaKey) && event.shiftKey && (event.code === 'KeyZ' || event.keyCode === 90))) {
             HistoryState.shared.redo();
+        } else if (event.code === 'ArrowUp' || event.keyCode === 38) {
+            this._selectNextLayer();
+        } else if (event.code === 'ArrowDown' || event.keyCode === 40) {
+            this._selectPreviousLayer();
         }
     }
 
@@ -1119,6 +1176,7 @@ class RendererPresenter extends InputDevice {
                 if (layer.name == text) return;
                 layer.name = text;
                 this._renderer.updateWith({ symbolArt: UIApplication.shared.symbolArt });
+                HistoryState.shared.pushHistory({ data: UIApplication.shared.symbolArt.clone() });
             }
         });
     }
@@ -1238,6 +1296,43 @@ class RendererPresenter extends InputDevice {
                 this._colorValueOfRecentSymbol = symbol.color.value;
             }
         }
+    }
+    
+    _selectNextLayer() {
+        let foundCurrentlySelected = false;
+        let layers = [];
+        UIApplication.shared.symbolArt.root.reverseDepthFirstIterator(layer => {
+            layers.push(layer);
+        });
+        for (var index = layers.length - 1; index >= 0; index--) {
+            let layer = layers[index];
+            if (foundCurrentlySelected) {
+                this._renderer.setSelection({ layer3D: Object.values(Layer3D.layersInUse).filter(a => a.layerUuid === layer.uuid)[0] });
+                SymbolControls3D.shared.attach({ toSymbol3D: this._renderer.selectionGroup });
+                ContainerControls3D.shared.attach({ toContainer3D: this._renderer.selectionGroup });
+                HelperImageControls3D.shared.attach({ toHelperImage: null });
+                break;
+            }
+            if (layer.uuid === this._renderer.selectionUuid) {
+                foundCurrentlySelected = true;
+            }
+        }
+    }
+    
+    _selectPreviousLayer() {
+        let foundCurrentlySelected = false;
+        UIApplication.shared.symbolArt.root.reverseDepthFirstIterator(layer => {
+            if (foundCurrentlySelected) {
+                this._renderer.setSelection({ layer3D: Object.values(Layer3D.layersInUse).filter(a => a.layerUuid === layer.uuid)[0] });
+                SymbolControls3D.shared.attach({ toSymbol3D: this._renderer.selectionGroup });
+                ContainerControls3D.shared.attach({ toContainer3D: this._renderer.selectionGroup });
+                HelperImageControls3D.shared.attach({ toHelperImage: null });
+                return true;
+            }
+            if (layer.uuid === this._renderer.selectionUuid) {
+                foundCurrentlySelected = true;
+            }
+        });
     }
 
 }

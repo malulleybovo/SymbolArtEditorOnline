@@ -114,5 +114,11 @@ class UIView extends UUID {
             });
         });
     }
+    
+    remove() {
+        this.didLoad(_ => {
+            this.view.remove();
+        });
+    }
 
 }

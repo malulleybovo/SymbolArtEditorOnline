@@ -33,6 +33,8 @@ class UIMenu extends UIView {
 
     get viewPath() { return 'res/templates/menu.html' }
 
+    _tapHoldEnabled = true;
+
     _collapsibleMenu = new UICollapsibleMenu();
 
     _ellipsisButton = (() => {
@@ -41,6 +43,21 @@ class UIMenu extends UIView {
             this._ellipsisButton.gestureRecognizer = new UITapGestureRecognizer({
                 targetHtmlElement: this._ellipsisButton[0], onTap: () => {
                     this._collapsibleMenu.toggle();
+                }
+            });
+        });
+    })();
+    
+    _tapHoldToggleButton = (() => {
+        this.didLoad(_ => {
+            this._tapHoldToggleButton = this.view.find('#tapholdtogglebutton');
+            this._tapHoldToggleButton.gestureRecognizer = new UITapGestureRecognizer({
+                targetHtmlElement: this._tapHoldToggleButton[0], onTap: () => {
+                    if (!this._tapHoldEnabled) {
+                        ApplicationState.shared.interaction = InteractionType.enablingTapHoldFeature;
+                    } else {
+                        ApplicationState.shared.interaction = InteractionType.disablingTapHoldFeature;
+                    }
                 }
             });
         });
@@ -89,6 +106,16 @@ class UIMenu extends UIView {
         ApplicationState.shared.add({
             onChangeViewModeListener: () => {
                 this.updateState();
+            },
+            onChangeInteractionListener: () => {
+                if (ApplicationState.shared.interaction === InteractionType.enablingTapHoldFeature) {
+                    this._tapHoldEnabled = true;
+                    this.updateState();
+                }
+                if (ApplicationState.shared.interaction === InteractionType.disablingTapHoldFeature) {
+                    this._tapHoldEnabled = false;
+                    this.updateState();
+                }
             }
         });
         HistoryState.shared.add({
@@ -109,6 +136,7 @@ class UIMenu extends UIView {
             this._redoButton.css('opacity', HistoryState.shared.isAtMostRecentState ? '0.5' : '1');
             this._symbolArtTypeLabel.text(UIApplication.shared.symbolArt.type === SymbolArtType.symbolArt ? 'SYMBOL ART' : 'TEAM FLAG');
             this._symbolArtTypeLabel.css('opacity', window.innerWidth < 460 && ApplicationState.shared.viewMode === ViewMode.layerEditorMode ? '0' : '');
+            this._tapHoldToggleButton.css('color', this._tapHoldEnabled ? 'white' : '#ff9e2c');
         });
     }
 

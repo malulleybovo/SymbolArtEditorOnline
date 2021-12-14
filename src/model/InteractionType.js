@@ -49,6 +49,9 @@ class InteractionType {
     static reshapingHelperImageDidBegin = 15;
     static reshapingContainerWillBegin = 16;
     static reshapingContainerDidBegin = 17;
+    static willCloneCurrentSelection = 18;
+    static enablingTapHoldFeature = 19;
+    static disablingTapHoldFeature = 20;
 
     static valid({ rawValue }) {
         switch (rawValue) {
@@ -70,6 +73,9 @@ class InteractionType {
             case InteractionType.reshapingHelperImageDidBegin:
             case InteractionType.reshapingContainerWillBegin:
             case InteractionType.reshapingContainerDidBegin:
+            case InteractionType.willCloneCurrentSelection:
+            case InteractionType.enablingTapHoldFeature:
+            case InteractionType.disablingTapHoldFeature:
                 return true;
             default:
                 return false;

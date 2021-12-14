@@ -110,6 +110,7 @@ class Symbol extends Layer {
 
     clone({ retainUuid = true } = { }) {
         let clone = new Symbol({
+            name: this.name,
             origin: new Origin({ x: this.frame.origin.x, y: this.frame.origin.y }),
             sizeOfDiagonalAC: this.frame.sizeOfDiagonalAC,
             sizeOfDiagonalBD: this.frame.sizeOfDiagonalBD,

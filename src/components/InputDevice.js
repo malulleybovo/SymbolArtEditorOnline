@@ -39,11 +39,21 @@ class InputDevice {
     _tapDuration = 500;
     _tapTimeout = null;
 
-    _longTapDuration = 750;
+    _longTapDuration = 600;
     _longTapTimeout = null;
 
     _longStart = false;
     get longStart() { return this._longStart }
+
+    _longTouchesWithoutDelay = false;
+    get longTouchesWithoutDelay() {
+        return this._longTouchesWithoutDelay;
+    }
+    set longTouchesWithoutDelay(value) {
+        if (typeof value === 'boolean') {
+            this._longTouchesWithoutDelay = value;
+        }
+    }
 
     _previousPinchLength = -1;
 
@@ -89,7 +99,7 @@ class InputDevice {
                 this._longTapTimeout = null;
                 this._longStart = true;
                 this.longTouchBegan(longEvent);
-            }, this._longTapDuration);
+            }, this._longTouchesWithoutDelay ? 25 : this._longTapDuration);
         }
         this.touchBegan(event, this._activeTouchEvents.length);
     }
@@ -147,6 +157,19 @@ class InputDevice {
 
     _interactionEnded(event) {
         if (!UIApplication.shared.loaded) return;
+        let longStart = this._longStart;
+        if (this._longTapTimeout !== null) {
+            if (this._longTouchesWithoutDelay) {
+                setTimeout(_ => {
+                    this._interactionEnded(event);
+                });
+                return;
+            } else {
+                clearTimeout(this._longTapTimeout);
+                this._longTapTimeout = null;
+                this._longStart = false;
+            }
+        }
         if (event && event.type === 'blur') {
             this._activeTouchEvents = [];
         }
@@ -165,15 +188,10 @@ class InputDevice {
         }
         this._activeEventState = 0;
         this._originalTouchEvent = null;
-        if (this._longStart) {
+        if (longStart) {
             this.longTouchEnded(event);
         } else {
             this.touchEnded(event);
-        }
-        if (this._longTapTimeout !== null) {
-            clearTimeout(this._longTapTimeout);
-            this._longTapTimeout = null;
-            this._longStart = false;
         }
     }
 

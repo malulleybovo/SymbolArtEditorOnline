@@ -407,6 +407,7 @@ class UIColorPicker extends UIView {
             }
         });
         this._colorPaletteList.empty();
+        this._colorPalette.forEach(a => a.remove());
         this._colorPalette = [];
         Object.values(occurrences).forEach(a => {
             let subview = new UIColorPreview({

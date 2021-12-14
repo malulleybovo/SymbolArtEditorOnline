@@ -1,0 +1,20 @@
+<div style="margin: 4px 0px;pointer-events: all;cursor: pointer;overflow: hidden;background: #ffffff10;border-radius: 6px;position: relative;">
+    <div id="collapsebutton" style="position: absolute;left: 0;top: 0;bottom: 0;background: white;width: 12px;font-size: 10px;text-align: center;color: #3c3c3c;text-shadow: none;">
+        <i style="position: absolute;transform: translate(-50%, -50%);top: 50%;" class="fas fa-angle-down"></i>
+    </div>
+    <div id="symbolpreview" style="position: absolute;left: 0;top: 0;bottom: 0;width: 24px;">
+        <svg style="position: absolute;width: 16px;height: 16px;left: 50%;top: 50%;transform: translate(-50%, -50%);">
+            <filter id="placeholderid" color-interpolation-filters="sRGB">
+                <feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0"></feColorMatrix>
+            </filter>
+            <image filter="url(#placeholderid)" href="" style="width: 100%;"></image>
+        </svg>
+    </div>
+    <div id="textview" style="margin-left: 20px;margin-right: 40px;margin-top: 2px;margin-bottom: 4px;padding-left: 4px;"></div>
+    <div id="renamebutton" style="position: absolute;right: 20px;top: 0;bottom: 0;width: 20px;font-size: 10px;text-align: center;color: white;text-shadow: none;">
+        <i class="fas fa-pen" style="position: absolute;transform: translate(-50%, -50%);top: 50%;"></i>
+    </div>
+    <div id="deletebutton" style="position: absolute;right: 0;top: 0;bottom: 0;width: 20px;font-size: 10px;text-align: center;color: white;text-shadow: none;">
+        <i style="position: absolute;transform: translate(-50%, -50%);top: 50%;" class="fas fa-trash"></i>
+    </div>
+</div>

@@ -90,6 +90,11 @@ class UIModalTextField extends UIView {
                     // to prevent propagation
                 }
             });
+            this._textField.on('keyup', event => {
+                if (event.key === 'Enter' || event.keyCode === 13) {
+                    this._close();
+                }
+            });
         });
     })();
 

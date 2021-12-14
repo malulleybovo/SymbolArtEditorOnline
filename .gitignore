@@ -1,3 +1,5 @@
 .vs/*
 node_modules/*
 *.stg
+package-lock.json
+package.json

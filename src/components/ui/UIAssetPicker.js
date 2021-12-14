@@ -206,7 +206,6 @@ class UIAssetPicker extends UIView {
             this._assetPreview.attr('src', '');
             return;
         }
-        this._assetSelected({ uiAsset: this._catalog[asset.filePath].uiAsset });
     }
 
     updateState() {

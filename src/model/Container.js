@@ -34,16 +34,31 @@ class Container extends Layer {
     static maximumDepth = 5;
     
     get origin() {
-        let containerOrigin = new Origin();
+        let x = 0;
+        let y = 0;
         let origins = this.symbols.map(a => a.frame.origin);
         for (var index in origins) {
             let origin = origins[index];
-            containerOrigin.x += origin.x;
-            containerOrigin.y += origin.y;
+            x += origin.x;
+            y += origin.y;
         }
-        containerOrigin.x /= origins.length;
-        containerOrigin.y /= origins.length;
-        return containerOrigin;
+        x /= origins.length;
+        y /= origins.length;
+        return new Origin({ x: x, y: y });
+    }
+    set origin(value) {
+        if (!(value instanceof Origin)) return;
+        let currentOrigin = this.origin;
+        let dx = SymbolArt.scaling * Math.round((value.x - currentOrigin.x) / SymbolArt.scaling);
+        let dy = SymbolArt.scaling * Math.round((value.y - currentOrigin.y) / SymbolArt.scaling);
+        let frames = this.symbols.map(a => a.frame);
+        for (var index in frames) {
+            let origin = frames[index].origin;
+            frames[index].origin = new Origin({
+                x: origin.x + SymbolArt.scaling * Math.round(dx / SymbolArt.scaling),
+                y: origin.y + SymbolArt.scaling * Math.round(dy / SymbolArt.scaling)
+            });
+        }
     }
 
     get boundingBox() {
@@ -219,6 +234,21 @@ class Container extends Layer {
                 let shouldBreak = callback(sublayer);
                 if (shouldBreak) return true;
                 shouldBreak = sublayer.depthFirstIterator(callback);
+                if (shouldBreak) return true;
+            }
+        }
+    }
+    
+    reverseDepthFirstIterator(callback) {
+        for (var index = this._sublayers.length - 1; index >= 0; index--) {
+            let sublayer = this._sublayers[index];
+            if (sublayer instanceof Symbol) {
+                let shouldBreak = callback(sublayer);
+                if (shouldBreak) return true;
+            } else if (sublayer instanceof Container) {
+                let shouldBreak = callback(sublayer);
+                if (shouldBreak) return true;
+                shouldBreak = sublayer.reverseDepthFirstIterator(callback);
                 if (shouldBreak) return true;
             }
         }
