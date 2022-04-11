@@ -33,7 +33,9 @@ class UIApplication {
 
     static shared = (() => {
         $(document).ready(_ => {
-            UIApplication.shared = new UIApplication();
+            setTimeout(_ => {
+                UIApplication.shared = new UIApplication();
+            }, 500);
         });
         return null;
     })();

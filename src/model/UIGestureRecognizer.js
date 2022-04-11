@@ -47,6 +47,20 @@ class UIGestureRecognizer {
         this._preventsDefault = value;
     }
 
+    _preventsPropagation = null;
+    get preventsPropagation() { return this._preventsPropagation }
+    set preventsPropagation(value) {
+        if (typeof value !== 'function') return;
+        this._preventsPropagation = value;
+    }
+
+    _cancellable = null;
+    get cancellable() { return this._cancellable }
+    set cancellable(value) {
+        if (typeof value !== 'function') return;
+        this._cancellable = value;
+    }
+
     _onPointerDown = null;
     set onPointerDown(value) {
         if (typeof value !== 'function') return;
@@ -76,10 +90,21 @@ class UIGestureRecognizer {
         if (typeof value !== 'function') return;
         this._onKeyPress = value;
     }
+
+    _listeners = {
+        'interactionStarted': (e) => this.interactionStarted(e),
+        'interactionChanged': (e) => this.interactionChanged(e),
+        'interactionEnded': (e) => this.interactionEnded(e),
+        'interactionCanceled': (e) => this.interactionCanceled(e),
+        'scrolled': (e) => this.scrolled(e),
+        'pressedKey': (e) => this.pressedKey(e)
+    }
     
-    constructor({ targetHtmlElement = null, preventsDefault = null, onPointerDown = null, onPointerMove = null, onPointerUp = null, onScroll = null, onKeyPress = null }) {
+    constructor({ targetHtmlElement = null, preventsDefault = null, preventsPropagation = null, cancellable = null, onPointerDown = null, onPointerMove = null, onPointerUp = null, onScroll = null, onKeyPress = null }) {
         this.target = targetHtmlElement;
         this.preventsDefault = preventsDefault;
+        this.preventsPropagation = preventsPropagation;
+        this.cancellable = cancellable;
         this.onPointerDown = onPointerDown;
         this.onPointerMove = onPointerMove;
         this.onPointerUp = onPointerUp;
@@ -89,36 +114,36 @@ class UIGestureRecognizer {
 
     detach() {
         if (!(this._target instanceof HTMLElement)) return;
-        this._target.removeEventListener('pointerdown', (e) => this.interactionStarted(e), false);
-        this._target.removeEventListener('pointermove', (e) => this.interactionChanged(e), false);
-        this._target.removeEventListener('pointerup', (e) => this.interactionEnded(e), false);
-        this._target.removeEventListener('pointerout', (e) => this.interactionEnded(e), false);
-        this._target.removeEventListener('pointerleave', (e) => this.interactionEnded(e), false);
-        this._target.removeEventListener('pointercancel', (e) => this.interactionEnded(e), false);
-        this._target.removeEventListener('lostpointercapture', (e) => this.interactionEnded(e), false);
-        this._target.removeEventListener('scroll', (e) => this.scrolled(e), false);
-        this._target.removeEventListener('wheel', (e) => this.scrolled(e), false);
-        this._target.removeEventListener('keyup', (e) => this.pressedKey(e), false);
+        this._target.removeEventListener('pointerdown', this._listeners['interactionStarted'], false);
+        this._target.removeEventListener('pointermove', this._listeners['interactionChanged'], false);
+        this._target.removeEventListener('pointerup', this._listeners['interactionEnded'], false);
+        this._target.removeEventListener('pointerout', this._listeners['interactionCanceled'], false);
+        this._target.removeEventListener('pointerleave', this._listeners['interactionCanceled'], false);
+        this._target.removeEventListener('pointercancel', this._listeners['interactionCanceled'], false);
+        this._target.removeEventListener('lostpointercapture', this._listeners['interactionCanceled'], false);
+        this._target.removeEventListener('scroll', this._listeners['scrolled'], false);
+        this._target.removeEventListener('wheel', this._listeners['scrolled'], false);
+        this._target.removeEventListener('keyup', this._listeners['pressedKey'], false);
     }
 
     attach() {
         if (!(this._target instanceof HTMLElement)) return;
-        this._target.addEventListener('pointerdown', (e) => this.interactionStarted(e), false);
-        this._target.addEventListener('pointermove', (e) => this.interactionChanged(e), false);
-        this._target.addEventListener('pointerup', (e) => this.interactionEnded(e), false);
-        this._target.addEventListener('pointerout', (e) => this.interactionCanceled(e), false);
-        this._target.addEventListener('pointerleave', (e) => this.interactionCanceled(e), false);
-        this._target.addEventListener('pointercancel', (e) => this.interactionCanceled(e), false);
-        this._target.addEventListener('lostpointercapture', (e) => this.interactionCanceled(e), false);
-        this._target.addEventListener('scroll', (e) => this.scrolled(e), false);
-        this._target.addEventListener('wheel', (e) => this.scrolled(e), false);
-        this._target.addEventListener('keyup', (e) => this.pressedKey(e), false);
+        this._target.addEventListener('pointerdown', this._listeners['interactionStarted'], false);
+        this._target.addEventListener('pointermove', this._listeners['interactionChanged'], false);
+        this._target.addEventListener('pointerup', this._listeners['interactionEnded'], false);
+        this._target.addEventListener('pointerout', this._listeners['interactionCanceled'], false);
+        this._target.addEventListener('pointerleave', this._listeners['interactionCanceled'], false);
+        this._target.addEventListener('pointercancel', this._listeners['interactionCanceled'], false);
+        this._target.addEventListener('lostpointercapture', this._listeners['interactionCanceled'], false);
+        this._target.addEventListener('scroll', this._listeners['scrolled'], false);
+        this._target.addEventListener('wheel', this._listeners['scrolled'], false);
+        this._target.addEventListener('keyup', this._listeners['pressedKey'], false);
     }
 
     interactionStarted(event) {
         if (!event || !this._onPointerDown) return;
         if (this._preventsDefault) event.preventDefault();
-        event.stopPropagation();
+        if (!this._preventsPropagation || this._preventsPropagation(event)) event.stopPropagation();
         this._initialEvent = event;
         this._onPointerDown(event);
     }
@@ -126,7 +151,7 @@ class UIGestureRecognizer {
     interactionChanged(event) {
         if (!event || !this._onPointerMove) return;
         if (this._preventsDefault) event.preventDefault();
-        event.stopPropagation();
+        if (!this._preventsPropagation || this._preventsPropagation(event)) event.stopPropagation();
         if (this._initialEvent) {
             this._onPointerMove(event);
         }
@@ -138,18 +163,21 @@ class UIGestureRecognizer {
             return;
         }
         if (this._preventsDefault) event.preventDefault();
-        event.stopPropagation();
+        if (!this._preventsPropagation || this._preventsPropagation(event)) event.stopPropagation();
         this._onPointerUp(event);
         this._initialEvent = null;
     }
 
     interactionCanceled(event) {
+        if (this._cancellable && !this._cancellable(event)) {
+            return
+        }
         if (!event || !this._onPointerUp) {
             this._initialEvent = null;
             return;
         }
         if (this._preventsDefault) event.preventDefault();
-        event.stopPropagation();
+        if (!this._preventsPropagation || this._preventsPropagation(event)) event.stopPropagation();
         if (this._initialEvent) {
             this._onPointerUp(event);
         }
@@ -158,13 +186,13 @@ class UIGestureRecognizer {
 
     scrolled(event) {
         if (!event || !this._onScroll) return;
-        event.stopPropagation();
+        if (!this._preventsPropagation || this._preventsPropagation(event)) event.stopPropagation();
         this._onScroll(event);
     }
 
     pressedKey(event) {
         if (!event) return;
-        event.stopPropagation();
+        if (!this._preventsPropagation || this._preventsPropagation(event)) event.stopPropagation();
         if (this._onKeyPress) {
             return this._onKeyPress(event);
         }

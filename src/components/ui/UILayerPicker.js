@@ -68,9 +68,79 @@ class UILayerPicker extends UIView {
         });
     })();
 
+    _isExpanding = false;
+    _expandButtonInitialTap = null;
+    _expandButton = (() => {
+        this.didLoad(_ => {
+            this._expandButton = this.view.find('#expandbutton');
+            this._expandButton.css('display', 'none');
+            this._expandButton.gestureRecognizer = new UIGestureRecognizer({
+                targetHtmlElement: this._expandButton[0],
+                preventsDefault: false,
+                preventsPropagation: event => {
+                    if (event.type === 'pointerdown') {
+                        return false;
+                    }
+                    return !this._isExpanding;
+                },
+                cancellable: event => {
+                    return !this._isExpanding;
+                },
+                onPointerDown: (event) => {
+                    this._isExpanding = true;
+                }, onPointerMove: (event) => {
+                    // to prevent propagation
+                }, onPointerUp: (event) => {
+                    // to prevent propagation
+                }, onScroll: (event) => {
+                    // to prevent propagation
+                }, onKeyPress: (event) => {
+                    return false;
+                }
+            });
+            this._expandButton.outterGestureRecognizer = new UIGestureRecognizer({
+                targetHtmlElement: $('body')[0],
+                preventsDefault: false,
+                preventsPropagation: event => {
+                    return this._isExpanding;
+                },
+                cancellable: event => {
+                    return event.type !== 'pointerout';
+                },
+                onPointerDown: (event) => {
+                    if (this._isExpanding && /[0-9]+/.exec(this._listView.css('max-height'))) {
+                        this._expandButtonInitialTap = {
+                            x: event.clientX, y: event.clientY,
+                            height: Number.parseInt(/[0-9]+/.exec(this._listView.css('max-height'))[0])
+                        }
+                    }
+                }, onPointerMove: (event) => {
+                    if (this._isExpanding && this._expandButtonInitialTap && event) {
+                        let currentValue = this._expandButtonInitialTap.height;
+                        let deltaY = this._expandButtonInitialTap.y - event.clientY;
+                        let maxHeight = Math.min($(document).height() - 170, this._listView[0].scrollHeight);
+                        let value = Math.round(Math.max(180, Math.min(maxHeight, currentValue + deltaY)));
+                        this._listView.css('max-height', value + 'px');
+                    }
+                }, onPointerUp: (event) => {
+                    if (event.type === 'pointerout') return;
+                    this._expandButtonInitialTap = null;
+                    this._isExpanding = false;
+                }
+            });
+            window.addEventListener('resize', event => {
+                let currentValue = Number.parseInt(/[0-9]+/.exec(this._listView.css('max-height'))[0]);
+                let maxHeight = Math.min($(document).height() - 120, this._listView[0].scrollHeight);
+                let value = Math.round(Math.max(180, Math.min(maxHeight, currentValue)));
+                this._listView.css('max-height', value + 'px');
+            }, true);
+        });
+    })();
+
     _layerSearchContainer = (() => {
         this.didLoad(_ => {
             this._layerSearchContainer = this.view.find('#layersearchcontainer');
+            this._layerSearchContainer.css('display', 'none');
         });
     })();
 
@@ -136,6 +206,7 @@ class UILayerPicker extends UIView {
             && this._symbolTotal instanceof jQuery
             && this._containerCount instanceof jQuery
             && this._containerTotal instanceof jQuery
+            && this._expandButton instanceof jQuery
             && this._layerSearchContainer instanceof jQuery
             && this._layerSearchTextField instanceof jQuery;
     }
@@ -156,6 +227,12 @@ class UILayerPicker extends UIView {
             this.view.gestureRecognizer = new UIGestureRecognizer({
                 targetHtmlElement: this.view[0],
                 preventsDefault: false,
+                preventsPropagation: _ => {
+                    return !this._isExpanding;
+                },
+                cancellable: event => {
+                    return !this._isExpanding;
+                },
                 onPointerDown: (event) => {
                     // to prevent propagation
                 }, onPointerMove: (event) => {
@@ -251,8 +328,10 @@ class UILayerPicker extends UIView {
             for (var index in this._uiLayers) {
                 this._uiLayers[index].append({ to: this._listView });
             }
+            this._expandButton.css('display', '');
             this._layerSearchContainer.css('display', '');
-            if (uiLayers.length < 2) {
+            if (uiLayers.length <= 5) {
+                this._expandButton.css('display', 'none');
                 this._layerSearchContainer.css('display', 'none');
             }
             setTimeout(_ => {
@@ -299,9 +378,11 @@ class UILayerPicker extends UIView {
         if (this._layerSearchTextField.val().trim().length > 0) {
             icon.removeClass('fa-search');
             icon.addClass('fa-times');
+            this._expandButton.css('display', 'none');
         } else {
             icon.removeClass('fa-times');
             icon.addClass('fa-search');
+            this._expandButton.css('display', '');
         }
         this._updateCollapsibles();
         this.select({ layerWithUuid: this._lastSelectedUuid });
