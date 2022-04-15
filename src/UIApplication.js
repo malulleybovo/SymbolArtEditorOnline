@@ -312,4 +312,11 @@ class UIApplication {
         document.body.appendChild(this._renderer.domElement);
     }
 
+    async imageBlob() {
+        let pngData = await this._renderer.pngData();
+        let stream = await fetch(pngData);
+        let blob = await stream.blob();
+        return blob;
+    }
+
 }

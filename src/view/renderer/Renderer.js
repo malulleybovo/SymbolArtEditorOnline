@@ -813,4 +813,44 @@ class Renderer {
         }
     }
 
+    async pngData() {
+        return new Promise((resolve, reject) => {
+            this._previewSymbolArtDelimiter.outlineMaterial.visible = false;
+            try {
+                let width = SymbolArt.viewableDimensions.width;
+                let height = SymbolArt.viewableDimensions.height;
+                if (width > height && width > window.innerWidth) {
+                    height = height * window.innerWidth / width;
+                    width = window.innerWidth;
+                } else if (width < height && height > window.innerHeight) {
+                    width = width * window.innerHeight / height;
+                    height = window.innerHeight;
+                }
+                this._engine.clear();
+                this._engine.setViewport(0, window.innerHeight - height, width, height);
+                this._engine.setScissor(0, window.innerHeight - height, width, height);
+                this._engine.render(this._scene, this._previewCamera);
+                let snapshot = this._engine.domElement.toDataURL();
+                let previewImage = new Image();
+                previewImage.crossOrigin = 'anonymous';
+                previewImage.onload = async _ => {
+                    let previewCanvas = document.createElement('canvas');
+                    let context = previewCanvas.getContext('2d');
+                    previewCanvas.width = width;
+                    previewCanvas.height = height;
+                    context.drawImage(previewImage, 0, 0, width, height, 0, 0, width, height);
+                    let pngData = previewCanvas.toDataURL();
+                    resolve(pngData);
+                };
+                previewImage.onerror = _ => {
+                    reject();
+                }
+                previewImage.src = snapshot;
+            } catch (e) {
+                this._previewSymbolArtDelimiter.outlineMaterial.visible = true;
+                reject();
+            }
+        });
+    }
+
 }

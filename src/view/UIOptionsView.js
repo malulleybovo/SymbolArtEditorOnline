@@ -125,6 +125,18 @@ class UIOptionsView extends UIView {
         });
     })();
 
+    _pngExportButton = (() => {
+        this.didLoad(_ => {
+            this._pngExportButton = this.view.find('#pngexportbutton');
+            this.updateState();
+            this._pngExportButton.gestureRecognizer = new UITapGestureRecognizer({
+                targetHtmlElement: this._pngExportButton[0], onTap: () => {
+                    this._requestToExportAsPng();
+                }
+            });
+        });
+    })();
+
     _importAsComponentButton = (() => {
         this.didLoad(_ => {
             this._importAsComponentButton = this.view.find('#importascomponentbutton');
@@ -324,6 +336,16 @@ class UIOptionsView extends UIView {
         link[0].href = fileUrl;
         link[0].download = 'symbolArtProject.saml';
         link[0].click();
+    }
+
+    _requestToExportAsPng() {
+        UIApplication.shared.imageBlob().then(blob => {
+            let fileUrl = URL.createObjectURL(blob);
+            let link = $('<a>');
+            link[0].href = fileUrl;
+            link[0].download = 'symbolArtPreview.png';
+            link[0].click();
+        });
     }
 
 }
